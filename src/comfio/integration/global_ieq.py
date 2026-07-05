@@ -15,21 +15,21 @@ from dataclasses import dataclass
 import numpy as np
 
 from comfio.core.exceptions import DomainNotAvailableError
-from comfio.domains.acoustic import AcousticResult, acoustic_score
-from comfio.domains.iaq import IAQResult, iaq_score
-from comfio.domains.thermal import ThermalResult, thermal_score
-from comfio.domains.visual import VisualResult, visual_score
-from comfio.integration.weights import WeightSchema, default_weights
+from comfio.domains.acoustic import AcousticResult
 
 # Advanced result types (importable — the modules don't import heavy deps at module level)
 from comfio.domains.acoustic_advanced import (
     ReverberationResult,
     SpeechIntelligibilityResult,
 )
+from comfio.domains.iaq import IAQResult
 from comfio.domains.iaq_advanced import VentilationResult
 from comfio.domains.iaq_pollutants import PollutantIAQResult
+from comfio.domains.thermal import ThermalResult, thermal_score
 from comfio.domains.thermal_tsv import TSVResult
+from comfio.domains.visual import VisualResult
 from comfio.domains.visual_advanced import ColorQualityResult, DaylightingResult
+from comfio.integration.weights import WeightSchema, default_weights
 
 
 @dataclass
@@ -201,9 +201,13 @@ def calculate_global_ieq(
     elif hasattr(first_result, "co2"):
         n = first_result.co2.shape[0]
     elif hasattr(first_result, "pm25"):
-        n = first_result.pm25.shape[0] if first_result.pm25 is not None else (
-            first_result.tvoc.shape[0] if first_result.tvoc is not None else (
-                first_result.co.shape[0] if first_result.co is not None else 1
+        n = (
+            first_result.pm25.shape[0]
+            if first_result.pm25 is not None
+            else (
+                first_result.tvoc.shape[0]
+                if first_result.tvoc is not None
+                else (first_result.co.shape[0] if first_result.co is not None else 1)
             )
         )
     elif hasattr(first_result, "tsv"):

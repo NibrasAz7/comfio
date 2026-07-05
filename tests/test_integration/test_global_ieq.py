@@ -39,9 +39,7 @@ def all_domain_results(mock_thermal_arrays, mock_visual_array, mock_acoustic_arr
 class TestCalculateGlobalIEQ:
     def test_all_domains(self, all_domain_results) -> None:
         thermal, visual, acoustic, iaq = all_domain_results
-        result = calculate_global_ieq(
-            thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq
-        )
+        result = calculate_global_ieq(thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq)
         assert isinstance(result, GlobalIEQResult)
         assert len(result.domains) == 4
         assert result.n_timestamps == 100
@@ -73,16 +71,17 @@ class TestCalculateGlobalIEQ:
         thermal, visual, acoustic, iaq = all_domain_results
         weights = custom_weights(0.5, 0.2, 0.1, 0.2)
         result = calculate_global_ieq(
-            thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq,
+            thermal=thermal,
+            visual=visual,
+            acoustic=acoustic,
+            iaq=iaq,
             weights=weights,
         )
         assert result.weights_used["thermal"] == 0.5
 
     def test_index_shape_matches_input(self, all_domain_results) -> None:
         thermal, visual, acoustic, iaq = all_domain_results
-        result = calculate_global_ieq(
-            thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq
-        )
+        result = calculate_global_ieq(thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq)
         assert result.index.shape == (100,)
 
 
@@ -103,6 +102,7 @@ class TestWeightSchema:
 
     def test_invalid_weights_raise(self) -> None:
         from comfio.core.exceptions import WeightConfigurationError
+
         with pytest.raises(WeightConfigurationError):
             WeightSchema(weights={"thermal": 0.5, "visual": 0.6})
 

@@ -21,12 +21,12 @@ def mock_thermal_arrays(n_samples: int) -> dict[str, np.ndarray]:
     """Mock thermal comfort sensor arrays (realistic office conditions)."""
     rng = np.random.default_rng(42)
     return {
-        "tdb": rng.normal(24.0, 1.5, n_samples),       # 24°C ± 1.5
-        "tr": rng.normal(24.0, 1.0, n_samples),         # radiant ~ air temp
-        "vr": rng.normal(0.1, 0.03, n_samples),         # 0.1 m/s
-        "rh": rng.normal(50.0, 5.0, n_samples),         # 50% RH
-        "met": np.full(n_samples, 1.2),                 # sedentary
-        "clo": np.full(n_samples, 0.5),                 # light clothing
+        "tdb": rng.normal(24.0, 1.5, n_samples),  # 24°C ± 1.5
+        "tr": rng.normal(24.0, 1.0, n_samples),  # radiant ~ air temp
+        "vr": rng.normal(0.1, 0.03, n_samples),  # 0.1 m/s
+        "rh": rng.normal(50.0, 5.0, n_samples),  # 50% RH
+        "met": np.full(n_samples, 1.2),  # sedentary
+        "clo": np.full(n_samples, 0.5),  # light clothing
     }
 
 
@@ -61,18 +61,20 @@ def mock_sensor_df(
 ) -> pd.DataFrame:
     """Full mock sensor DataFrame with all four domains."""
     dates = pd.date_range("2025-01-01", periods=n_samples, freq="h")
-    return pd.DataFrame({
-        "timestamp": dates,
-        "air_temp_c": mock_thermal_arrays["tdb"],
-        "radiant_temp_c": mock_thermal_arrays["tr"],
-        "air_velocity_ms": mock_thermal_arrays["vr"],
-        "relative_humidity_pct": mock_thermal_arrays["rh"],
-        "metabolic_rate_met": mock_thermal_arrays["met"],
-        "clothing_insulation_clo": mock_thermal_arrays["clo"],
-        "illuminance_lux": mock_visual_array,
-        "noise_laeq_db": mock_acoustic_array,
-        "co2_ppm": mock_iaq_array,
-    })
+    return pd.DataFrame(
+        {
+            "timestamp": dates,
+            "air_temp_c": mock_thermal_arrays["tdb"],
+            "radiant_temp_c": mock_thermal_arrays["tr"],
+            "air_velocity_ms": mock_thermal_arrays["vr"],
+            "relative_humidity_pct": mock_thermal_arrays["rh"],
+            "metabolic_rate_met": mock_thermal_arrays["met"],
+            "clothing_insulation_clo": mock_thermal_arrays["clo"],
+            "illuminance_lux": mock_visual_array,
+            "noise_laeq_db": mock_acoustic_array,
+            "co2_ppm": mock_iaq_array,
+        }
+    )
 
 
 @pytest.fixture
@@ -83,16 +85,18 @@ def mock_sensor_df_partial(
 ) -> pd.DataFrame:
     """Partial mock sensor DataFrame (thermal + IAQ only, no visual/acoustic)."""
     dates = pd.date_range("2025-01-01", periods=n_samples, freq="h")
-    return pd.DataFrame({
-        "timestamp": dates,
-        "tdb": mock_thermal_arrays["tdb"],
-        "tr": mock_thermal_arrays["tr"],
-        "vr": mock_thermal_arrays["vr"],
-        "rh": mock_thermal_arrays["rh"],
-        "met": mock_thermal_arrays["met"],
-        "clo": mock_thermal_arrays["clo"],
-        "co2": mock_iaq_array,
-    })
+    return pd.DataFrame(
+        {
+            "timestamp": dates,
+            "tdb": mock_thermal_arrays["tdb"],
+            "tr": mock_thermal_arrays["tr"],
+            "vr": mock_thermal_arrays["vr"],
+            "rh": mock_thermal_arrays["rh"],
+            "met": mock_thermal_arrays["met"],
+            "clo": mock_thermal_arrays["clo"],
+            "co2": mock_iaq_array,
+        }
+    )
 
 
 @pytest.fixture
@@ -104,17 +108,19 @@ def mock_sensor_df_with_nan(
     n_samples: int,
 ) -> pd.DataFrame:
     """Mock sensor DataFrame with some NaN values injected."""
-    df = pd.DataFrame({
-        "air_temp_c": mock_thermal_arrays["tdb"].copy(),
-        "radiant_temp_c": mock_thermal_arrays["tr"].copy(),
-        "air_velocity_ms": mock_thermal_arrays["vr"].copy(),
-        "relative_humidity_pct": mock_thermal_arrays["rh"].copy(),
-        "metabolic_rate_met": mock_thermal_arrays["met"],
-        "clothing_insulation_clo": mock_thermal_arrays["clo"],
-        "illuminance_lux": mock_visual_array.copy(),
-        "noise_laeq_db": mock_acoustic_array.copy(),
-        "co2_ppm": mock_iaq_array.copy(),
-    })
+    df = pd.DataFrame(
+        {
+            "air_temp_c": mock_thermal_arrays["tdb"].copy(),
+            "radiant_temp_c": mock_thermal_arrays["tr"].copy(),
+            "air_velocity_ms": mock_thermal_arrays["vr"].copy(),
+            "relative_humidity_pct": mock_thermal_arrays["rh"].copy(),
+            "metabolic_rate_met": mock_thermal_arrays["met"],
+            "clothing_insulation_clo": mock_thermal_arrays["clo"],
+            "illuminance_lux": mock_visual_array.copy(),
+            "noise_laeq_db": mock_acoustic_array.copy(),
+            "co2_ppm": mock_iaq_array.copy(),
+        }
+    )
     # Inject NaNs in 10% of rows for air_temp_c
     rng = np.random.default_rng(99)
     nan_idx = rng.choice(n_samples, size=10, replace=False)
@@ -127,11 +133,11 @@ def mock_pollutant_arrays(n_samples: int) -> dict[str, np.ndarray]:
     """Mock IAQ pollutant arrays (typical office conditions)."""
     rng = np.random.default_rng(42)
     return {
-        "pm25": rng.normal(8.0, 2.0, n_samples),        # ~8 µg/m³
-        "pm10": rng.normal(15.0, 3.0, n_samples),       # ~15 µg/m³
-        "tvoc": rng.normal(150.0, 30.0, n_samples),     # ~150 µg/m³
+        "pm25": rng.normal(8.0, 2.0, n_samples),  # ~8 µg/m³
+        "pm10": rng.normal(15.0, 3.0, n_samples),  # ~15 µg/m³
+        "tvoc": rng.normal(150.0, 30.0, n_samples),  # ~150 µg/m³
         "formaldehyde": rng.normal(20.0, 5.0, n_samples),  # ~20 ppb
-        "co": rng.normal(1.5, 0.5, n_samples),          # ~1.5 ppm
+        "co": rng.normal(1.5, 0.5, n_samples),  # ~1.5 ppm
     }
 
 
@@ -175,4 +181,5 @@ def mock_pmv_tsv_pairs(n_samples: int) -> tuple[np.ndarray, np.ndarray]:
 def mock_seasonal_dates(n_samples: int) -> list:
     """Mock dates spanning multiple seasons for seasonal personalisation."""
     from datetime import date, timedelta
+
     return [date(2025, 1, 15) + timedelta(days=int(i * 3.65)) for i in range(n_samples)]

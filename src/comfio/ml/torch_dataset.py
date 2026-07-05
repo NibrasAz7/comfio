@@ -92,9 +92,11 @@ class IEQTimeSeriesDataset:
 
         # Build raw feature matrix from validated columns
         self._raw_columns = list(sensor.column_map.keys())
-        self._raw_data = np.column_stack(
-            [sensor.get_validated(col) for col in self._raw_columns]
-        ) if self._raw_columns else np.empty((len(df), 0))
+        self._raw_data = (
+            np.column_stack([sensor.get_validated(col) for col in self._raw_columns])
+            if self._raw_columns
+            else np.empty((len(df), 0))
+        )
 
         # Calculate number of windows
         n = len(df)
@@ -179,8 +181,7 @@ class IEQTimeSeriesDataset:
         if self.include_ieq:
             sample["ieq_index"] = self._ieq_result.index[start:end]
             sample["domain_scores"] = {
-                d: self._ieq_result.domain_scores[d][start:end]
-                for d in self._ieq_result.domains
+                d: self._ieq_result.domain_scores[d][start:end] for d in self._ieq_result.domains
             }
 
         return sample

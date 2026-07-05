@@ -22,34 +22,34 @@ from comfio.utils.validation import validate_input_array
 # 25 at "moderate", 0 at or above "poor".
 POLLUTANT_THRESHOLDS: dict[str, dict[str, float]] = {
     "pm25": {
-        "excellent": 5.0,    # WHO 24-h guideline
-        "good": 15.0,        # EPA NAAQS
-        "moderate": 35.0,    # EPA unhealthy for sensitive
-        "poor": 55.0,        # EPA unhealthy
+        "excellent": 5.0,  # WHO 24-h guideline
+        "good": 15.0,  # EPA NAAQS
+        "moderate": 35.0,  # EPA unhealthy for sensitive
+        "poor": 55.0,  # EPA unhealthy
     },
     "pm10": {
         "excellent": 15.0,
-        "good": 45.0,        # WHO 24-h guideline
+        "good": 45.0,  # WHO 24-h guideline
         "moderate": 75.0,
-        "poor": 150.0,       # EPA NAAQS
+        "poor": 150.0,  # EPA NAAQS
     },
     "tvoc": {
-        "excellent": 100.0,   # WELL v2
-        "good": 300.0,        # WELL v2
-        "moderate": 500.0,    # AgBB
-        "poor": 1000.0,       # LEED
+        "excellent": 100.0,  # WELL v2
+        "good": 300.0,  # WELL v2
+        "moderate": 500.0,  # AgBB
+        "poor": 1000.0,  # LEED
     },
     "formaldehyde": {
-        "excellent": 16.0,    # WELL v2 (ppb)
-        "good": 27.0,         # OEHHA chronic REL
-        "moderate": 50.0,     # OEHHA 8-h REL
-        "poor": 100.0,        # NIOSH ceiling
+        "excellent": 16.0,  # WELL v2 (ppb)
+        "good": 27.0,  # OEHHA chronic REL
+        "moderate": 50.0,  # OEHHA 8-h REL
+        "poor": 100.0,  # NIOSH ceiling
     },
     "co": {
-        "excellent": 2.0,     # WELL v2 (ppm)
-        "good": 9.0,          # EPA NAAQS 8-h
-        "moderate": 15.0,     # EPA NAAQS 1-h
-        "poor": 35.0,         # EPA NAAQS 1-h
+        "excellent": 2.0,  # WELL v2 (ppm)
+        "good": 9.0,  # EPA NAAQS 8-h
+        "moderate": 15.0,  # EPA NAAQS 1-h
+        "poor": 35.0,  # EPA NAAQS 1-h
     },
 }
 
@@ -131,15 +131,15 @@ def _pollutant_score(
     .. math::
 
         \text{score}(x) = \begin{cases}
-        100 & x \leq t_{\text{excellent}} \\
+        100 & x \\leq t_{\text{excellent}} \\
         100 - 50 \frac{x - t_{\text{exc}}}{t_{\text{good}} - t_{\text{exc}}}
-            & t_{\text{exc}} < x \leq t_{\text{good}} \\
+            & t_{\text{exc}} < x \\leq t_{\text{good}} \\
         50 - 25 \frac{x - t_{\text{good}}}{t_{\text{mod}} - t_{\text{good}}}
-            & t_{\text{good}} < x \leq t_{\text{mod}} \\
+            & t_{\text{good}} < x \\leq t_{\text{mod}} \\
         25 \frac{t_{\text{poor}} - x}{t_{\text{poor}} - t_{\text{mod}}}
-            & t_{\text{mod}} < x \leq t_{\text{poor}} \\
+            & t_{\text{mod}} < x \\leq t_{\text{poor}} \\
         0 & x > t_{\text{poor}}
-        \end{cases}
+        \\end{cases}
     """
     exc = thresholds["excellent"]
     good = thresholds["good"]
@@ -307,7 +307,11 @@ def pollutant_iaq_score(
         Pollutant IAQ score (0-100), higher is better.
     """
     result = evaluate_iaq_pollutants(
-        pm25=pm25, pm10=pm10, tvoc=tvoc,
-        formaldehyde=formaldehyde, co=co, threshold_level=threshold_level,
+        pm25=pm25,
+        pm10=pm10,
+        tvoc=tvoc,
+        formaldehyde=formaldehyde,
+        co=co,
+        threshold_level=threshold_level,
     )
     return result.score

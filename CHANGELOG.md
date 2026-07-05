@@ -5,6 +5,21 @@ All notable changes to comfio will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2025-07-06
+
+### Fixed
+
+- CI workflow paths corrected from `src/comfortpy/` to `src/comfio/` (mypy + pytest)
+- PyPI publish workflow URL corrected from `comfortpy` to `comfio`
+- 157 ruff lint errors fixed (unused imports, E712 comparisons, import sorting, line length)
+- 33 files reformatted to satisfy `ruff format --check`
+- Renamed `comfioError` to `ComfioError` (PEP 8 CapWords convention)
+- Replaced `Union` with modern `X | Y` syntax in `units.py`
+- Merged nested `if` in `data_handler.py` (SIM102)
+- Broke long LaTeX docstring lines in `thermal_tsv.py`
+- Added `__all__` to `domains/__init__.py` for re-export clarity
+- Relaxed mypy `strict` mode to per-module overrides for intentional type patterns
+
 ## [0.1.1] - 2025-07-05
 
 ### Fixed

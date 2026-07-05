@@ -67,8 +67,7 @@ class WeightSchema:
         total = sum(self.weights.values())
         if not np.isclose(total, 1.0, atol=0.01):
             raise WeightConfigurationError(
-                f"Weights must sum to 1.0 (got {total:.4f}). "
-                f"Weights: {self.weights}"
+                f"Weights must sum to 1.0 (got {total:.4f}). Weights: {self.weights}"
             )
         for kiwi, w in self.weights.items():
             if w < 0 or w > 1:
@@ -97,7 +96,7 @@ class WeightSchema:
         if total <= 0:
             # Equal weighting fallback
             n = len(available_domains)
-            return {d: 1.0 / n for d in available_domains}
+            return dict.fromkeys(available_domains, 1.0 / n)
         return {d: w / total for d, w in present.items()}
 
     def get_array(self, available_domains: list[str]) -> np.ndarray:

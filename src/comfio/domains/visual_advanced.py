@@ -12,12 +12,12 @@ On Windows, the [daylighting] extra may require WSL for Radiance binaries.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Literal
 
 import numpy as np
 
-from comfio.domains.visual import ILLUMINANCE_TARGETS, UGR_LIMITS
+from comfio.domains.visual import ILLUMINANCE_TARGETS
 
 SkyModel = Literal["cie_clear", "cie_overcast", "cie_intermediate"]
 DaylightMetric = Literal["illuminance", "dgp", "udi", "sda"]
@@ -174,21 +174,21 @@ def evaluate_daylighting(
 
     # Generate sky parameters
     if sky_model == "cie_overcast" or datetime_str is None:
-        sky_params = pr.gensky(
+        pr.gensky(
             month_day_time="06 21 12:00",
             sky_type="-c",  # cloudy/overcast
             latitude=latitude,
             longitude=longitude,
         )
     elif sky_model == "cie_clear":
-        sky_params = pr.gensky(
+        pr.gensky(
             month_day_time=datetime_str,
             sky_type="+s",  # sunny
             latitude=latitude,
             longitude=longitude,
         )
     else:  # cie_intermediate
-        sky_params = pr.gensky(
+        pr.gensky(
             month_day_time=datetime_str or "06 21 12:00",
             sky_type="-i",  # intermediate
             latitude=latitude,
@@ -230,7 +230,9 @@ def evaluate_daylighting(
         )
         if eye_output.ndim == 2 and eye_output.shape[1] >= 3:
             eye_rgb = eye_output[:, :3]
-            eye_lux = 179.0 * (0.265 * eye_rgb[:, 0] + 0.670 * eye_rgb[:, 1] + 0.065 * eye_rgb[:, 2])
+            eye_lux = 179.0 * (
+                0.265 * eye_rgb[:, 0] + 0.670 * eye_rgb[:, 1] + 0.065 * eye_rgb[:, 2]
+            )
         else:
             eye_lux = np.array(eye_output).flatten()[:n_views]
 
@@ -253,7 +255,7 @@ def evaluate_daylighting(
     # Penalize DGP > 0.40 (perceptible glare)
     if dgp_values is not None:
         glare_penalty = np.clip(1.0 - dgp_values / 0.40, 0.0, 1.0)
-        score = score[:len(glare_penalty)] * glare_penalty
+        score = score[: len(glare_penalty)] * glare_penalty
 
     return DaylightingResult(
         illuminance=illuminance,
@@ -315,25 +317,22 @@ def evaluate_color_quality(
 
     # Ensure SPD matches wavelength length
     if len(spd_values) != len(wl):
-        raise ValueError(
-            f"SPD length ({len(spd_values)}) must match wavelength length ({len(wl)})"
-        )
+        raise ValueError(f"SPD length ({len(spd_values)}) must match wavelength length ({len(wl)})")
 
     sd = colour.SpectralDistribution(wl, spd_values, name="test_source")
 
     # Calculate CRI
-    cri_result = colour.colour_rendering_index(
-        sd, additional_data=additional_data, method=method
-    )
+    cri_result = colour.colour_rendering_index(sd, additional_data=additional_data, method=method)
 
-    if additional_data and isinstance(cri_result, colour.quality.cri.ColourRendering_Specification_CRI):
+    if additional_data and isinstance(
+        cri_result, colour.quality.cri.ColourRendering_Specification_CRI
+    ):
         cri_value = float(cri_result.Q_a)
         cri_data: dict[str, Any] | None = {
             "name": cri_result.name,
             "Q_a": cri_value,
             "Q_as": {
-                str(k): {"name": v.name, "Q_a": float(v.Q_a)}
-                for k, v in cri_result.Q_as.items()
+                str(k): {"name": v.name, "Q_a": float(v.Q_a)} for k, v in cri_result.Q_as.items()
             },
         }
     else:

@@ -12,7 +12,7 @@ jobs:
 
     environment:
       name: pypi
-      url: https://pypi.org/p/comfortpy
+      url: https://pypi.org/p/comfio
 
     steps:
       - uses: actions/checkout@v4

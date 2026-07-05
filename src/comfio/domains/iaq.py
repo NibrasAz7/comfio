@@ -24,10 +24,10 @@ from comfio.utils.validation import validate_input_array
 # limits), but practical indicators of ventilation adequacy.
 # Source: ASHRAE Position Document on Indoor CO₂ (2023), EPA, WHO guidelines.
 CO2_THRESHOLDS: dict[str, float] = {
-    "excellent": 800.0,    # Good ventilation, outdoor air ~10 L/s per person
-    "good": 1000.0,        # Acceptable ventilation (commonly cited benchmark)
-    "moderate": 1200.0,    # Marginal ventilation
-    "poor": 1500.0,        # Inadequate ventilation
+    "excellent": 800.0,  # Good ventilation, outdoor air ~10 L/s per person
+    "good": 1000.0,  # Acceptable ventilation (commonly cited benchmark)
+    "moderate": 1200.0,  # Marginal ventilation
+    "poor": 1500.0,  # Inadequate ventilation
 }
 
 # Default threshold (commonly cited 1000 ppm benchmark)
@@ -147,11 +147,11 @@ def iaq_score(co2: np.ndarray, threshold_ppm: float) -> np.ndarray:
     .. math::
 
         \text{score} = \begin{cases}
-        100 & \text{CO}_2 \leq 420 \\
-        100 - 50 \frac{\text{CO}_2 - 420}{t - 420} & 420 < \text{CO}_2 \leq t \\
-        50 \frac{2t - \text{CO}_2}{t} & t < \text{CO}_2 \leq 2t \\
+        100 & \text{CO}_2 \\leq 420 \\
+        100 - 50 \frac{\text{CO}_2 - 420}{t - 420} & 420 < \text{CO}_2 \\leq t \\
+        50 \frac{2t - \text{CO}_2}{t} & t < \text{CO}_2 \\leq 2t \\
         0 & \text{CO}_2 > 2t
-        \end{cases}
+        \\end{cases}
 
     where :math:`t` is the threshold in ppm.
     """
@@ -167,7 +167,8 @@ def iaq_score(co2: np.ndarray, threshold_ppm: float) -> np.ndarray:
         np.where(
             co2_arr <= threshold_ppm,
             # Between baseline and threshold: 100 → 50
-            100.0 - 50.0 * (co2_arr - CO2_OUTDOOR_BASELINE) / (threshold_ppm - CO2_OUTDOOR_BASELINE),
+            100.0
+            - 50.0 * (co2_arr - CO2_OUTDOOR_BASELINE) / (threshold_ppm - CO2_OUTDOOR_BASELINE),
             # Between threshold and 2× threshold: 50 → 0
             50.0 * (upper_bound - co2_arr) / (upper_bound - threshold_ppm),
         ),

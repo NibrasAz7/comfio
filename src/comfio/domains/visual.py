@@ -53,10 +53,20 @@ UNIFORMITY_MIN_SURROUND = 0.4  # immediate surrounding area
 MIN_CONTINUOUS_ILLUMINANCE = 200.0
 
 TaskType = Literal[
-    "office_writing", "office_typing", "office_reading", "office_data_processing",
-    "office_filing", "office_copying", "office_circulation", "office_technical_drawing",
-    "office_detailed_work", "industrial_fine", "industrial_rough", "circulation",
-    "storage", "general",
+    "office_writing",
+    "office_typing",
+    "office_reading",
+    "office_data_processing",
+    "office_filing",
+    "office_copying",
+    "office_circulation",
+    "office_technical_drawing",
+    "office_detailed_work",
+    "industrial_fine",
+    "industrial_rough",
+    "circulation",
+    "storage",
+    "general",
 ]
 
 
@@ -197,8 +207,8 @@ def visual_score(
         s_{\text{lux}} = \begin{cases}
         100 \times \frac{E}{E_{\text{target}}} & E < E_{\text{target}} \\
         \text{clip}(100 - 20(\frac{E}{E_{\text{target}}} - 1), 50, 100)
-            & E \geq E_{\text{target}}
-        \end{cases}
+            & E \\geq E_{\text{target}}
+        \\end{cases}
 
     When UGR is provided, the final score is a 70/30 blend:
 

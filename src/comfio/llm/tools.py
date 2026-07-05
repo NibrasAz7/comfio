@@ -17,9 +17,9 @@ from comfio.domains.acoustic import evaluate_acoustic
 from comfio.domains.iaq import evaluate_iaq
 from comfio.domains.iaq_pollutants import evaluate_iaq_pollutants
 from comfio.domains.thermal import evaluate_thermal
-from comfio.domains.thermal_spmv import evaluate_spmv
 from comfio.domains.thermal_adaptive import evaluate_adaptive_ashrae, evaluate_adaptive_en
-from comfio.domains.thermal_tsv import augment_tsv_cdf, evaluate_tsv
+from comfio.domains.thermal_spmv import evaluate_spmv
+from comfio.domains.thermal_tsv import evaluate_tsv
 from comfio.domains.visual import evaluate_visual
 from comfio.integration.global_ieq import calculate_global_ieq
 from comfio.llm.interpreters import ieq_to_markdown, ieq_to_summary_dict
@@ -84,16 +84,15 @@ def _try_import_pydantic() -> Any:
         return pydantic
     except ImportError as exc:
         raise ImportError(
-            "Pydantic is required for LLM tool schemas. "
-            "Install with: pip install comfio[agent]"
+            "Pydantic is required for LLM tool schemas. Install with: pip install comfio[agent]"
         ) from exc
 
 
 def _build_pydantic_models() -> None:
     """Build Pydantic model classes dynamically (called once on first import)."""
     pydantic = _try_import_pydantic()
-    BaseModel = pydantic.BaseModel
-    Field = pydantic.Field
+    BaseModel = pydantic.BaseModel  # noqa: N806
+    Field = pydantic.Field  # noqa: N806
 
     global _ThermalComfortInputModel, _IEQEvaluationInputModel
     global _PollutantIAQInputModel, _SPMVInputModel, _AdaptiveInputModel, _TSVInputModel
@@ -110,7 +109,9 @@ def _build_pydantic_models() -> None:
         )
         air_velocity: float = Field(0.1, description="Air velocity in m/s. Default 0.1.")
         metabolic_rate: float = Field(1.2, description="Metabolic rate in met. Default 1.2.")
-        clothing_insulation: float = Field(0.5, description="Clothing insulation in clo. Default 0.5.")
+        clothing_insulation: float = Field(
+            0.5, description="Clothing insulation in clo. Default 0.5."
+        )
 
     class _IEQEvaluationInputModel(BaseModel):
         air_temperature: list[float] = Field(..., description="Dry-bulb air temperatures in °C.")
@@ -120,7 +121,9 @@ def _build_pydantic_models() -> None:
         )
         air_velocity: float = Field(0.1, description="Air velocity in m/s.")
         illuminance: list[float] | None = Field(None, description="Illuminance in lux.")
-        noise_laeq: list[float] | None = Field(None, description="A-weighted equivalent sound levels in dB.")
+        noise_laeq: list[float] | None = Field(
+            None, description="A-weighted equivalent sound levels in dB."
+        )
         co2: list[float] | None = Field(None, description="CO₂ concentration in ppm.")
         metabolic_rate: float = Field(1.2, description="Metabolic rate in met.")
         clothing_insulation: float = Field(0.5, description="Clothing insulation in clo.")
@@ -134,7 +137,9 @@ def _build_pydantic_models() -> None:
         tvoc: list[float] | None = Field(None, description="TVOC concentrations in µg/m³.")
         formaldehyde: list[float] | None = Field(None, description="Formaldehyde in ppb.")
         co: list[float] | None = Field(None, description="CO concentrations in ppm.")
-        threshold_level: str = Field("good", description="Threshold level: excellent/good/moderate/poor.")
+        threshold_level: str = Field(
+            "good", description="Threshold level: excellent/good/moderate/poor."
+        )
 
     class _SPMVInputModel(BaseModel):
         indoor_temp: list[float] = Field(..., description="Indoor air temperatures in °C.")
@@ -248,8 +253,12 @@ def evaluate_thermal_tool(
     vr = np.full_like(tdb, air_velocity)
 
     result = evaluate_thermal(
-        tdb=tdb, tr=tr, vr=vr, rh=rh,
-        met=metabolic_rate, clo=clothing_insulation,
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=metabolic_rate,
+        clo=clothing_insulation,
     )
 
     mean_pmv = float(np.mean(result.pmv))
@@ -335,8 +344,12 @@ def evaluate_ieq_tool(
     vr = np.full_like(tdb, air_velocity)
 
     thermal_res = evaluate_thermal(
-        tdb=tdb, tr=tr, vr=vr, rh=rh,
-        met=metabolic_rate, clo=clothing_insulation,
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=metabolic_rate,
+        clo=clothing_insulation,
     )
 
     visual_res = None
@@ -424,7 +437,8 @@ def evaluate_pollutant_iaq_tool(
         "min_pollutant_score": float(np.min(result.score)),
         "threshold_level": result.threshold_level,
         "pollutants_evaluated": [
-            k for k in ["pm25", "pm10", "tvoc", "formaldehyde", "co"]
+            k
+            for k in ["pm25", "pm10", "tvoc", "formaldehyde", "co"]
             if getattr(result, k) is not None
         ],
     }
@@ -643,8 +657,7 @@ def to_langchain_tools() -> list[Any]:
         from langchain.tools import StructuredTool
     except ImportError as exc:
         raise ImportError(
-            "LangChain is required for to_langchain_tools(). "
-            "Install with: pip install langchain"
+            "LangChain is required for to_langchain_tools(). Install with: pip install langchain"
         ) from exc
 
     thermal_tool = StructuredTool.from_function(
@@ -681,27 +694,21 @@ def to_langchain_tools() -> list[Any]:
     spmv_tool = StructuredTool.from_function(
         func=evaluate_spmv_tool,
         name="evaluate_spmv",
-        description=(
-            "Calculate simplified PMV from indoor temperature and humidity only."
-        ),
+        description=("Calculate simplified PMV from indoor temperature and humidity only."),
         args_schema=all_models["spmv"],
     )
 
     adaptive_tool = StructuredTool.from_function(
         func=evaluate_adaptive_tool,
         name="evaluate_adaptive",
-        description=(
-            "Evaluate adaptive thermal comfort per ASHRAE 55 or EN 16798-1."
-        ),
+        description=("Evaluate adaptive thermal comfort per ASHRAE 55 or EN 16798-1."),
         args_schema=all_models["adaptive"],
     )
 
     tsv_tool = StructuredTool.from_function(
         func=evaluate_tsv_tool,
         name="evaluate_tsv",
-        description=(
-            "Evaluate Thermal Sensation Vote data for comfort and compliance."
-        ),
+        description=("Evaluate Thermal Sensation Vote data for comfort and compliance."),
         args_schema=all_models["tsv"],
     )
 

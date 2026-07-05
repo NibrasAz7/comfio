@@ -22,14 +22,37 @@ from comfio.integration.global_ieq import GlobalIEQResult, calculate_global_ieq
 from comfio.performance.contracts import ComplianceReport, calculate_compliance
 
 _DOMAIN_DIAGNOSTICS: dict[str, str] = {
-    "thermal": "PMV drifted outside the comfort band. Action: check cooling/heating setpoints or solar gains.",
-    "visual": "Illuminance below target levels. Action: verify lighting fixtures or increase daylight access.",
-    "acoustic": "Noise levels exceeded NC threshold. Action: inspect noise sources or add acoustic damping.",
-    "iaq": "CO₂ thresholds breached. Action: trigger HVAC fresh air purge or increase ventilation rate.",
-    "pollutant_iaq": "PM2.5/TVOC/formaldehyde/CO levels exceed WHO/WELL thresholds. Action: check filtration, source control, or increase ventilation.",
-    "adaptive": "Operative temperature outside adaptive comfort band. Action: adjust natural ventilation or shading.",
-    "spmv": "Simplified PMV outside comfort range. Action: verify seasonal coefficients and indoor temperature.",
-    "tsv": "Occupant thermal sensation votes indicate discomfort. Action: review setpoints against occupant feedback.",
+    "thermal": (
+        "PMV drifted outside the comfort band. "
+        "Action: check cooling/heating setpoints or solar gains."
+    ),
+    "visual": (
+        "Illuminance below target levels. "
+        "Action: verify lighting fixtures or increase daylight access."
+    ),
+    "acoustic": (
+        "Noise levels exceeded NC threshold. Action: inspect noise sources or add acoustic damping."
+    ),
+    "iaq": (
+        "CO₂ thresholds breached. "
+        "Action: trigger HVAC fresh air purge or increase ventilation rate."
+    ),
+    "pollutant_iaq": (
+        "PM2.5/TVOC/formaldehyde/CO levels exceed WHO/WELL thresholds. "
+        "Action: check filtration, source control, or increase ventilation."
+    ),
+    "adaptive": (
+        "Operative temperature outside adaptive comfort band. "
+        "Action: adjust natural ventilation or shading."
+    ),
+    "spmv": (
+        "Simplified PMV outside comfort range. "
+        "Action: verify seasonal coefficients and indoor temperature."
+    ),
+    "tsv": (
+        "Occupant thermal sensation votes indicate discomfort. "
+        "Action: review setpoints against occupant feedback."
+    ),
 }
 
 
@@ -65,7 +88,9 @@ def ieq_to_markdown(
 
     if compliance_report is not None:
         status = "COMPLIANT" if compliance_report.compliance_rate_pct > 85.0 else "NON-COMPLIANT"
-        compliance_line = f"- **Contract Compliance Rate**: {compliance_report.compliance_rate_pct:.1f}%\n"
+        compliance_line = (
+            f"- **Contract Compliance Rate**: {compliance_report.compliance_rate_pct:.1f}%\n"
+        )
     else:
         status = "COMPLIANT" if index_avg >= 80.0 else "NON-COMPLIANT"
         compliance_line = ""
@@ -84,7 +109,7 @@ def ieq_to_markdown(
         flag = "WARNING" if avg_score < 70 else "OK"
         md += f"  - [{flag}] {domain.upper()}: {avg_score:.1f}/100\n"
 
-    md += f"\n#### Diagnostic Insight:\n"
+    md += "\n#### Diagnostic Insight:\n"
     md += f"The primary limiting factor is the **{worst_domain.upper()}** domain "
     md += f"(score: {domain_avgs[worst_domain]:.1f}/100). "
     md += _DOMAIN_DIAGNOSTICS.get(worst_domain, "Investigate sensor readings for this domain.")
@@ -111,7 +136,8 @@ def ieq_to_summary_dict(
         Flat dictionary with scalar aggregates.
     """
     domain_avgs = {
-        domain: round(float(np.mean(scores)), 1) for domain, scores in ieq_result.domain_scores.items()
+        domain: round(float(np.mean(scores)), 1)
+        for domain, scores in ieq_result.domain_scores.items()
     }
     worst_domain = min(domain_avgs, key=domain_avgs.get)
 
@@ -209,8 +235,10 @@ def generate_markdown_summary(
     if "pollutant_iaq" in advanced:
         pollutant_kwargs = {}
         for col, key in [
-            ("pm25_ugm3", "pm25"), ("pm10_ugm3", "pm10"),
-            ("tvoc_ugm3", "tvoc"), ("formaldehyde_ppb", "formaldehyde"),
+            ("pm25_ugm3", "pm25"),
+            ("pm10_ugm3", "pm10"),
+            ("tvoc_ugm3", "tvoc"),
+            ("formaldehyde_ppb", "formaldehyde"),
             ("co_ppm", "co"),
         ]:
             if col in sensor.column_map:
@@ -231,7 +259,9 @@ def generate_markdown_summary(
     zone_label = f"Zone {zone_id}" if zone_id else "Building"
     md = f"## IEQ Report: {zone_label}\n"
     md += f"* **Global IEQ Average:** {report.ieq_index_avg:.1f}/100\n"
-    md += f"* **Compliance Rate:** {report.compliance_rate_pct:.1f}% (Threshold > {threshold:.0f})\n"
+    md += (
+        f"* **Compliance Rate:** {report.compliance_rate_pct:.1f}% (Threshold > {threshold:.0f})\n"
+    )
     md += f"* **Timestamps:** {ieq_result.n_timestamps}\n\n"
 
     md += "### Domain Summary\n"

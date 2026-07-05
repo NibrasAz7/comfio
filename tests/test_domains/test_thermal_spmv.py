@@ -5,7 +5,6 @@ from __future__ import annotations
 from datetime import date
 
 import numpy as np
-import pytest
 
 from comfio.domains.thermal_spmv import (
     SPMVResult,
@@ -74,8 +73,8 @@ class TestEvaluateSPMV:
         spmv = np.array([0.0, 1.0, -1.0, 3.0, -3.0])
         scores = spmv_score(spmv)
         assert scores[0] == 100.0  # neutral
-        assert scores[3] == 0.0    # extreme
-        assert scores[4] == 0.0    # extreme
+        assert scores[3] == 0.0  # extreme
+        assert scores[4] == 0.0  # extreme
 
     def test_vapor_pressure_computed(self, mock_thermal_arrays):
         result = evaluate_spmv(

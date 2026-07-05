@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import date
-
 import numpy as np
 import pytest
 
 from comfio.domains.thermal_personal import (
     PersonalisationIndex,
-    SeasonalPersonalisationIndex,
-    PersonalisedPMVResult,
     PersonalisedAdaptiveResult,
+    PersonalisedPMVResult,
+    SeasonalPersonalisationIndex,
     evaluate_personalised_adaptive,
     evaluate_personalised_pmv,
     evaluate_personalised_spmv,

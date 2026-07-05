@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-import numpy as np
+
 import pytest
 
 from comfio.domains.acoustic import evaluate_acoustic
@@ -29,9 +29,7 @@ def ieq_result_full(mock_thermal_arrays, mock_visual_array, mock_acoustic_array,
     visual = evaluate_visual(mock_visual_array)
     acoustic = evaluate_acoustic(mock_acoustic_array)
     iaq = evaluate_iaq(mock_iaq_array)
-    return calculate_global_ieq(
-        thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq
-    )
+    return calculate_global_ieq(thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq)
 
 
 class TestCalculateCompliance:

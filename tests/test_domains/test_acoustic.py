@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import numpy as np
-import pytest
 
 from comfio.domains.acoustic import (
     DEFAULT_NC_LEVEL,
@@ -24,9 +23,9 @@ class TestEvaluateAcoustic:
     def test_compliance(self) -> None:
         laeq = np.array([30.0, 41.0, 50.0])
         result = evaluate_acoustic(laeq, nc_level="NC-35")
-        assert result.compliant[0] == True   # 30 <= 41
-        assert result.compliant[1] == True   # 41 <= 41
-        assert result.compliant[2] == False  # 50 > 41
+        assert result.compliant[0]  # 30 <= 41
+        assert result.compliant[1]  # 41 <= 41
+        assert not result.compliant[2]  # 50 > 41
 
     def test_result_type(self) -> None:
         result = evaluate_acoustic(np.array([40.0]))

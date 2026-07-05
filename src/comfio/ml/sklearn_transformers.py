@@ -75,7 +75,7 @@ class IEQFeatureExtractor:
         self.iaq_threshold_level = iaq_threshold_level
         self._feature_names: list[str] = []
 
-    def fit(self, X: pd.DataFrame, y: Any = None) -> "IEQFeatureExtractor":
+    def fit(self, X: pd.DataFrame, y: Any = None) -> IEQFeatureExtractor:
         """Fit the transformer (no-op, just records feature names).
 
         Parameters

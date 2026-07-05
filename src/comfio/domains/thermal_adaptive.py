@@ -33,8 +33,8 @@ EN_T_OUT_MAX = 30.0
 
 # EN 16798-1 category bands (°C offset from comfort temperature)
 EN_CATEGORY_BANDS: dict[str, float] = {
-    "i": 2.0,    # Category I: high expectation
-    "ii": 3.0,   # Category II: normal expectation
+    "i": 2.0,  # Category I: high expectation
+    "ii": 3.0,  # Category II: normal expectation
     "iii": 4.0,  # Category III: moderate expectation
 }
 
@@ -113,7 +113,7 @@ def adaptive_thermal_score(
 
     .. math::
 
-        \text{score} = \text{clip}\left(100 - 50 \frac{|t_{op} - t_{comf}|}{band}, 0, 100\right)
+        \text{score} = \text{clip}\\left(100 - 50 \frac{|t_{op} - t_{comf}|}{band}, 0, 100\right)
 
     Examples
     --------
@@ -186,12 +186,12 @@ def evaluate_adaptive_ashrae(
 
     .. math::
 
-        t_{comf} = 0.31\, \bar{t}_{out} + 17.8
+        t_{comf} = 0.31\\, \bar{t}_{out} + 17.8
 
     Acceptability bands:
 
-    - 80%: :math:`t_{comf} \pm 3.5` °C
-    - 90%: :math:`t_{comf} \pm 2.5` °C
+    - 80%: :math:`t_{comf} \\pm 3.5` °C
+    - 90%: :math:`t_{comf} \\pm 2.5` °C
 
     Operative temperature:
 
@@ -233,10 +233,7 @@ def evaluate_adaptive_ashrae(
     # ASHRAE 55-2023 comfort equation
     t_comf = 0.31 * t_prevail + 17.8
 
-    if acceptability == 90:
-        band = 2.5
-    else:
-        band = 3.5
+    band = 2.5 if acceptability == 90 else 3.5
 
     t_comf_lower = t_comf - band
     t_comf_upper = t_comf + band
@@ -265,7 +262,7 @@ def evaluate_adaptive_en(
     vr: float = 0.1,
     category: ENCategory = "ii",
 ) -> AdaptiveThermalResult:
-    """Evaluate adaptive thermal comfort per EN 16798-1:2019.
+    r"""Evaluate adaptive thermal comfort per EN 16798-1:2019.
 
     Comfort temperature: t_comf = 0.33 * t_running_mean + 18.8
     Category bands: I ±2°C, II ±3°C, III ±4°C

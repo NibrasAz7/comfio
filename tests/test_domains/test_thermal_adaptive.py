@@ -111,18 +111,27 @@ class TestEvaluateAdaptiveEN:
 class TestAdaptiveThermalScore:
     def test_score_at_comfort_temp(self):
         score = adaptive_thermal_score(
-            np.array([24.0]), 24.0, 20.5, 27.5,
+            np.array([24.0]),
+            24.0,
+            20.5,
+            27.5,
         )
         assert score[0] == 100.0
 
     def test_score_at_boundary(self):
         score = adaptive_thermal_score(
-            np.array([27.5]), 24.0, 20.5, 27.5,
+            np.array([27.5]),
+            24.0,
+            20.5,
+            27.5,
         )
         assert abs(score[0] - 50.0) < 0.01
 
     def test_score_far_outside(self):
         score = adaptive_thermal_score(
-            np.array([35.0]), 24.0, 20.5, 27.5,
+            np.array([35.0]),
+            24.0,
+            20.5,
+            27.5,
         )
         assert score[0] == 0.0

@@ -6,7 +6,6 @@ Tests assert outputs match ISO 7730 / ASHRAE 55 calibration expectations.
 from __future__ import annotations
 
 import numpy as np
-import pytest
 
 from comfio.domains.thermal import (
     CATEGORY_PMV_LIMITS,
@@ -18,7 +17,9 @@ from comfio.domains.thermal import (
 
 
 class TestEvaluateThermal:
-    def test_neutral_conditions_pmv_near_zero(self, mock_thermal_arrays: dict[str, np.ndarray]) -> None:
+    def test_neutral_conditions_pmv_near_zero(
+        self, mock_thermal_arrays: dict[str, np.ndarray]
+    ) -> None:
         """At ~24°C, 50% RH, 0.1 m/s, 1.2 met, 0.5 clo → PMV should be near 0."""
         result = evaluate_thermal(
             tdb=mock_thermal_arrays["tdb"],

@@ -8,25 +8,25 @@ compilation script.
 from __future__ import annotations
 
 
-class comfioError(Exception):
+class ComfioError(Exception):
     """Base exception for all comfio errors."""
 
 
-class MissingSensorDataError(comfioError):
+class MissingSensorDataError(ComfioError):
     """Raised when required sensor columns are absent from the input data."""
 
 
-class OutOfRangeError(comfioError):
+class OutOfRangeError(ComfioError):
     """Raised when a measured value falls outside physically realistic bounds."""
 
 
-class InvalidUnitError(comfioError):
+class InvalidUnitError(ComfioError):
     """Raised when a unit conversion is requested for an unknown or mismatched unit."""
 
 
-class DomainNotAvailableError(comfioError):
+class DomainNotAvailableError(ComfioError):
     """Raised when a domain score is requested but the domain was not computed."""
 
 
-class WeightConfigurationError(comfioError):
+class WeightConfigurationError(ComfioError):
     """Raised when weighting schema configuration is invalid (e.g., weights don't sum to 1)."""

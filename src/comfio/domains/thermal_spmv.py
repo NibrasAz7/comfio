@@ -11,7 +11,6 @@ Reference: Buratti, L., Ricciardi, P., & Naticchia, B. (2009).
 
 from __future__ import annotations
 
-import warnings
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Literal
@@ -27,7 +26,7 @@ Season = Literal["winter", "mid", "summer"]
 # where pv = vapor pressure (kPa) computed via Magnus formula.
 SEASONAL_COEFFS: dict[str, dict[str, float]] = {
     "winter": {"a": 0.21, "b": 1.90, "c": 5.20},
-    "mid":    {"a": 0.23, "b": 1.65, "c": 5.55},
+    "mid": {"a": 0.23, "b": 1.65, "c": 5.55},
     "summer": {"a": 0.25, "b": 1.40, "c": 5.90},
 }
 
@@ -70,7 +69,7 @@ def _magnus_vapor_pressure(temp_c: np.ndarray, rh: np.ndarray) -> np.ndarray:
 
     .. math::
 
-        e_s = 0.61094 \times \exp\left(\frac{17.625\, T}{T + 243.04}\right)
+        e_s = 0.61094 \times \\exp\\left(\frac{17.625\\, T}{T + 243.04}\right)
 
     .. math::
 
@@ -142,7 +141,7 @@ def evaluate_spmv(
 
     .. math::
 
-        \text{sPMV} = a \, T + b \, p_v - c
+        \text{sPMV} = a \\, T + b \\, p_v - c
 
     The coefficients :math:`(a, b, c)` vary by season:
 
@@ -177,7 +176,11 @@ def evaluate_spmv(
     if season is not None:
         squiggly: Season = season
     elif date_ref is not None:
-        d = date_ref if isinstance(date_ref, date) and not isinstance(date_ref, datetime) else date_ref
+        d = (
+            date_ref
+            if isinstance(date_ref, date) and not isinstance(date_ref, datetime)
+            else date_ref
+        )
         squiggly = _season_from_date(d)
     else:
         squiggly = "mid"

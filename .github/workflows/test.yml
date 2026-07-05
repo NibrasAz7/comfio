@@ -33,11 +33,11 @@ jobs:
 
       - name: Type check with mypy
         run: |
-          mypy src/comfortpy/
+          mypy src/comfio/
 
       - name: Run tests
         run: |
-          pytest --cov=comfortpy --cov-report=xml --doctest-modules src/comfortpy/
+          pytest --cov=comfio --cov-report=xml --doctest-modules src/comfio/
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4

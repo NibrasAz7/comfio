@@ -7,15 +7,14 @@ column names, and provides typed access to individual variable arrays.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Literal
 
 import numpy as np
 import pandas as pd
 
 from comfio.core.exceptions import MissingSensorDataError
 from comfio.utils.validation import (
-    NaN_STRATEGY,
     PHYSICAL_BOUNDS,
+    NaN_STRATEGY,
     ValidationResult,
     validate_sensor_column,
 )
@@ -129,10 +128,8 @@ class SensorData:
         """Attempt to map DataFrame columns to canonical names using aliases."""
         available = {col.lower().strip(): col for col in self.df.columns}
         for alias, canonical in DEFAULT_ALIASES.items():
-            if alias in available:
-                # Don't overwrite if a canonical name was already matched
-                if canonical not in self.column_map:
-                    self.column_map[canonical] = available[alias]
+            if alias in available and canonical not in self.column_map:
+                self.column_map[canonical] = available[alias]
 
     def _resolve_columns(self) -> None:
         """Validate that user-provided column_map references existing columns."""
@@ -168,7 +165,9 @@ class SensorData:
             )
         return self.df[self.column_map[canonical_name]].to_numpy(dtype=float)
 
-    def get_validated(self, canonical_name: str, nan_strategy: NaN_STRATEGY = "interpolate") -> np.ndarray:
+    def get_validated(
+        self, canonical_name: str, nan_strategy: NaN_STRATEGY = "interpolate"
+    ) -> np.ndarray:
         """Return the validated array for a canonical variable.
 
         If ``validate()`` has been called, returns the cached result.
@@ -188,7 +187,9 @@ class SensorData:
         """
         if canonical_name in self.validation_results:
             return self.validation_results[canonical_name].data
-        result = validate_sensor_column(self.get_column(canonical_name), canonical_name, nan_strategy)
+        result = validate_sensor_column(
+            self.get_column(canonical_name), canonical_name, nan_strategy
+        )
         self.validation_results[canonical_name] = result
         return result.data
 

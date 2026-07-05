@@ -5,7 +5,7 @@ and actionable smart building management by unifying Thermal, Visual,
 Acoustic, and Indoor Air Quality (IAQ) metrics into a Global IEQ Index.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 from comfio.core.data_handler import SensorData
 from comfio.core.exceptions import (
@@ -14,22 +14,6 @@ from comfio.core.exceptions import (
     OutOfRangeError,
 )
 from comfio.domains.acoustic import evaluate_acoustic
-from comfio.domains.iaq import evaluate_iaq
-from comfio.domains.thermal import evaluate_thermal
-from comfio.domains.visual import evaluate_visual
-from comfio.integration.global_ieq import calculate_global_ieq
-from comfio.integration.weights import WeightSchema, default_weights
-from comfio.performance.contracts import ComplianceReport, calculate_compliance
-
-# LLM-native module (interpreters + prompts have no extra deps; tools requires [agent])
-from comfio.llm import (
-    DIAGNOSTIC_PROMPT_TEMPLATE,
-    EDGE_SYSTEM_PROMPT,
-    format_prompt,
-    generate_markdown_summary,
-    ieq_to_markdown,
-    ieq_to_summary_dict,
-)
 
 # Advanced domain functions — importable, raise ImportError on use if extra missing
 from comfio.domains.acoustic_advanced import (
@@ -38,17 +22,12 @@ from comfio.domains.acoustic_advanced import (
     evaluate_reverberation,
     evaluate_speech_intelligibility,
 )
+from comfio.domains.iaq import evaluate_iaq
 from comfio.domains.iaq_advanced import (
     PsychrometricResult,
     VentilationResult,
     evaluate_ventilation,
     get_psychrometrics,
-)
-from comfio.domains.visual_advanced import (
-    ColorQualityResult,
-    DaylightingResult,
-    evaluate_color_quality,
-    evaluate_daylighting,
 )
 
 # New domain modules
@@ -57,11 +36,7 @@ from comfio.domains.iaq_pollutants import (
     evaluate_iaq_pollutants,
     pollutant_iaq_score,
 )
-from comfio.domains.thermal_spmv import (
-    SPMVResult,
-    evaluate_spmv,
-    spmv_score,
-)
+from comfio.domains.thermal import evaluate_thermal
 from comfio.domains.thermal_adaptive import (
     AdaptiveThermalResult,
     adaptive_thermal_score,
@@ -79,11 +54,36 @@ from comfio.domains.thermal_personal import (
     train_personalisation,
     train_seasonal_personalisation,
 )
+from comfio.domains.thermal_spmv import (
+    SPMVResult,
+    evaluate_spmv,
+    spmv_score,
+)
 from comfio.domains.thermal_tsv import (
     TSVResult,
     augment_tsv_cdf,
     evaluate_tsv,
 )
+from comfio.domains.visual import evaluate_visual
+from comfio.domains.visual_advanced import (
+    ColorQualityResult,
+    DaylightingResult,
+    evaluate_color_quality,
+    evaluate_daylighting,
+)
+from comfio.integration.global_ieq import calculate_global_ieq
+from comfio.integration.weights import WeightSchema, default_weights
+
+# LLM-native module (interpreters + prompts have no extra deps; tools requires [agent])
+from comfio.llm import (
+    DIAGNOSTIC_PROMPT_TEMPLATE,
+    EDGE_SYSTEM_PROMPT,
+    format_prompt,
+    generate_markdown_summary,
+    ieq_to_markdown,
+    ieq_to_summary_dict,
+)
+from comfio.performance.contracts import ComplianceReport, calculate_compliance
 from comfio.utils.validation import validate_input_array
 
 __all__ = [

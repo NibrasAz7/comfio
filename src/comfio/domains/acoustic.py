@@ -19,13 +19,13 @@ from comfio.utils.validation import validate_input_array
 # data we use the approximate dBA equivalents commonly used in practice.
 # Source: ASHRAE Handbook — HVAC Applications, Chapter 49.
 NC_THRESHOLDS: dict[str, float] = {
-    "NC-25": 35.0,   # Concert halls, recording studios
-    "NC-30": 38.0,   # Private offices, bedrooms, libraries
-    "NC-35": 41.0,   # General offices, meeting rooms
-    "NC-40": 45.0,   # Open-plan offices, retail
-    "NC-45": 48.0,   # Industrial workspaces, lobbies
-    "NC-50": 52.0,   # Light industrial
-    "NC-55": 56.0,   # Heavy industrial
+    "NC-25": 35.0,  # Concert halls, recording studios
+    "NC-30": 38.0,  # Private offices, bedrooms, libraries
+    "NC-35": 41.0,  # General offices, meeting rooms
+    "NC-40": 45.0,  # Open-plan offices, retail
+    "NC-45": 48.0,  # Industrial workspaces, lobbies
+    "NC-50": 52.0,  # Light industrial
+    "NC-55": 56.0,  # Heavy industrial
 }
 
 # Default NC level for general office use
@@ -141,7 +141,7 @@ def acoustic_score(laeq: np.ndarray, threshold_db: float) -> np.ndarray:
 
     .. math::
 
-        \text{score} = \text{clip}\left(100 \times \frac{t + 10 - L_{Aeq}}{20}, 0, 100\right)
+        \text{score} = \text{clip}\\left(100 \times \frac{t + 10 - L_{Aeq}}{20}, 0, 100\right)
 
     where :math:`t` is the NC threshold in dBA.
     """

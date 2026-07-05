@@ -240,8 +240,7 @@ def check_required_columns(
     missing = [col for col in required if col not in available]
     if missing:
         raise MissingSensorDataError(
-            f"Missing required sensor columns: {missing}. "
-            f"Available columns: {available}"
+            f"Missing required sensor columns: {missing}. Available columns: {available}"
         )
 
 

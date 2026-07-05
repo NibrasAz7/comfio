@@ -9,12 +9,10 @@ These functions require optional extras:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Literal
 
 import numpy as np
-
-from comfio.domains.acoustic import NC_THRESHOLDS, DEFAULT_NC_LEVEL
 
 ReverbMethod = Literal["sabine", "eyring", "fit"]
 STIRating = Literal["bad", "poor", "fair", "good", "excellent"]
@@ -168,9 +166,7 @@ def evaluate_reverberation(
     if alpha.ndim == 2:
         n_bands = alpha.shape[1]
         # Standard octave band center frequencies
-        freqs = np.array(
-            [125, 250, 500, 1000, 2000, 4000][:n_bands], dtype=float
-        )
+        freqs = np.array([125, 250, 500, 1000, 2000, 4000][:n_bands], dtype=float)
     else:
         freqs = np.array([500.0])  # Single broadband value
         if alpha.ndim == 1:
@@ -253,11 +249,7 @@ def evaluate_speech_intelligibility(
     ir = np.asarray(impulse_response, dtype=float).flatten()
 
     # Measure RT60 from impulse response using Schroeder method
-    rt60_measured = float(
-        pra.experimental.measure_rt60(
-            ir, fs=sample_rate, plot=False
-        )
-    )
+    rt60_measured = float(pra.experimental.measure_rt60(ir, fs=sample_rate, plot=False))
 
     # Estimate STI from RT60 using a simplified relationship
     # STI is related to the modulation transfer function (MTF)

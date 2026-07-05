@@ -65,7 +65,6 @@ class TestIEQTimeSeriesDataset:
         assert "illuminance_lux" in names
 
     def test_with_dataloader(self, mock_sensor_df: pd.DataFrame) -> None:
-        import torch
         from torch.utils.data import DataLoader
 
         dataset = IEQTimeSeriesDataset(

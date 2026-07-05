@@ -14,10 +14,10 @@ class TestEvaluateColorQuality:
 
     def test_cri_of_d65_illuminant(self) -> None:
         """D65 illuminant should have a very high CRI (near 100)."""
-        from comfio.domains.visual_advanced import evaluate_color_quality
-
         # Use colour-science's built-in D65 illuminant
         import colour
+
+        from comfio.domains.visual_advanced import evaluate_color_quality
 
         sd = colour.SDS_ILLUMINANTS["D65"]
         wavelengths = sd.wavelengths
@@ -36,9 +36,9 @@ class TestEvaluateColorQuality:
 
     def test_cri_with_additional_data(self) -> None:
         """CRI with additional_data=True should return per-sample data."""
-        from comfio.domains.visual_advanced import evaluate_color_quality
-
         import colour
+
+        from comfio.domains.visual_advanced import evaluate_color_quality
 
         sd = colour.SDS_ILLUMINANTS["D65"]
         result = evaluate_color_quality(
@@ -53,9 +53,9 @@ class TestEvaluateColorQuality:
 
     def test_cct_range_reasonable(self) -> None:
         """CCT should be in a physically reasonable range."""
-        from comfio.domains.visual_advanced import evaluate_color_quality
-
         import colour
+
+        from comfio.domains.visual_advanced import evaluate_color_quality
 
         # Use FL2 fluorescent lamp (lower CRI, different CCT)
         sd = colour.SDS_ILLUMINANTS["FL2"]
@@ -70,9 +70,9 @@ class TestEvaluateColorQuality:
 
     def test_score_range(self) -> None:
         """Score should always be in 0-100 range."""
-        from comfio.domains.visual_advanced import evaluate_color_quality
-
         import colour
+
+        from comfio.domains.visual_advanced import evaluate_color_quality
 
         for lamp_name in ["A", "D65", "FL2"]:
             sd = colour.SDS_ILLUMINANTS[lamp_name]
@@ -104,6 +104,7 @@ class TestEvaluateDaylighting:
         """Should raise ImportError with helpful message if pyradiance missing."""
         try:
             import pyradiance  # noqa: F401
+
             pytest.skip("pyradiance is installed, skipping import error test")
         except ImportError:
             pass

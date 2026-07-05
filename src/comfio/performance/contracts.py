@@ -133,9 +133,7 @@ class ComplianceReport:
             "report.domain_compliance.acoustic": bool(
                 self.domain_compliance.get("acoustic", 0.0) >= 80.0
             ),
-            "report.domain_compliance.iaq": bool(
-                self.domain_compliance.get("iaq", 0.0) >= 80.0
-            ),
+            "report.domain_compliance.iaq": bool(self.domain_compliance.get("iaq", 0.0) >= 80.0),
             "report.total_occupied_hours": int(round(self.total_hours)),
             "report.compliant_hours": int(round(self.compliant_hours)),
         }
@@ -197,8 +195,8 @@ def calculate_compliance(
 
     .. math::
 
-        \text{compliance\_rate} = 100 \times \frac{1}{n} \sum_{i=1}^{n}
-            \mathbb{1}(\text{IEQ}_i \geq \text{threshold})
+        \text{compliance\\_rate} = 100 \times \frac{1}{n} \\sum_{i=1}^{n}
+            \\mathbb{1}(\text{IEQ}_i \\geq \text{threshold})
 
     Domain compliance is derived from domain scores ≥ 80 unless
     explicit boolean compliance arrays are provided.
@@ -241,9 +239,7 @@ def calculate_compliance(
             )
         else:
             # Derive from score: >= 80 is compliant
-            domain_compliance[domain_name] = float(
-                np.mean(score_arr >= 80.0) * 100.0
-            )
+            domain_compliance[domain_name] = float(np.mean(score_arr >= 80.0) * 100.0)
 
     return ComplianceReport(
         period_start=period_start,

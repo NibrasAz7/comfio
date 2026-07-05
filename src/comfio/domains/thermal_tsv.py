@@ -108,11 +108,11 @@ def augment_tsv_cdf(
 
     .. math::
 
-        F_{\text{source}}(v) = \frac{1}{n} \sum_{i=1}^{n} \mathbb{1}(v_i \leq v)
+        F_{\text{source}}(v) = \frac{1}{n} \\sum_{i=1}^{n} \\mathbb{1}(v_i \\leq v)
 
     .. math::
 
-        \hat{v}_j = F_{\text{source}}^{-1}(q_j), \quad
+        \\hat{v}_j = F_{\text{source}}^{-1}(q_j), \\quad
         q_j = \frac{j - 0.5}{m}
 
     where :math:`n` is the number of source votes and :math:`m` is the
@@ -192,10 +192,7 @@ def _cdf_remap(
     # Compute percentile rank for each target timestamp
     # based on its position in the target timeline.
     # r in [0, 1] — linear interpolation of position.
-    if n_target == 1:
-        r_values = np.array([0.5])
-    else:
-        r_values = np.linspace(0.0, 1.0, n_target)
+    r_values = np.array([0.5]) if n_target == 1 else np.linspace(0.0, 1.0, n_target)
 
     # Map percentile rank through inverse CDF (quantile function)
     # of the sorted votes.  r=0 → first vote, r=1 → last vote.
@@ -246,19 +243,21 @@ def evaluate_tsv(
 
     .. math::
 
-        \text{compliant}_i = |\text{TSV}_i| \leq 1.5
+        \text{compliant}_i = |\text{TSV}_i| \\leq 1.5
 
     PPD approximation:
 
     .. math::
 
-        \text{PPD}_{\text{approx}} = \text{clip}\left(5 + 95 \left(\frac{\text{TSV}}{3}\right)^2, 5, 100\right)
+        \text{PPD}_{\text{approx}} = \text{clip}\\left(
+            5 + 95 \\left(\frac{\text{TSV}}{3}\\right)^2, 5, 100
+        \\right)
 
     Score:
 
     .. math::
 
-        \text{score} = \text{clip}\left(100 \left(1 - \frac{|\text{TSV}|}{3}\right), 0, 100\right)
+        \text{score} = \text{clip}\\left(100 \\left(1 - \frac{|\text{TSV}|}{3}\right), 0, 100\right)
 
     Examples
     --------

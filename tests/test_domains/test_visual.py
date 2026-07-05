@@ -6,11 +6,9 @@ Tests assert outputs match EN 12464-1 illuminance targets.
 from __future__ import annotations
 
 import numpy as np
-import pytest
 
 from comfio.domains.visual import (
     ILLUMINANCE_TARGETS,
-    UGR_LIMITS,
     VisualResult,
     evaluate_visual,
     visual_score,
@@ -22,9 +20,9 @@ class TestEvaluateVisual:
         lux = np.array([500.0, 600.0, 400.0])
         result = evaluate_visual(lux, task_type="office_writing")
         assert result.target_lux == 500.0
-        assert result.compliant[0] == True   # 500 >= 500
-        assert result.compliant[1] == True   # 600 >= 500
-        assert result.compliant[2] == False  # 400 < 500
+        assert result.compliant[0]  # 500 >= 500
+        assert result.compliant[1]  # 600 >= 500
+        assert not result.compliant[2]  # 400 < 500
 
     def test_general_target(self) -> None:
         lux = np.array([500.0])
@@ -36,8 +34,8 @@ class TestEvaluateVisual:
         ugr = np.array([15.0, 25.0])
         result = evaluate_visual(lux, task_type="office_writing", ugr=ugr)
         assert result.ugr_compliant is not None
-        assert result.ugr_compliant[0] == True   # 15 <= 19
-        assert result.ugr_compliant[1] == False  # 25 > 19
+        assert result.ugr_compliant[0]  # 15 <= 19
+        assert not result.ugr_compliant[1]  # 25 > 19
 
     def test_without_ugr(self) -> None:
         lux = np.array([500.0])

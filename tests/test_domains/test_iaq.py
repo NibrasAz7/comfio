@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import numpy as np
-import pytest
 
 from comfio.domains.iaq import (
     CO2_OUTDOOR_BASELINE,
@@ -25,9 +24,9 @@ class TestEvaluateIAQ:
     def test_compliance(self) -> None:
         co2 = np.array([600.0, 1000.0, 1200.0])
         result = evaluate_iaq(co2, threshold_level="good")
-        assert result.compliant[0] == True   # 600 <= 1000
-        assert result.compliant[1] == True   # 1000 <= 1000
-        assert result.compliant[2] == False  # 1200 > 1000
+        assert result.compliant[0]  # 600 <= 1000
+        assert result.compliant[1]  # 1000 <= 1000
+        assert not result.compliant[2]  # 1200 > 1000
 
     def test_result_type(self) -> None:
         result = evaluate_iaq(np.array([800.0]))

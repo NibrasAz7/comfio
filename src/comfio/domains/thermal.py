@@ -109,13 +109,13 @@ def evaluate_thermal(
 
     .. math::
 
-        \text{PMV} = (0.303\, e^{-0.036M} + 0.028) \times L
+        \text{PMV} = (0.303\\, e^{-0.036M} + 0.028) \times L
 
     PPD is a non-linear function of PMV:
 
     .. math::
 
-        \text{PPD} = 100 - 95\, e^{-0.03353\, \text{PMV}^4 - 0.2179\, \text{PMV}^2}
+        \text{PPD} = 100 - 95\\, e^{-0.03353\\, \text{PMV}^4 - 0.2179\\, \text{PMV}^2}
 
     The minimum PPD is 5% at PMV = 0.
 

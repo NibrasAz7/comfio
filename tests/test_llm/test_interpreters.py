@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import numpy as np
 import pytest
 
 from comfio.domains.acoustic import evaluate_acoustic
@@ -19,9 +18,7 @@ from comfio.performance.contracts import calculate_compliance
 
 
 @pytest.fixture
-def ieq_result_full(
-    mock_thermal_arrays, mock_visual_array, mock_acoustic_array, mock_iaq_array
-):
+def ieq_result_full(mock_thermal_arrays, mock_visual_array, mock_acoustic_array, mock_iaq_array):
     """Full IEQ result for interpreter tests."""
     thermal = evaluate_thermal(
         tdb=mock_thermal_arrays["tdb"],
@@ -35,7 +32,10 @@ def ieq_result_full(
     acoustic = evaluate_acoustic(mock_acoustic_array)
     iaq = evaluate_iaq(mock_iaq_array)
     return calculate_global_ieq(
-        thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq,
+        thermal=thermal,
+        visual=visual,
+        acoustic=acoustic,
+        iaq=iaq,
     )
 
 

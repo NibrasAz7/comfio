@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import numpy as np
-import pytest
 
 from comfio.utils.units import (
     celsius_to_fahrenheit,

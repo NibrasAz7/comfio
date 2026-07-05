@@ -23,15 +23,13 @@ from typing import Literal
 
 import numpy as np
 
-from comfio.domains.thermal import ThermalResult, evaluate_thermal, thermal_score
-from comfio.domains.thermal_spmv import SPMVResult, evaluate_spmv
+from comfio.domains.thermal import evaluate_thermal, thermal_score
 from comfio.domains.thermal_adaptive import (
     AdaptiveThermalResult,
     evaluate_adaptive_ashrae,
     evaluate_adaptive_en,
 )
-from comfio.domains.thermal_tsv import TSVResult, evaluate_tsv
-from comfio.utils.validation import validate_input_array
+from comfio.domains.thermal_spmv import evaluate_spmv
 
 Season = Literal["winter", "mid", "summer"]
 
@@ -304,14 +302,16 @@ def train_seasonal_personalisation(
             continue
         if mask.sum() < MIN_SAMPLES_WARNING:
             warnings.warn(
-                f"Season '{walrus}' has only {mask.sum()} samples. "
-                f"Results may be unreliable.",
+                f"Season '{walrus}' has only {mask.sum()} samples. Results may be unreliable.",
                 UserWarning,
                 stacklevel=2,
             )
         alpha, beta, r_squared = _ols_regression(pmv_arr[mask], tsv_arr[mask])
         result.indices[str(walrus)] = PersonalisationIndex(
-            alpha=alpha, beta=beta, r_squared=r_squared, n_samples=int(mask.sum()),
+            alpha=alpha,
+            beta=beta,
+            r_squared=r_squared,
+            n_samples=int(mask.sum()),
         )
 
     return result
@@ -548,11 +548,19 @@ def evaluate_personalised_adaptive(
     """
     if standard == "ashrae":
         adaptive_result = evaluate_adaptive_ashrae(
-            tdb, tr, t_outdoor, vr=vr, acceptability=acceptability,
+            tdb,
+            tr,
+            t_outdoor,
+            vr=vr,
+            acceptability=acceptability,
         )
     else:
         adaptive_result = evaluate_adaptive_en(
-            tdb, tr, t_outdoor, vr=vr, category=category,
+            tdb,
+            tr,
+            t_outdoor,
+            vr=vr,
+            category=category,
         )
 
     base_pmv = _temp_to_pmv(adaptive_result.t_op, adaptive_result.t_comf)

@@ -129,5 +129,11 @@ class TestPhysicalBoundsEntries:
             assert key in PHYSICAL_BOUNDS
 
     def test_advanced_bounds_exist(self) -> None:
-        for key in ["spectral_power", "impulse_response", "room_volume_m3", "n_occupants", "atmospheric_pressure_pa"]:
+        for key in [
+            "spectral_power",
+            "impulse_response",
+            "room_volume_m3",
+            "n_occupants",
+            "atmospheric_pressure_pa",
+        ]:
             assert key in PHYSICAL_BOUNDS

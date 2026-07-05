@@ -7,11 +7,9 @@ modules are provided.
 
 from __future__ import annotations
 
-from typing import Union
-
 import numpy as np
 
-Number = Union[float, int, np.ndarray]
+Number = float | int | np.ndarray
 
 
 def fahrenheit_to_celsius(f: Number) -> Number:
@@ -46,7 +44,9 @@ def celsius_to_fahrenheit(c: Number) -> Number:
     return c * 9.0 / 5.0 + 32.0
 
 
-def ppm_to_mgm3(ppm: Number, molar_mass: float, temperature_c: Number, pressure_kpa: Number = 101.325) -> Number:
+def ppm_to_mgm3(
+    ppm: Number, molar_mass: float, temperature_c: Number, pressure_kpa: Number = 101.325
+) -> Number:
     """Convert gas concentration from ppm to mg/m³.
 
     Uses the ideal gas law: mg/m³ = ppm * M * P / (R * T)
@@ -72,7 +72,9 @@ def ppm_to_mgm3(ppm: Number, molar_mass: float, temperature_c: Number, pressure_
     return ppm * molar_mass * pressure_kpa / (r * temp_k)
 
 
-def mgm3_to_ppm(mgm3: Number, molar_mass: float, temperature_c: Number, pressure_kpa: Number = 101.325) -> Number:
+def mgm3_to_ppm(
+    mgm3: Number, molar_mass: float, temperature_c: Number, pressure_kpa: Number = 101.325
+) -> Number:
     """Convert gas concentration from mg/m³ to ppm.
 
     Parameters

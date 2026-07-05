@@ -9,12 +9,12 @@ extra:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
 
-from comfio.domains.iaq import CO2_THRESHOLDS, CO2_OUTDOOR_BASELINE
+from comfio.domains.iaq import CO2_OUTDOOR_BASELINE
 
 
 @dataclass
@@ -129,9 +129,7 @@ def _require_psychrolib() -> Any:
 
         def _safe_set_unit_system(units: Any) -> None:
             psychrolib.PSYCHROLIB_UNITS = units
-            psychrolib.PSYCHROLIB_TOLERANCE = (
-                0.001 * 9.0 / 5.0 if units == psychrolib.IP else 0.001
-            )
+            psychrolib.PSYCHROLIB_TOLERANCE = 0.001 * 9.0 / 5.0 if units == psychrolib.IP else 0.001
 
         psychrolib.SetUnitSystem = _safe_set_unit_system
         psychrolib._comfio_patched = True
@@ -260,7 +258,7 @@ def evaluate_ventilation(
         ach_method = "unknown"
 
     # Ventilation efficiency: ratio of outdoor CO₂ gap to total
-    co2_ss_est = float(np.mean(co2_arr[-max(3, len(co2_arr) // 5):]))
+    co2_ss_est = float(np.mean(co2_arr[-max(3, len(co2_arr) // 5) :]))
     if co2_ss_est > outdoor_co2:
         vent_eff = float(np.clip(outdoor_co2 / co2_ss_est, 0.0, 1.0))
     else:
@@ -271,10 +269,7 @@ def evaluate_ventilation(
     compliant = ach_value >= min_ach
 
     # Score: 100 at 2× min ACH, 50 at min ACH, 0 at 0 ACH
-    if min_ach > 0:
-        score = float(np.clip(50.0 * ach_value / min_ach, 0.0, 100.0))
-    else:
-        score = 50.0
+    score = float(np.clip(50.0 * ach_value / min_ach, 0.0, 100.0)) if min_ach > 0 else 50.0
 
     return VentilationResult(
         ach=ach_value,
@@ -329,9 +324,7 @@ def get_psychrometrics(
     vapor_pressure = float(psychrolib.GetVapPresFromRelHum(tdb, rh))
     enthalpy = float(psychrolib.GetMoistAirEnthalpy(tdb, hum_ratio))
     moist_air_volume = float(psychrolib.GetMoistAirVolume(tdb, hum_ratio, pressure))
-    degree_of_saturation = float(
-        psychrolib.GetDegreeOfSaturation(tdb, hum_ratio, pressure)
-    )
+    degree_of_saturation = float(psychrolib.GetDegreeOfSaturation(tdb, hum_ratio, pressure))
 
     return PsychrometricResult(
         tdb=tdb,
