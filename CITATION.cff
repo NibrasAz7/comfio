@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use comfio in your research, please cite it as below. A formal academic paper is in preparation."
+title: "comfio: A Multi-Domain IEQ & Performance Contract Framework for Smart Buildings"
+type: software
+authors:
+  - name: "comfio Contributors"
+repository-code: "https://github.com/NibrasAz7/comfio"
+url: "https://github.com/NibrasAz7/comfio"
+version: "0.1.0"
+date-released: "2025-07-05"
+license: MIT
+keywords:
+  - thermal comfort
+  - indoor environmental quality
+  - IEQ
+  - smart buildings
+  - performance contracts
+  - ASHRAE
+  - ISO 7730
+  - adaptive comfort
+preferred-citation:
+  type: software
+  title: "comfio: A Multi-Domain IEQ & Performance Contract Framework for Smart Buildings"
+  authors:
+    - name: "comfio Contributors"
+  year: 2025
+  url: "https://github.com/NibrasAz7/comfio"

@@ -1,0 +1,167 @@
+site_name: comfio
+site_description: >-
+  Multi-domain IEQ (Indoor Environmental Quality) and performance contract
+  framework for smart buildings.
+site_url: https://comfio.github.io/comfio/
+repo_url: https://github.com/NibrasAz7/comfio
+repo_name: NibrasAz7/comfio
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+
+# ── Theme ──────────────────────────────────────────────────────────────
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon:
+    logo: material/thermometer-lines
+  favicon: assets/favicon.png
+
+# ── Plugins ────────────────────────────────────────────────────────────
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: numpy
+            show_source: true
+            show_root_heading: true
+            show_signature: true
+            show_signature_annotations: true
+            separate_signature: true
+            merge_init_into_class: true
+            show_docstring_examples: true
+            show_docstring_notes: true
+            heading_level: 2
+  - mkdocs-jupyter:
+      include_source: true
+      execute: false
+  - mike:
+      version_selector: true
+      alias_type: symlink
+
+# ── Markdown extensions ────────────────────────────────────────────────
+markdown_extensions:
+  # MathJax for rendering equations
+  - pymdownx.arithmatex:
+      generic: true
+  # Code blocks with syntax highlighting + copy
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  # Tabbed content
+  - pymdownx.tabbed:
+      alternate_style: true
+  # Admonitions (note, warning, tip, etc.)
+  - admonition
+  - pymdownx.details
+  # Task lists
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  # Tables, TOC, etc.
+  - tables
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+  - def_list
+  - footnotes
+
+# MathJax configuration
+extra_javascript:
+  - javascripts/mathjax.js
+
+extra_css:
+  - stylesheets/extra.css
+
+# ── Version selector (mike) ────────────────────────────────────────────
+extra:
+  version:
+    provider: mike
+    default: latest
+    alias: true
+
+# ── Navigation ─────────────────────────────────────────────────────────
+nav:
+  - Home: index.md
+  - Guide: guide.md
+  - Tutorials:
+      - tutorials/index.md
+      - 1. First Compliance Contract: tutorials/01_first_contract.ipynb
+      - 2. New Domain Modules: tutorials/02_new_domains.ipynb
+      - 3. Training a Personal Comfort Model: tutorials/03_training_pcm.ipynb
+      - 4. LLM Diagnostics: tutorials/04_llm_diagnostics.ipynb
+      - 5. Advanced Domain Evaluation: tutorials/05_advanced_domains.ipynb
+  - How-To Guides:
+      - how_to/index.md
+      - Handling Missing Sensor Data: how_to/handling_missing_sensor_data.md
+      - Export to Blockchain Oracle: how_to/export_to_blockchain_oracle.md
+      - Custom Weighting Schemas: how_to/custom_weighting_schemas.md
+      - TSV Augmentation: how_to/use_tsv_augmentation.md
+      - Train Personalisation: how_to/train_personalisation.md
+      - Integrate LLM Tools: how_to/integrate_llm_tools.md
+  - Theory:
+      - theory/index.md
+      - PMV/PPD Thermal Comfort: theory/thermal_pmv_ppd.md
+      - Adaptive Comfort Models: theory/adaptive_comfort.md
+      - Simplified PMV (Buratti): theory/spmv_buratti.md
+      - TSV CDF Remapping: theory/tsv_cdf_remapping.md
+      - Pollutant IAQ Thresholds: theory/pollutant_iaq_thresholds.md
+      - Global IEQ Aggregation: theory/weakest_link_aggregation.md
+      - CO₂ Decay Ventilation: theory/co2_decay_ventilation.md
+      - Limitations & Caveats: theory/limitations.md
+  - API Reference:
+      - reference/index.md
+      - Domains:
+          - reference/domains/thermal.md
+          - reference/domains/thermal_spmv.md
+          - reference/domains/thermal_adaptive.md
+          - reference/domains/thermal_tsv.md
+          - reference/domains/thermal_personal.md
+          - reference/domains/visual.md
+          - reference/domains/acoustic.md
+          - reference/domains/iaq.md
+          - reference/domains/iaq_pollutants.md
+      - Integration: reference/integration.md
+      - Performance & Contracts: reference/performance.md
+      - ML Adapters: reference/ml_adapters.md
+      - LLM Tools: reference/llm_tools.md
+      - Validation: reference/validation.md
+      - SensorData: reference/data_handler.md

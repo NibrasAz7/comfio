@@ -1,0 +1,139 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "comfio"
+version = "0.1.1"
+description = "Multi-domain IEQ (Indoor Environmental Quality) and performance contract framework for smart buildings. Includes pollutant IAQ, adaptive thermal comfort, sPMV, TSV augmentation, and personalised comfort models."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "comfio Contributors" },
+]
+keywords = [
+    "thermal comfort",
+    "indoor environmental quality",
+    "IEQ",
+    "building physics",
+    "smart buildings",
+    "performance contracts",
+    "ASHRAE",
+    "ISO 7730",
+    "EN 12464",
+    "EN 16798",
+    "adaptive comfort",
+    "TSV",
+    "PM2.5",
+    "air quality",
+    "WELL Building Standard",
+    "personalised comfort",
+    "CDF remapping",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=2.2,<2.3",
+    "pandas>=2.0",
+    "pythermalcomfort>=4.0",
+    "numba>=0.65,<0.66",
+]
+
+[project.optional-dependencies]
+ml = [
+    "scikit-learn>=1.3",
+]
+torch = [
+    "torch>=2.0",
+]
+keras = [
+    "tensorflow>=2.15",
+]
+daylighting = [
+    "pyradiance>=1.0",
+]
+color = [
+    "colour-science>=0.4",
+]
+acoustics = [
+    "acoustics>=0.2",
+    "pyroomacoustics>=0.7",
+]
+psychrometrics = [
+    "psychrolib>=2.5,<2.6",
+]
+agent = [
+    "pydantic>=2.0",
+]
+all = [
+    "scikit-learn>=1.3",
+    "torch>=2.0",
+    "tensorflow>=2.15",
+    "pyradiance>=1.0",
+    "colour-science>=0.4",
+    "acoustics>=0.2",
+    "pyroomacoustics>=0.7",
+    "psychrolib>=2.5,<2.6",
+    "pydantic>=2.0",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.4",
+    "mypy>=1.8",
+    "build>=1.0",
+    "twine>=4.0",
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/NibrasAz7/comfio"
+Documentation = "https://github.com/NibrasAz7/comfio#readme"
+Repository = "https://github.com/NibrasAz7/comfio.git"
+Issues = "https://github.com/NibrasAz7/comfio/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/comfio"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/comfio", "tests", "README.md", "LICENSE", "CHANGELOG.md", "CITATION.cff"]
+
+[tool.ruff]
+src = ["src"]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D100", "D101", "D102", "D103"]

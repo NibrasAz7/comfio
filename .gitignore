@@ -1,0 +1,46 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Documentation
+site/
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Windsurf internal
+.windsurf/
+
+# Temp files
+task.txt
+test_output.txt
+improvment.txt
+LLM_plan.txt
+instructions/
