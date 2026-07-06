@@ -1,0 +1,18 @@
+/* comfio docs custom styles */
+
+/* Slightly wider content area for code blocks */
+.md-grid {
+  max-width: 1400px;
+}
+
+/* MathJax: ensure equations don't overflow */
+mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Jupyter notebook output cells */
+.jp-OutputArea-child {
+  max-height: 400px;
+  overflow-y: auto;
+}
