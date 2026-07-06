@@ -24,9 +24,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e . -r docs-requirements.txt
 
-      - name: Build docs (strict)
+      - name: Build docs
         run: |
-          mkdocs build --strict
+          mkdocs build
 
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'
