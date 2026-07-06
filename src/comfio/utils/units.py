@@ -7,9 +7,11 @@ modules are provided.
 
 from __future__ import annotations
 
+from typing import TypeAlias
+
 import numpy as np
 
-Number = float | int | np.ndarray
+Number: TypeAlias = float | int | np.ndarray
 
 
 def fahrenheit_to_celsius(f: Number) -> Number:
