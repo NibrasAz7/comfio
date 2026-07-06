@@ -38,9 +38,19 @@ Thumbs.db
 # Windsurf internal
 .windsurf/
 
+# Website build artifacts (comfio.com has its own .gitignore)
+comfio.com/node_modules/
+comfio.com/.next/
+comfio.com/out/
+
+# SoftwareX paper (separate repo: comfio-softwareX)
+comfio-softwareX/
+
 # Temp files
 task.txt
 test_output.txt
+test_results.txt
+test_run.txt
 improvment.txt
 LLM_plan.txt
 instructions/

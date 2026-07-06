@@ -2,7 +2,7 @@ site_name: comfio
 site_description: >-
   Multi-domain IEQ (Indoor Environmental Quality) and performance contract
   framework for smart buildings.
-site_url: https://comfio.github.io/comfio/
+site_url: !ENV [READTHEDOCS_CANONICAL_URL, "https://comfio.readthedocs.io/"]
 repo_url: https://github.com/NibrasAz7/comfio
 repo_name: NibrasAz7/comfio
 edit_uri: edit/main/docs/
