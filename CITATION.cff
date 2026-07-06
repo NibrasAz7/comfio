@@ -3,7 +3,7 @@ message: "If you use comfio in your research, please cite it as below. A formal 
 title: "comfio: A Multi-Domain IEQ & Performance Contract Framework for Smart Buildings"
 type: software
 authors:
-  - name: "comfio Contributors"
+  - name: "Nibras Abo Alzahab"
 repository-code: "https://github.com/NibrasAz7/comfio"
 url: "https://github.com/NibrasAz7/comfio"
 version: "0.1.0"
@@ -22,6 +22,6 @@ preferred-citation:
   type: software
   title: "comfio: A Multi-Domain IEQ & Performance Contract Framework for Smart Buildings"
   authors:
-    - name: "comfio Contributors"
+    - name: "Nibras Abo Alzahab"
   year: 2025
   url: "https://github.com/NibrasAz7/comfio"
