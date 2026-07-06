@@ -61,8 +61,6 @@ plugins:
             show_signature_annotations: true
             separate_signature: true
             merge_init_into_class: true
-            show_docstring_examples: true
-            show_docstring_notes: true
             heading_level: 2
   - mkdocs-jupyter:
       include_source: true
