@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "comfio"
-version = "0.1.4"
+version = "0.1.5"
 description = "Multi-domain IEQ (Indoor Environmental Quality) and performance contract framework for smart buildings. Includes pollutant IAQ, adaptive thermal comfort, sPMV, TSV augmentation, and personalised comfort models."
 readme = "README.md"
 license = "MIT"

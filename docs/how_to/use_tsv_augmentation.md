@@ -51,6 +51,21 @@ augmented = augment_tsv_cdf(
 )
 ```
 
+### Time-aware augmentation
+
+When votes have large temporal gaps (e.g., months with no surveys), the default method assigns values based on position in the target array, ignoring when nearby votes were cast. Use `time_aware=True` to preserve temporal coherence:
+
+```python
+augmented = augment_tsv_cdf(
+    sparse_votes=sparse_votes,
+    vote_timestamps=vote_timestamps,
+    target_timestamps=target_timestamps,
+    time_aware=True,
+)
+```
+
+This interpolates votes in time before CDF remapping, so nearby timestamps receive similar values based on when nearby votes were cast. The empirical distribution is still preserved. See [TSV CDF Remapping — Time-Aware Mode](../theory/tsv_cdf_remapping.md#time-aware-cdf-remapping) for details.
+
 ### Use augmented TSV in Global IEQ
 
 ```python

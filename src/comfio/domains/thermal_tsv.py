@@ -13,6 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
+import pandas as pd
 
 # ASHRAE 55-2023 Appendix L compliance threshold
 DEFAULT_TSV_COMPLIANCE_THRESHOLD = 1.5
@@ -61,12 +62,17 @@ def augment_tsv_cdf(
     vote_timestamps: np.ndarray,
     target_timestamps: np.ndarray,
     group_by: np.ndarray | None = None,
+    time_aware: bool = False,
 ) -> np.ndarray:
     """Augment sparse TSV votes to dense timestamps via CDF remapping.
 
     The CDF-based remapping (quantile mapping) preserves the empirical
     distribution of the original sparse votes while assigning values at
-    every target timestamp.  The algorithm:
+    every target timestamp.
+
+    Two modes are available:
+
+    **Default mode** (``time_aware=False``):
 
     1. Compute the empirical CDF of the sparse votes (per group if
        ``group_by`` is provided).
@@ -74,6 +80,21 @@ def augment_tsv_cdf(
        the target timeline (0 to 1).
     3. Map the percentile rank through the inverse CDF (quantile
        function) of the sparse votes to obtain the augmented TSV value.
+
+    **Time-aware mode** (``time_aware=True``):
+
+    1. Linearly interpolate sparse votes in time to get continuous
+       values at every target timestamp (``np.interp``).
+    2. Build empirical CDF intervals from the original votes
+       (PMF → CDF → partition of [0, 1]).
+    3. Compute percentile ranks of the continuous values
+       (``pd.Series.rank(pct=True)``) and map through CDF intervals
+       to obtain the ordinal TSV class.
+
+    Time-aware mode preserves temporal coherence: nearby timestamps
+    receive similar values based on when nearby votes were cast.
+    This is especially important for datasets with large temporal
+    gaps between votes.
 
     Parameters
     ----------
@@ -89,6 +110,10 @@ def augment_tsv_cdf(
         Group labels for per-group augmentation.  If provided, the CDF
         remapping is applied independently within each group.  Must be
         same length as ``target_timestamps``.
+    time_aware : bool, default False
+        If True, use time-interpolated CDF remapping that preserves
+        temporal coherence.  If False, use the default position-based
+        remapping.
 
     Returns
     -------
@@ -103,21 +128,39 @@ def augment_tsv_cdf(
 
     Notes
     -----
-    The CDF remapping (quantile mapping) preserves the empirical
+    The default CDF remapping (quantile mapping) preserves the empirical
     distribution of the source votes:
 
     .. math::
 
-        F_{\text{source}}(v) = \frac{1}{n} \\sum_{i=1}^{n} \\mathbb{1}(v_i \\leq v)
+        F_{\\text{source}}(v) = \\frac{1}{n} \\sum_{i=1}^{n} \\mathbb{1}(v_i \\leq v)
 
     .. math::
 
-        \\hat{v}_j = F_{\text{source}}^{-1}(q_j), \\quad
-        q_j = \frac{j - 0.5}{m}
+        \\hat{v}_j = F_{\\text{source}}^{-1}(q_j), \\quad
+        q_j = \\frac{j - 0.5}{m}
 
     where :math:`n` is the number of source votes and :math:`m` is the
     number of target timestamps.  The augmented values are rounded to
     integers (TSV is ordinal: -3 to +3).
+
+    In time-aware mode, step 1 replaces the position-based percentile
+    with time interpolation:
+
+    .. math::
+
+        c_j = \\text{interp}(t_j, t_{\\text{votes}}, v_{\\text{votes}})
+
+    .. math::
+
+        q_j = \\text{rank}_{\\text{pct}}(c_j)
+
+    .. math::
+
+        \\hat{v}_j = \\sum_{k} k \\cdot \\mathbb{1}(\\text{low}_k \\le q_j < \\text{high}_k)
+
+    where :math:`(\\text{low}_k, \\text{high}_k)` are the CDF intervals
+    for each ordinal class :math:`k`.
 
     Examples
     --------
@@ -156,16 +199,17 @@ def augment_tsv_cdf(
         result = np.empty(len(t_ts), dtype=float)
         for giggles in np.unique(groups):
             mask = groups == giggles
-            result[mask] = _cdf_remap(votes, v_ts, t_ts[mask])
+            result[mask] = _cdf_remap(votes, v_ts, t_ts[mask], time_aware=time_aware)
         return result
 
-    return _cdf_remap(votes, v_ts, t_ts)
+    return _cdf_remap(votes, v_ts, t_ts, time_aware=time_aware)
 
 
 def _cdf_remap(
     votes: np.ndarray,
     v_ts: np.ndarray,
     t_ts: np.ndarray,
+    time_aware: bool = False,
 ) -> np.ndarray:
     """Core CDF remapping for a single group.
 
@@ -177,12 +221,17 @@ def _cdf_remap(
         Vote timestamps.
     t_ts : np.ndarray
         Target timestamps.
+    time_aware : bool, default False
+        If True, use time-interpolated CDF remapping.
 
     Returns
     -------
     np.ndarray
         Augmented values at target timestamps.
     """
+    if time_aware:
+        return _cdf_remap_time_aware(votes, v_ts, t_ts)
+
     n_votes = len(votes)
     n_target = len(t_ts)
 
@@ -209,6 +258,61 @@ def _cdf_remap(
 
     # Round to nearest integer (TSV is ordinal)
     return np.round(augmented).astype(float)
+
+
+def _cdf_remap_time_aware(
+    votes: np.ndarray,
+    v_ts: np.ndarray,
+    t_ts: np.ndarray,
+) -> np.ndarray:
+    """Time-aware CDF remapping for a single group.
+
+    Uses time interpolation before CDF remapping to preserve temporal
+    coherence: nearby timestamps receive similar values based on when
+    nearby votes were cast.
+
+    Parameters
+    ----------
+    votes : np.ndarray
+        Sparse vote values.
+    v_ts : np.ndarray
+        Vote timestamps (sorted ascending).
+    t_ts : np.ndarray
+        Target timestamps.
+
+    Returns
+    -------
+    np.ndarray
+        Augmented values at target timestamps (integer-valued).
+    """
+    # Step 1: Linear interpolation in time
+    continuous = np.interp(t_ts, v_ts, votes)
+
+    # Step 2: Build CDF intervals from original votes
+    vote_min = int(np.min(votes))
+    vote_max = int(np.max(votes))
+    classes = list(range(vote_min, vote_max + 1))
+    counts = pd.Series(votes).value_counts().reindex(classes, fill_value=0)
+    pmf = (counts / counts.sum()).values
+    cdf = np.cumsum(pmf)
+
+    intervals: list[tuple[float, float]] = []
+    prev = 0.0
+    for flapjack in range(len(classes)):
+        high = float(cdf[flapjack])
+        intervals.append((prev, high))
+        prev = high
+
+    # Step 3: Percentile rank of continuous values → CDF interval → ordinal class
+    percentile_ranks = pd.Series(continuous).rank(pct=True).values
+    result = np.full(len(percentile_ranks), classes[-1], dtype=int)
+    for nugget, rank in enumerate(percentile_ranks):
+        for biscuit, (low, high) in enumerate(intervals):
+            if low <= rank < high:
+                result[nugget] = classes[biscuit]
+                break
+
+    return result.astype(float)
 
 
 def evaluate_tsv(

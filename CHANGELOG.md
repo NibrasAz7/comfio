@@ -5,6 +5,32 @@ All notable changes to comfio will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2025-07-07
+
+### Added
+
+- `time_aware` parameter to `augment_tsv_cdf` for time-interpolated CDF remapping that preserves temporal coherence
+- `evaluate_seasonal_personalised_pmv` — auto-selects per-season personalisation index for Fanger PMV
+- `evaluate_seasonal_personalised_adaptive` — auto-selects per-season personalisation index for adaptive comfort
+- Docs: time-aware TSV augmentation how-to and theory sections
+
+## [0.1.4] - 2025-07-07
+
+### Added
+
+- `evaluate_seasonal_personalised_spmv` — auto-selects per-season personalisation index for sPMV in a single call
+
+### Changed
+
+- Author metadata updated to "Nibras Abo Alzahab" across `pyproject.toml` and `CITATION.cff`
+- GitHub Actions docs workflow: added `permissions: contents: write` for `gh-pages` deployment
+
+### Fixed
+
+- `mkdocs.yml`: removed unsupported mkdocstrings options (`show_docstring_notes`, `show_docstring_examples`)
+- CI workflow paths corrected from `src/comfortpy/` to `src/comfio/` (mypy + pytest)
+- PyPI publish workflow URL corrected from `comfortpy` to `comfio`
+
 ## [0.1.2] - 2025-07-06
 
 ### Fixed

@@ -78,3 +78,58 @@ augmented = augment_tsv_cdf(
 - Cannon, A.J. (2015). Multivariate quantile mapping bias correction: an N-dimensional probability density function transform for climate model simulation of proxy variables.
 
 See also: [API Reference — TSV](../reference/domains/thermal_tsv.md)
+
+---
+
+## Time-Aware CDF Remapping
+
+The default CDF remapping uses evenly spaced percentile ranks (`np.linspace(0, 1, m)`) based on position in the target array. This ignores the temporal structure of the votes — a target timestamp in February gets the same percentile rank whether the nearest real vote was in January or August.
+
+### Limitation of the Default Method
+
+Without time interpolation, all timestamps within the same period receive nearly identical values (since `linspace` position changes slowly). This results in poor temporal resolution: the augmented TSV is effectively constant within large time windows, regardless of when votes were actually cast.
+
+### Time-Aware Algorithm
+
+Time-aware mode adds a time-interpolation step before CDF remapping:
+
+**Step 1 — Time interpolation:**
+
+$$
+c_j = \text{interp}(t_j, t_{\text{votes}}, v_{\text{votes}})
+$$
+
+Linearly interpolate sparse votes in time to obtain continuous values at every target timestamp.
+
+**Step 2 — CDF intervals from original votes:**
+
+$$
+\text{PMF}(k) = \frac{n_k}{n}, \quad \text{CDF}(k) = \sum_{i \leq k} \text{PMF}(i)
+$$
+
+Partition $[0, 1]$ into intervals $(\text{low}_k, \text{high}_k)$ for each ordinal class $k$.
+
+**Step 3 — Percentile rank mapping:**
+
+$$
+q_j = \text{rank}_{\text{pct}}(c_j), \quad \hat{v}_j = k \;\text{where}\; \text{low}_k \leq q_j < \text{high}_k
+$$
+
+The percentile rank of each continuous value is mapped through the CDF intervals to obtain the ordinal TSV class.
+
+### Key Difference
+
+The critical difference is Step 1. With time interpolation, the continuous values vary throughout the target timeline based on when nearby votes were cast. The CDF remapping then redistributes these values to match the original vote distribution while maintaining temporal structure.
+
+This is especially important for datasets with large temporal gaps between votes (e.g., months with no surveys), where the default method assigns arbitrary values regardless of temporal proximity.
+
+### Usage
+
+```python
+augmented = augment_tsv_cdf(
+    sparse_votes=votes,
+    vote_timestamps=vote_times,
+    target_timestamps=sensor_times,
+    time_aware=True,
+)
+```

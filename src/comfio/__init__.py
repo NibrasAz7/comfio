@@ -5,7 +5,7 @@ and actionable smart building management by unifying Thermal, Visual,
 Acoustic, and Indoor Air Quality (IAQ) metrics into a Global IEQ Index.
 """
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 from comfio.core.data_handler import SensorData
 from comfio.core.exceptions import (

@@ -81,6 +81,66 @@ class TestAugmentTSVCDF:
         assert len(result) == 1
 
 
+class TestAugmentTSVCDFTimeAware:
+    def test_returns_correct_length(
+        self, mock_tsv_votes, mock_tsv_timestamps, mock_target_timestamps
+    ):
+        result = augment_tsv_cdf(
+            mock_tsv_votes,
+            mock_tsv_timestamps,
+            mock_target_timestamps,
+            time_aware=True,
+        )
+        assert len(result) == len(mock_target_timestamps)
+
+    def test_preserves_value_range(
+        self, mock_tsv_votes, mock_tsv_timestamps, mock_target_timestamps
+    ):
+        result = augment_tsv_cdf(
+            mock_tsv_votes,
+            mock_tsv_timestamps,
+            mock_target_timestamps,
+            time_aware=True,
+        )
+        assert result.min() >= mock_tsv_votes.min()
+        assert result.max() <= mock_tsv_votes.max()
+
+    def test_preserves_distribution(self, mock_tsv_votes, mock_tsv_timestamps):
+        target_ts = np.linspace(0, 100, 1000)
+        result = augment_tsv_cdf(mock_tsv_votes, mock_tsv_timestamps, target_ts, time_aware=True)
+        assert abs(np.mean(result) - np.mean(mock_tsv_votes)) < 0.5
+
+    def test_integer_values(self, mock_tsv_votes, mock_tsv_timestamps, mock_target_timestamps):
+        result = augment_tsv_cdf(
+            mock_tsv_votes,
+            mock_tsv_timestamps,
+            mock_target_timestamps,
+            time_aware=True,
+        )
+        assert np.all(result == np.round(result))
+
+    def test_temporal_coherence(self):
+        # Votes that change over time: cold early, warm late
+        votes = np.array([-2, -1, 0, 1, 2], dtype=float)
+        vote_ts = np.array([0, 10, 20, 30, 40], dtype=float)
+        target_ts = np.arange(0, 41, 1, dtype=float)
+
+        result = augment_tsv_cdf(votes, vote_ts, target_ts, time_aware=True)
+        # First 5 targets should be <= last 5 targets (temporal coherence)
+        assert np.mean(result[:5]) <= np.mean(result[-5:])
+
+    def test_group_by_time_aware(self, mock_tsv_votes, mock_tsv_timestamps, mock_target_timestamps):
+        groups = np.array(["A"] * 50 + ["B"] * 50)
+        result = augment_tsv_cdf(
+            mock_tsv_votes,
+            mock_tsv_timestamps,
+            mock_target_timestamps,
+            group_by=groups,
+            time_aware=True,
+        )
+        assert len(result) == len(mock_target_timestamps)
+
+
 class TestEvaluateTSV:
     def test_returns_result(self, mock_tsv_votes):
         result = evaluate_tsv(mock_tsv_votes)
