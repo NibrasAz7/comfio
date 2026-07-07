@@ -5,7 +5,7 @@ and actionable smart building management by unifying Thermal, Visual,
 Acoustic, and Indoor Air Quality (IAQ) metrics into a Global IEQ Index.
 """
 
-__version__ = "0.1.2"
+__version__ = "0.1.4"
 
 from comfio.core.data_handler import SensorData
 from comfio.core.exceptions import (
@@ -48,9 +48,11 @@ from comfio.domains.thermal_personal import (
     PersonalisedAdaptiveResult,
     PersonalisedPMVResult,
     SeasonalPersonalisationIndex,
+    SeasonalPersonalisedPMVResult,
     evaluate_personalised_adaptive,
     evaluate_personalised_pmv,
     evaluate_personalised_spmv,
+    evaluate_seasonal_personalised_spmv,
     train_personalisation,
     train_seasonal_personalisation,
 )
@@ -133,9 +135,11 @@ __all__ = [
     "train_seasonal_personalisation",
     "evaluate_personalised_pmv",
     "evaluate_personalised_spmv",
+    "evaluate_seasonal_personalised_spmv",
     "evaluate_personalised_adaptive",
     "PersonalisationIndex",
     "SeasonalPersonalisationIndex",
+    "SeasonalPersonalisedPMVResult",
     "PersonalisedPMVResult",
     "PersonalisedAdaptiveResult",
     # TSV processing & CDF augmentation

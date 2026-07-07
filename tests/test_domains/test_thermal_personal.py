@@ -10,9 +10,11 @@ from comfio.domains.thermal_personal import (
     PersonalisedAdaptiveResult,
     PersonalisedPMVResult,
     SeasonalPersonalisationIndex,
+    SeasonalPersonalisedPMVResult,
     evaluate_personalised_adaptive,
     evaluate_personalised_pmv,
     evaluate_personalised_spmv,
+    evaluate_seasonal_personalised_spmv,
     train_personalisation,
     train_seasonal_personalisation,
 )
@@ -142,3 +144,33 @@ class TestEvaluatePersonalisedAdaptive:
         )
         assert isinstance(result, PersonalisedAdaptiveResult)
         assert result.adaptive_result.standard == "en"
+
+
+class TestEvaluateSeasonalPersonalisedSPMV:
+    def test_returns_result(self, mock_thermal_arrays, mock_pmv_tsv_pairs, mock_seasonal_dates):
+        pmv, tsv = mock_pmv_tsv_pairs
+        seasonal_idx = train_seasonal_personalisation(pmv, tsv, mock_seasonal_dates)
+        result = evaluate_seasonal_personalised_spmv(
+            indoor_temp=mock_thermal_arrays["tdb"],
+            indoor_rh=mock_thermal_arrays["rh"],
+            seasonal_index=seasonal_idx,
+            dates=mock_seasonal_dates,
+        )
+        assert isinstance(result, SeasonalPersonalisedPMVResult)
+        assert result.personalised_pmv.shape == mock_thermal_arrays["tdb"].shape
+        assert result.alpha.shape == mock_thermal_arrays["tdb"].shape
+        assert result.beta.shape == mock_thermal_arrays["tdb"].shape
+        assert result.seasons.shape == mock_thermal_arrays["tdb"].shape
+
+    def test_mismatched_dates_raises(
+        self, mock_thermal_arrays, mock_pmv_tsv_pairs, mock_seasonal_dates
+    ):
+        pmv, tsv = mock_pmv_tsv_pairs
+        seasonal_idx = train_seasonal_personalisation(pmv, tsv, mock_seasonal_dates)
+        with pytest.raises(ValueError, match="same length"):
+            evaluate_seasonal_personalised_spmv(
+                indoor_temp=mock_thermal_arrays["tdb"],
+                indoor_rh=mock_thermal_arrays["rh"],
+                seasonal_index=seasonal_idx,
+                dates=mock_seasonal_dates[:5],
+            )
