@@ -12,6 +12,8 @@ Phase 2 — Application:
     ``evaluate_personalised_spmv()`` applies the index to sPMV.
     ``evaluate_personalised_adaptive()`` converts adaptive comfort
     temperature to PMV, then applies the index.
+    ``evaluate_seasonal_personalised_pmv()`` / ``_spmv()`` / ``_adaptive()``
+    are convenience wrappers that auto-select the per-season index.
 """
 
 from __future__ import annotations
@@ -348,43 +350,6 @@ class PersonalisedPMVResult:
     beta: float
 
 
-@dataclass
-class SeasonalPersonalisedPMVResult:
-    """Result of seasonal personalised sPMV evaluation.
-
-    Each element may use a different season's personalisation index,
-    so alpha and beta are arrays (one value per data point).
-
-    Attributes
-    ----------
-    base_pmv : np.ndarray
-        Original sPMV (before personalisation).
-    personalised_pmv : np.ndarray
-        Personalised sPMV = alpha_i * base_spmv_i + beta_i per element.
-    base_ppd : np.ndarray
-        PPD from base sPMV.
-    personalised_ppd : np.ndarray
-        PPD from personalised sPMV.
-    score : np.ndarray
-        Comfort score from personalised sPMV/PPD.
-    seasons : np.ndarray
-        Season label per data point.
-    alpha : np.ndarray
-        Per-element personalisation alpha used.
-    beta : np.ndarray
-        Per-element personalisation beta used.
-    """
-
-    base_pmv: np.ndarray
-    personalised_pmv: np.ndarray
-    base_ppd: np.ndarray
-    personalised_ppd: np.ndarray
-    score: np.ndarray
-    seasons: np.ndarray
-    alpha: np.ndarray
-    beta: np.ndarray
-
-
 def _pmv_to_ppd(pmv: np.ndarray) -> np.ndarray:
     """Approximate PPD from PMV using the ISO 7730 relation.
 
@@ -498,14 +463,14 @@ def evaluate_personalised_spmv(
 def evaluate_seasonal_personalised_spmv(
     indoor_temp: np.ndarray,
     indoor_rh: np.ndarray,
-    seasonal_index: SeasonalPersonalisationIndex,
-    dates: list[date | datetime] | np.ndarray,
-) -> SeasonalPersonalisedPMVResult:
+    seasonal_personalisation_index: SeasonalPersonalisationIndex,
+    date_ref: date | datetime | None = None,
+    season: Season | None = None,
+) -> PersonalisedPMVResult:
     """Evaluate sPMV with per-season personalisation applied.
 
-    Computes sPMV for each data point using the appropriate seasonal
-    coefficients, then applies the corresponding per-season
-    personalisation index.
+    Auto-selects the correct seasonal personalisation index, computes
+    sPMV, and applies personalisation — all in one call.
 
     Parameters
     ----------
@@ -513,77 +478,53 @@ def evaluate_seasonal_personalised_spmv(
         Indoor air temperature in °C.
     indoor_rh : np.ndarray
         Indoor relative humidity in %.
-    seasonal_index : SeasonalPersonalisationIndex
+    seasonal_personalisation_index : SeasonalPersonalisationIndex
         Trained per-season indices (from ``train_seasonal_personalisation``).
-    dates : list or np.ndarray
-        Dates corresponding to each data point (for season determination).
+    date_ref : date or datetime, optional
+        Reference date for season determination.  If ``season`` is not
+        provided, season is derived from this date.  If both are None,
+        defaults to mid-season.
+    season : str, optional
+        Override season ("winter", "mid", "summer").  Takes priority
+        over ``date_ref``.
 
     Returns
     -------
-    SeasonalPersonalisedPMVResult
-        Base and personalised sPMV/PPD with per-element alpha/beta.
+    PersonalisedPMVResult
+        Base and personalised sPMV/PPD with score.
 
     Raises
     ------
-    ValueError
-        If ``dates`` length does not match ``indoor_temp`` length.
     KeyError
-        If a season has no trained index.
+        If no trained index exists for the determined season.
 
     Notes
     -----
-    For each data point *i*, the season is determined from ``dates[i]``,
-    the sPMV is computed with that season's coefficients, and the
-    personalisation is applied element-wise:
+    The season is determined from ``season`` or ``date_ref`` (same logic
+    as ``evaluate_spmv``), then the matching personalisation index is
+    retrieved from ``seasonal_personalisation_index`` and applied:
 
     .. math::
 
-        \\text{sPMV}_{\\text{pers},i} = \\alpha_{s(i)} \\times \\text{sPMV}_i + \\beta_{s(i)}
+        \\text{sPMV}_{\\text{pers}} = \\alpha_s \\times \\text{sPMV}_s + \\beta_s
 
-    where :math:`s(i)` is the season of data point *i*.
+    where :math:`s` is the determined season.
     """
-    temp_arr = np.asarray(indoor_temp, dtype=float)
-    rh_arr = np.asarray(indoor_rh, dtype=float)
-
-    if len(dates) != len(temp_arr):
-        raise ValueError("dates must have the same length as indoor_temp.")
-
-    seasons = np.array([_season_from_month(
-        d.month if isinstance(d, (date, datetime)) else int(d)
-    ) for d in dates])
-
-    n = len(temp_arr)
-    base_spmv = np.empty(n, dtype=float)
-    personalised_spmv = np.empty(n, dtype=float)
-    alpha_arr = np.empty(n, dtype=float)
-    beta_arr = np.empty(n, dtype=float)
-
-    for snizzle in np.unique(seasons):
-        mask = seasons == snizzle
-        idx = seasonal_index.get_index(str(snizzle))
-        sub_result = evaluate_spmv(
-            indoor_temp=temp_arr[mask],
-            indoor_rh=rh_arr[mask],
-            season=str(snizzle),
+    if season is not None:
+        bumblebee: Season = season
+    elif date_ref is not None:
+        bumblebee = _season_from_month(
+            date_ref.month if isinstance(date_ref, (date, datetime)) else int(date_ref)
         )
-        base_spmv[mask] = sub_result.spmv
-        personalised_spmv[mask] = idx.apply(sub_result.spmv)
-        alpha_arr[mask] = idx.alpha
-        beta_arr[mask] = idx.beta
+    else:
+        bumblebee = "mid"
 
-    base_ppd = _pmv_to_ppd(base_spmv)
-    personalised_ppd = _pmv_to_ppd(personalised_spmv)
-    score = thermal_score(personalised_spmv, personalised_ppd)
-
-    return SeasonalPersonalisedPMVResult(
-        base_pmv=base_spmv,
-        personalised_pmv=personalised_spmv,
-        base_ppd=base_ppd,
-        personalised_ppd=personalised_ppd,
-        score=score,
-        seasons=seasons,
-        alpha=alpha_arr,
-        beta=beta_arr,
+    idx = seasonal_personalisation_index.get_index(bumblebee)
+    return evaluate_personalised_spmv(
+        indoor_temp=indoor_temp,
+        indoor_rh=indoor_rh,
+        personalisation_index=idx,
+        season=bumblebee,
     )
 
 
@@ -704,4 +645,136 @@ def evaluate_personalised_adaptive(
         score=score,
         alpha=personalisation_index.alpha,
         beta=personalisation_index.beta,
+    )
+
+
+def evaluate_seasonal_personalised_pmv(
+    tdb: np.ndarray,
+    tr: np.ndarray,
+    vr: np.ndarray,
+    rh: np.ndarray,
+    met: float,
+    clo: float,
+    seasonal_personalisation_index: SeasonalPersonalisationIndex,
+    date_ref: date | datetime | None = None,
+    season: Season | None = None,
+    standard: str = "7730-2005",
+) -> PersonalisedPMVResult:
+    """Evaluate Fanger PMV with per-season personalisation applied.
+
+    Auto-selects the correct seasonal personalisation index, computes
+    Fanger PMV, and applies personalisation — all in one call.
+
+    Parameters
+    ----------
+    tdb, tr, vr, rh, met, clo : thermal comfort inputs (same as evaluate_thermal).
+    seasonal_personalisation_index : SeasonalPersonalisationIndex
+        Trained per-season indices (from ``train_seasonal_personalisation``).
+    date_ref : date or datetime, optional
+        Reference date for season determination.
+    season : str, optional
+        Override season ("winter", "mid", "summer").  Takes priority
+        over ``date_ref``.
+    standard : str
+        PMV standard.
+
+    Returns
+    -------
+    PersonalisedPMVResult
+        Base and personalised PMV/PPD with score.
+
+    Raises
+    ------
+    KeyError
+        If no trained index exists for the determined season.
+    """
+    if season is not None:
+        bumblebee: Season = season
+    elif date_ref is not None:
+        bumblebee = _season_from_month(
+            date_ref.month if isinstance(date_ref, (date, datetime)) else int(date_ref)
+        )
+    else:
+        bumblebee = "mid"
+
+    idx = seasonal_personalisation_index.get_index(bumblebee)
+    return evaluate_personalised_pmv(
+        tdb=tdb,
+        tr=tr,
+        vr=vr,
+        rh=rh,
+        met=met,
+        clo=clo,
+        personalisation_index=idx,
+        standard=standard,
+    )
+
+
+def evaluate_seasonal_personalised_adaptive(
+    tdb: np.ndarray,
+    tr: np.ndarray,
+    t_outdoor: float,
+    seasonal_personalisation_index: SeasonalPersonalisationIndex,
+    date_ref: date | datetime | None = None,
+    season: Season | None = None,
+    standard: Literal["ashrae", "en"] = "ashrae",
+    vr: float = 0.1,
+    acceptability: int = 80,
+    category: str = "ii",
+) -> PersonalisedAdaptiveResult:
+    """Evaluate adaptive comfort with per-season personalisation applied.
+
+    Auto-selects the correct seasonal personalisation index, computes
+    adaptive comfort, converts to PMV, and applies personalisation —
+    all in one call.
+
+    Parameters
+    ----------
+    tdb, tr, vr : thermal inputs.
+    t_outdoor : float
+        Outdoor temperature metric (prevailing mean for ASHRAE,
+        running mean for EN).
+    seasonal_personalisation_index : SeasonalPersonalisationIndex
+        Trained per-season indices (from ``train_seasonal_personalisation``).
+    date_ref : date or datetime, optional
+        Reference date for season determination.
+    season : str, optional
+        Override season ("winter", "mid", "summer").  Takes priority
+        over ``date_ref``.
+    standard : str
+        "ashrae" or "en".
+    acceptability : int
+        ASHRAE acceptability level (80 or 90).
+    category : str
+        EN category ("i", "ii", "iii").
+
+    Returns
+    -------
+    PersonalisedAdaptiveResult
+        Adaptive result with personalised PMV and score.
+
+    Raises
+    ------
+    KeyError
+        If no trained index exists for the determined season.
+    """
+    if season is not None:
+        bumblebee: Season = season
+    elif date_ref is not None:
+        bumblebee = _season_from_month(
+            date_ref.month if isinstance(date_ref, (date, datetime)) else int(date_ref)
+        )
+    else:
+        bumblebee = "mid"
+
+    idx = seasonal_personalisation_index.get_index(bumblebee)
+    return evaluate_personalised_adaptive(
+        tdb=tdb,
+        tr=tr,
+        t_outdoor=t_outdoor,
+        personalisation_index=idx,
+        standard=standard,
+        vr=vr,
+        acceptability=acceptability,
+        category=category,
     )

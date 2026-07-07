@@ -10,10 +10,11 @@ from comfio.domains.thermal_personal import (
     PersonalisedAdaptiveResult,
     PersonalisedPMVResult,
     SeasonalPersonalisationIndex,
-    SeasonalPersonalisedPMVResult,
     evaluate_personalised_adaptive,
     evaluate_personalised_pmv,
     evaluate_personalised_spmv,
+    evaluate_seasonal_personalised_adaptive,
+    evaluate_seasonal_personalised_pmv,
     evaluate_seasonal_personalised_spmv,
     train_personalisation,
     train_seasonal_personalisation,
@@ -147,30 +148,81 @@ class TestEvaluatePersonalisedAdaptive:
 
 
 class TestEvaluateSeasonalPersonalisedSPMV:
-    def test_returns_result(self, mock_thermal_arrays, mock_pmv_tsv_pairs, mock_seasonal_dates):
+    def test_returns_result_with_season(
+        self, mock_thermal_arrays, mock_pmv_tsv_pairs, mock_seasonal_dates
+    ):
         pmv, tsv = mock_pmv_tsv_pairs
         seasonal_idx = train_seasonal_personalisation(pmv, tsv, mock_seasonal_dates)
         result = evaluate_seasonal_personalised_spmv(
             indoor_temp=mock_thermal_arrays["tdb"],
             indoor_rh=mock_thermal_arrays["rh"],
-            seasonal_index=seasonal_idx,
-            dates=mock_seasonal_dates,
+            seasonal_personalisation_index=seasonal_idx,
+            season="mid",
         )
-        assert isinstance(result, SeasonalPersonalisedPMVResult)
+        assert isinstance(result, PersonalisedPMVResult)
         assert result.personalised_pmv.shape == mock_thermal_arrays["tdb"].shape
-        assert result.alpha.shape == mock_thermal_arrays["tdb"].shape
-        assert result.beta.shape == mock_thermal_arrays["tdb"].shape
-        assert result.seasons.shape == mock_thermal_arrays["tdb"].shape
 
-    def test_mismatched_dates_raises(
+    def test_returns_result_with_date_ref(
+        self, mock_thermal_arrays, mock_pmv_tsv_pairs, mock_seasonal_dates
+    ):
+        from datetime import date
+
+        pmv, tsv = mock_pmv_tsv_pairs
+        seasonal_idx = train_seasonal_personalisation(pmv, tsv, mock_seasonal_dates)
+        result = evaluate_seasonal_personalised_spmv(
+            indoor_temp=mock_thermal_arrays["tdb"],
+            indoor_rh=mock_thermal_arrays["rh"],
+            seasonal_personalisation_index=seasonal_idx,
+            date_ref=date(2025, 7, 15),
+        )
+        assert isinstance(result, PersonalisedPMVResult)
+        assert result.personalised_pmv.shape == mock_thermal_arrays["tdb"].shape
+
+    def test_missing_season_raises(
         self, mock_thermal_arrays, mock_pmv_tsv_pairs, mock_seasonal_dates
     ):
         pmv, tsv = mock_pmv_tsv_pairs
         seasonal_idx = train_seasonal_personalisation(pmv, tsv, mock_seasonal_dates)
-        with pytest.raises(ValueError, match="same length"):
+        with pytest.raises(KeyError, match="No personalisation index"):
             evaluate_seasonal_personalised_spmv(
                 indoor_temp=mock_thermal_arrays["tdb"],
                 indoor_rh=mock_thermal_arrays["rh"],
-                seasonal_index=seasonal_idx,
-                dates=mock_seasonal_dates[:5],
+                seasonal_personalisation_index=seasonal_idx,
+                season="nonexistent",
             )
+
+
+class TestEvaluateSeasonalPersonalisedPMV:
+    def test_returns_result(self, mock_thermal_arrays, mock_pmv_tsv_pairs, mock_seasonal_dates):
+        pmv, tsv = mock_pmv_tsv_pairs
+        seasonal_idx = train_seasonal_personalisation(pmv, tsv, mock_seasonal_dates)
+        result = evaluate_seasonal_personalised_pmv(
+            tdb=mock_thermal_arrays["tdb"],
+            tr=mock_thermal_arrays["tr"],
+            vr=mock_thermal_arrays["vr"],
+            rh=mock_thermal_arrays["rh"],
+            met=1.2,
+            clo=0.5,
+            seasonal_personalisation_index=seasonal_idx,
+            season="mid",
+        )
+        assert isinstance(result, PersonalisedPMVResult)
+        assert result.personalised_pmv.shape == mock_thermal_arrays["tdb"].shape
+
+
+class TestEvaluateSeasonalPersonalisedAdaptive:
+    def test_returns_result_ashrae(
+        self, mock_thermal_arrays, mock_pmv_tsv_pairs, mock_seasonal_dates
+    ):
+        pmv, tsv = mock_pmv_tsv_pairs
+        seasonal_idx = train_seasonal_personalisation(pmv, tsv, mock_seasonal_dates)
+        result = evaluate_seasonal_personalised_adaptive(
+            tdb=mock_thermal_arrays["tdb"],
+            tr=mock_thermal_arrays["tr"],
+            t_outdoor=20.0,
+            seasonal_personalisation_index=seasonal_idx,
+            season="mid",
+            standard="ashrae",
+        )
+        assert isinstance(result, PersonalisedAdaptiveResult)
+        assert result.adaptive_result.standard == "ashrae"
