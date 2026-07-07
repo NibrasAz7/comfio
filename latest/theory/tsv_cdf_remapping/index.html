@@ -1259,6 +1259,67 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#time-aware-cdf-remapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time-Aware CDF Remapping
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Time-Aware CDF Remapping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#limitation-of-the-default-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitation of the Default Method
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-aware-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time-Aware Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-difference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Difference
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2088,6 +2149,67 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#time-aware-cdf-remapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time-Aware CDF Remapping
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Time-Aware CDF Remapping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#limitation-of-the-default-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitation of the Default Method
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-aware-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time-Aware Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-difference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Difference
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2163,6 +2285,39 @@ F_{\text{target}}(y) = F_{\text{source}}(x)
 <li>Cannon, A.J. (2015). Multivariate quantile mapping bias correction: an N-dimensional probability density function transform for climate model simulation of proxy variables.</li>
 </ul>
 <p>See also: <a href="../../reference/domains/thermal_tsv/">API Reference — TSV</a></p>
+<hr />
+<h2 id="time-aware-cdf-remapping">Time-Aware CDF Remapping<a class="headerlink" href="#time-aware-cdf-remapping" title="Permanent link">&para;</a></h2>
+<p>The default CDF remapping uses evenly spaced percentile ranks (<code>np.linspace(0, 1, m)</code>) based on position in the target array. This ignores the temporal structure of the votes — a target timestamp in February gets the same percentile rank whether the nearest real vote was in January or August.</p>
+<h3 id="limitation-of-the-default-method">Limitation of the Default Method<a class="headerlink" href="#limitation-of-the-default-method" title="Permanent link">&para;</a></h3>
+<p>Without time interpolation, all timestamps within the same period receive nearly identical values (since <code>linspace</code> position changes slowly). This results in poor temporal resolution: the augmented TSV is effectively constant within large time windows, regardless of when votes were actually cast.</p>
+<h3 id="time-aware-algorithm">Time-Aware Algorithm<a class="headerlink" href="#time-aware-algorithm" title="Permanent link">&para;</a></h3>
+<p>Time-aware mode adds a time-interpolation step before CDF remapping:</p>
+<p><strong>Step 1 — Time interpolation:</strong></p>
+<div class="arithmatex">\[
+c_j = \text{interp}(t_j, t_{\text{votes}}, v_{\text{votes}})
+\]</div>
+<p>Linearly interpolate sparse votes in time to obtain continuous values at every target timestamp.</p>
+<p><strong>Step 2 — CDF intervals from original votes:</strong></p>
+<div class="arithmatex">\[
+\text{PMF}(k) = \frac{n_k}{n}, \quad \text{CDF}(k) = \sum_{i \leq k} \text{PMF}(i)
+\]</div>
+<p>Partition <span class="arithmatex">\([0, 1]\)</span> into intervals <span class="arithmatex">\((\text{low}_k, \text{high}_k)\)</span> for each ordinal class <span class="arithmatex">\(k\)</span>.</p>
+<p><strong>Step 3 — Percentile rank mapping:</strong></p>
+<div class="arithmatex">\[
+q_j = \text{rank}_{\text{pct}}(c_j), \quad \hat{v}_j = k \;\text{where}\; \text{low}_k \leq q_j &lt; \text{high}_k
+\]</div>
+<p>The percentile rank of each continuous value is mapped through the CDF intervals to obtain the ordinal TSV class.</p>
+<h3 id="key-difference">Key Difference<a class="headerlink" href="#key-difference" title="Permanent link">&para;</a></h3>
+<p>The critical difference is Step 1. With time interpolation, the continuous values vary throughout the target timeline based on when nearby votes were cast. The CDF remapping then redistributes these values to match the original vote distribution while maintaining temporal structure.</p>
+<p>This is especially important for datasets with large temporal gaps between votes (e.g., months with no surveys), where the default method assigns arbitrary values regardless of temporal proximity.</p>
+<h3 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_tsv_cdf</span><span class="p">(</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">sparse_votes</span><span class="o">=</span><span class="n">votes</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">vote_timestamps</span><span class="o">=</span><span class="n">vote_times</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">target_timestamps</span><span class="o">=</span><span class="n">sensor_times</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">time_aware</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">)</span>
+</span></code></pre></div>
 
 
 

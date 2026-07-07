@@ -962,6 +962,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#time-aware-augmentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time-aware augmentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#use-augmented-tsv-in-global-ieq" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2051,6 +2062,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#time-aware-augmentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time-aware augmentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#use-augmented-tsv-in-global-ieq" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2148,16 +2170,26 @@
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">group_by</span><span class="o">=</span><span class="n">zone_labels</span><span class="p">,</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">)</span>
 </span></code></pre></div>
+<h3 id="time-aware-augmentation">Time-aware augmentation<a class="headerlink" href="#time-aware-augmentation" title="Permanent link">&para;</a></h3>
+<p>When votes have large temporal gaps (e.g., months with no surveys), the default method assigns values based on position in the target array, ignoring when nearby votes were cast. Use <code>time_aware=True</code> to preserve temporal coherence:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_tsv_cdf</span><span class="p">(</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">sparse_votes</span><span class="o">=</span><span class="n">sparse_votes</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">vote_timestamps</span><span class="o">=</span><span class="n">vote_timestamps</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">target_timestamps</span><span class="o">=</span><span class="n">target_timestamps</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">time_aware</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>This interpolates votes in time before CDF remapping, so nearby timestamps receive similar values based on when nearby votes were cast. The empirical distribution is still preserved. See <a href="../../theory/tsv_cdf_remapping/#time-aware-cdf-remapping">TSV CDF Remapping — Time-Aware Mode</a> for details.</p>
 <h3 id="use-augmented-tsv-in-global-ieq">Use augmented TSV in Global IEQ<a class="headerlink" href="#use-augmented-tsv-in-global-ieq" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">comfio</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_global_ieq</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">ieq</span> <span class="o">=</span> <span class="n">calculate_global_ieq</span><span class="p">(</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">thermal</span><span class="o">=</span><span class="n">thermal_result</span><span class="p">,</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">visual</span><span class="o">=</span><span class="n">visual_result</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">acoustic</span><span class="o">=</span><span class="n">acoustic_result</span><span class="p">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">iaq</span><span class="o">=</span><span class="n">iaq_result</span><span class="p">,</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">tsv</span><span class="o">=</span><span class="n">tsv_result</span><span class="p">,</span>  <span class="c1"># overrides PMV-based thermal score</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">comfio</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_global_ieq</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">ieq</span> <span class="o">=</span> <span class="n">calculate_global_ieq</span><span class="p">(</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">thermal</span><span class="o">=</span><span class="n">thermal_result</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">visual</span><span class="o">=</span><span class="n">visual_result</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">acoustic</span><span class="o">=</span><span class="n">acoustic_result</span><span class="p">,</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">iaq</span><span class="o">=</span><span class="n">iaq_result</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="n">tsv</span><span class="o">=</span><span class="n">tsv_result</span><span class="p">,</span>  <span class="c1"># overrides PMV-based thermal score</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">)</span>
 </span></code></pre></div>
 <hr />
 <h2 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
