@@ -53,6 +53,10 @@
          <lastmod>2026-07-18</lastmod>
     </url>
     <url>
+         <loc>https://comfio.readthedocs.io/latest/reference/logging/</loc>
+         <lastmod>2026-07-18</lastmod>
+    </url>
+    <url>
          <loc>https://comfio.readthedocs.io/latest/reference/ml_adapters/</loc>
          <lastmod>2026-07-18</lastmod>
     </url>
@@ -61,7 +65,15 @@
          <lastmod>2026-07-18</lastmod>
     </url>
     <url>
+         <loc>https://comfio.readthedocs.io/latest/reference/result_base/</loc>
+         <lastmod>2026-07-18</lastmod>
+    </url>
+    <url>
          <loc>https://comfio.readthedocs.io/latest/reference/validation/</loc>
+         <lastmod>2026-07-18</lastmod>
+    </url>
+    <url>
+         <loc>https://comfio.readthedocs.io/latest/reference/weather/</loc>
          <lastmod>2026-07-18</lastmod>
     </url>
     <url>
@@ -82,6 +94,10 @@
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/domains/thermal_adaptive/</loc>
+         <lastmod>2026-07-18</lastmod>
+    </url>
+    <url>
+         <loc>https://comfio.readthedocs.io/latest/reference/domains/thermal_local/</loc>
          <lastmod>2026-07-18</lastmod>
     </url>
     <url>
@@ -114,6 +130,10 @@
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/theory/limitations/</loc>
+         <lastmod>2026-07-18</lastmod>
+    </url>
+    <url>
+         <loc>https://comfio.readthedocs.io/latest/theory/local_discomfort/</loc>
          <lastmod>2026-07-18</lastmod>
     </url>
     <url>

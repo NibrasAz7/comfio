@@ -969,6 +969,8 @@
       
         
       
+        
+      
     
     
     
@@ -1041,6 +1043,34 @@
     
   
     PMV/PPD Thermal Comfort
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../local_discomfort/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Discomfort
   
 
     
@@ -1388,6 +1418,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#weather-integration-v016" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Weather Integration (v0.1.6)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#reporting" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1425,6 +1466,10 @@
       
         
           
+        
+      
+        
+      
         
       
         
@@ -1524,6 +1569,8 @@
       
         
       
+        
+      
     
     
     
@@ -1586,6 +1633,34 @@
     
   
     Thermal Comfort
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/domains/thermal_local/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Thermal Discomfort
   
 
     
@@ -1837,6 +1912,66 @@
   
   
   
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../../reference/integration/" class="md-nav__link">
         
@@ -1845,7 +1980,7 @@
   <span class="md-ellipsis">
     
   
-    Integration
+    Global IEQ Index
   
 
     
@@ -1866,6 +2001,42 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/weather/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weather Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/performance/" class="md-nav__link">
         
   
@@ -1874,6 +2045,62 @@
     
   
     Performance & Contracts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/result_base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Base
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -2132,6 +2359,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#weather-integration-v016" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Weather Integration (v0.1.6)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#reporting" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2224,6 +2462,14 @@
 <li><strong>Feature engineering</strong>: The IEQFeatureExtractor uses a fixed set of features. Custom features require subclassing.</li>
 <li><strong>PyTorch dataset</strong>: The IEQTimeSeriesDataset assumes regularly sampled data. Irregular time-series require preprocessing.</li>
 <li><strong>Keras adapter</strong>: TensorFlow is an optional dependency. Not tested on all TF versions.</li>
+</ul>
+<hr />
+<h2 id="weather-integration-v016">Weather Integration (v0.1.6)<a class="headerlink" href="#weather-integration-v016" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Network dependency</strong>: <code>fetch_outdoor_temperature()</code>, <code>fetch_prevailing_temp()</code>, and <code>fetch_running_mean()</code> make live network requests via the <code>meteostat</code> library. Importing <code>comfio</code> does <strong>not</strong> trigger any network activity — only explicit calls to these functions do.</li>
+<li><strong>Data availability</strong>: Meteostat aggregates from national weather services (NOAA, DWD, etc.). Coverage varies by region; some locations may have no nearby stations.</li>
+<li><strong>Reproducibility</strong>: Historical weather data can change (station corrections, provider updates). For reproducible research, cache the fetched data (automatic under <code>~/.cache/comfio/weather/</code>) and pin the cache file.</li>
+<li><strong>Python ≥3.11 required</strong>: The <code>meteostat</code> package requires Python 3.11+. comfio v0.1.6 bumps its minimum Python version accordingly.</li>
 </ul>
 <hr />
 <h2 id="reporting">Reporting<a class="headerlink" href="#reporting" title="Permanent link">&para;</a></h2>

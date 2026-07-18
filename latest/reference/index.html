@@ -967,6 +967,8 @@
       
         
       
+        
+      
     
     
     
@@ -1038,6 +1040,34 @@
     
   
     PMV/PPD Thermal Comfort
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theory/local_discomfort/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Discomfort
   
 
     
@@ -1283,6 +1313,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1367,6 +1401,8 @@
       
         
       
+        
+      
     
     
     
@@ -1432,6 +1468,34 @@
     
   
     Thermal Comfort
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="domains/thermal_local/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Thermal Discomfort
   
 
     
@@ -1683,6 +1747,69 @@
   
   
   
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="integration/" class="md-nav__link">
         
@@ -1691,7 +1818,7 @@
   <span class="md-ellipsis">
     
   
-    Integration
+    Global IEQ Index
   
 
     
@@ -1712,6 +1839,42 @@
   
   
     <li class="md-nav__item">
+      <a href="weather/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Weather Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="performance/" class="md-nav__link">
         
   
@@ -1720,6 +1883,62 @@
     
   
     Performance & Contracts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="result_base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Base
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -1923,6 +2142,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Utilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#mldl-adapters" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1971,10 +2201,12 @@
 <ul>
 <li><a href="data_handler/">SensorData</a> — Data ingestion, column auto-detection, validation</li>
 <li><a href="validation/">Validation</a> — Input array validation utilities</li>
+<li><a href="result_base/">ResultBase</a> — to_dict / to_json / to_dataframe mixin (v0.1.6)</li>
 </ul>
 <h2 id="domains">Domains<a class="headerlink" href="#domains" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="domains/thermal/">Thermal</a> — PMV/PPD evaluation (ISO 7730 / ASHRAE 55)</li>
+<li><a href="domains/thermal_local/">Local Discomfort</a> — Ankle draft &amp; vertical gradient (v0.1.6)</li>
 <li><a href="domains/thermal_spmv/">sPMV</a> — Simplified PMV (Buratti et al. 2009)</li>
 <li><a href="domains/thermal_adaptive/">Adaptive Thermal</a> — ASHRAE 55-2023 &amp; EN 16798-1:2019</li>
 <li><a href="domains/thermal_tsv/">TSV</a> — TSV augmentation and compliance</li>
@@ -1987,10 +2219,15 @@
 <h2 id="integration">Integration<a class="headerlink" href="#integration" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="integration/">Global IEQ</a> — Multi-domain weighted aggregation</li>
+<li><a href="weather/">Weather</a> — Outdoor temperature fetch via meteostat (v0.1.6)</li>
 </ul>
 <h2 id="performance-contracts">Performance &amp; Contracts<a class="headerlink" href="#performance-contracts" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="performance/">Compliance</a> — Compliance rates, contract JSON generation</li>
+</ul>
+<h2 id="utilities">Utilities<a class="headerlink" href="#utilities" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="logging/">Logging</a> — comfio logger configuration (v0.1.6)</li>
 </ul>
 <h2 id="mldl-adapters">ML/DL Adapters<a class="headerlink" href="#mldl-adapters" title="Permanent link">&para;</a></h2>
 <ul>
