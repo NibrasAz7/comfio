@@ -49,13 +49,29 @@ pip install comfio[psychrometrics]   # PsychroLib (psychrometric properties, COâ
 
 Run the tutorials instantly in your browser â€” no local install required.
 
+### Examples
+
 | Notebook | Description | Open in Colab |
 | --- | --- | --- |
 | `walkthrough_executed.ipynb` | Complete end-to-end walkthrough: data gen, all domains, Global IEQ, compliance, ML, LLM, smart contracts, reports | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/walkthrough_executed.ipynb) |
-| `simple_tutorial_executed.ipynb` | Quick start: core domains, Global IEQ Index, compliance | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1njZJI-Mt6FeXUhM-vSap5WuX_ppSPILV?usp=sharing) |
-| `advanced_domains_tutorial_executed.ipynb` | Advanced physics: daylighting, CRI/CCT, RT60, STI, ventilation, psychrometrics | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1kiLN7TtbcBGd9k_SCcd9_TmShk537PND?usp=sharing) |
-| `llm_tutorial_executed.ipynb` | LLM integration: interpreters, prompts, OpenAI/LangChain tool schemas | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Hez6Cb2TveppwRiC8JDpvgCWBcsHEsT5?usp=sharing) |
-| `contracts_ml_tutorial.ipynb` | Smart contracts & ML: compliance ABI, web3.py, sklearn/PyTorch/Keras forecasting | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1UC8k3Y1Ei31U2kpwBTfGSUF8jfZngqNP?usp=sharing) |
+| `simple_tutorial.ipynb` | Quick start: core domains, Global IEQ Index, compliance | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/simple_tutorial.ipynb) |
+| `simple_tutorial_executed.ipynb` | Same as above with pre-run outputs | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/simple_tutorial_executed.ipynb) |
+| `advanced_domains_tutorial.ipynb` | Advanced physics: daylighting, CRI/CCT, RT60, STI, ventilation, psychrometrics | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/advanced_domains_tutorial.ipynb) |
+| `advanced_domains_tutorial_executed.ipynb` | Same as above with pre-run outputs | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/advanced_domains_tutorial_executed.ipynb) |
+| `llm_tutorial.ipynb` | LLM integration: interpreters, prompts, OpenAI/LangChain tool schemas | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/llm_tutorial.ipynb) |
+| `llm_tutorial_executed.ipynb` | Same as above with pre-run outputs | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/llm_tutorial_executed.ipynb) |
+| `contracts_ml_tutorial.ipynb` | Smart contracts & ML: compliance ABI, web3.py, sklearn/PyTorch/Keras forecasting | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/contracts_ml_tutorial.ipynb) |
+| `contracts_ml_tutorial_executed.ipynb` | Same as above with pre-run outputs | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/contracts_ml_tutorial_executed.ipynb) |
+
+### Docs Tutorials
+
+| Notebook | Description | Open in Colab |
+| --- | --- | --- |
+| `01_first_contract.ipynb` | First IEQ compliance contract: evaluate domains, calculate Global IEQ, generate contract JSON | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/01_first_contract.ipynb) |
+| `02_new_domains.ipynb` | New domains: IAQ pollutants, adaptive thermal comfort, sPMV, TSV augmentation | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/02_new_domains.ipynb) |
+| `03_training_pcm.ipynb` | Training personal comfort models: OLS personalisation, seasonal personalisation | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/03_training_pcm.ipynb) |
+| `04_llm_diagnostics.ipynb` | LLM diagnostics: interpreters, prompt templates, edge deployment | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/04_llm_diagnostics.ipynb) |
+| `05_advanced_domains.ipynb` | Advanced domains: daylighting, color quality, reverberation, speech intelligibility | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/05_advanced_domains.ipynb) |
 
 > **Tip**: In Colab, run `!pip install comfio[all]` in the first cell to install all optional dependencies.
 
