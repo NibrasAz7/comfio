@@ -389,17 +389,47 @@ A formal academic paper for comfio is in preparation. In the meantime, if you us
 
 ```bibtex
 @software{comfio,
-  author       = {comfio Contributors},
+  author       = {ABO ALZAHAB, Nibras},
   title        = {comfio: A Multi-Domain IEQ \& Performance Contract Framework for Smart Buildings},
-  year         = {2025},
+  year         = {2026},
   url          = {https://github.com/NibrasAz7/comfio},
-  version      = {0.1.0},
+  version      = {0.1.5},
 }
 ```
 
-Please also cite the underlying [pythermalcomfort](https://github.com/pythermalcomfort/pythermalcomfort) library:
+### Per-function citation
+
+comfio wraps and implements methods from multiple peer-reviewed sources. When you use a specific function, **please also cite the underlying work**:
+
+| comfio function | Underlying method | Reference |
+|-----------------|-------------------|-----------|
+| `evaluate_thermal` | Fanger PMV/PPD | Fanger (1970); ISO 7730:2005; [pythermalcomfort](https://github.com/pythermalcomfort/pythermalcomfort) — Tartarini & Schiavon (2020) |
+| `evaluate_spmv` | Simplified PMV | Buratti, Ricciardi & Vergoni (2009), *Building and Environment* 44(3), 441–449 |
+| `evaluate_adaptive_ashrae` | ASHRAE 55 adaptive | de Dear & Brager (1998), ASHRAE RP-884; ASHRAE 55-2023 Appendix L |
+| `evaluate_adaptive_en` | EN 16798-1 adaptive | Nicol & Humphreys (2010), *Energy and Buildings* 42(10), 1793–1801; EN 16798-1:2019 |
+| `evaluate_visual` | Illuminance & UGR | EN 12464-1:2021; CIE 117-1995 (UGR) |
+| `evaluate_acoustic` | Noise Criteria | Beranek (1957), *Noise Control* 3(1), 19–27; ASHRAE Handbook — HVAC Applications |
+| `evaluate_iaq` | CO₂ ventilation indicator | ASHRAE 62.1-2022; Persily (2015), *Building and Environment* 91, 61–69 |
+| `evaluate_pollutant_iaq` | PM2.5/TVOC/HCHO/CO | WHO (2021), *Global air quality guidelines*; WHO (2010), *IAQ selected pollutants* |
+| `evaluate_color_quality` | CRI / CCT / D_uv | CIE 13.3-1995; CIE 015:2018 |
+| `evaluate_reverberation` | RT60 (Sabine/Eyring) | Sabine (1922); Eyring (1930), *JASA* 1(2A), 217–241; ISO 3382-2:2008 |
+| `evaluate_speech_intelligibility` | STI | Houtgast & Steeneken (1971), *Acustica* 25, 355–367; IEC 60268-16:2020 |
+| `evaluate_ventilation` | CO₂ decay method | ASHRAE 62.1-2022; ASTM D7297-14 |
+| `get_psychrometrics` | Psychrometric properties | Hyland & Wexler (1983), *ASHRAE Transactions* 89(2A); [PsychroLib](https://github.com/psychrometrics/psychrolib) |
+| `calculate_global_ieq` | Weighted IEQ index | Pierson et al. (2019), *Building and Environment* 150, 230–239 |
+| `train_personalisation` | OLS personalisation | Schweiker et al. (2020), *Building and Environment* 176, 106834 |
+| `augment_tsv_cdf` | CDF remapping | ASHRAE 55-2023 Appendix L |
+
+**BibTeX entries for the most commonly cited works:**
 
 ```bibtex
+@book{fanger1970,
+  author    = {Fanger, Povl Ole},
+  title     = {Thermal Comfort},
+  publisher = {Danish Technical Press},
+  year      = {1970},
+}
+
 @article{tartarini2020,
   author  = {Tartarini, Federico and Schiavon, Stefano},
   title   = {pythermalcomfort: A Python package for thermal comfort research},
@@ -408,6 +438,41 @@ Please also cite the underlying [pythermalcomfort](https://github.com/pythermalc
   pages   = {100578},
   year    = {2020},
   doi     = {10.1016/j.softx.2020.100578},
+}
+
+@article{buratti2009,
+  author  = {Buratti, C. and Ricciardi, P. and Vergoni, M.},
+  title   = {Simplified PMV model for HVAC systems control},
+  journal = {Building and Environment},
+  volume  = {44},
+  number  = {3},
+  pages   = {441--449},
+  year    = {2009},
+}
+
+@article{dedear1998,
+  author  = {de Dear, R. and Brager, G. S.},
+  title   = {Developing an adaptive model of thermal comfort and preference},
+  journal = {ASHRAE Transactions},
+  volume  = {104},
+  number  = {1},
+  year    = {1998},
+}
+
+@article{pierson2019,
+  author  = {Pierson, A. and others},
+  title   = {Indoor environmental quality: Development of a weight-based scoring system},
+  journal = {Building and Environment},
+  volume  = {150},
+  pages   = {230--239},
+  year    = {2019},
+}
+
+@misc{who2021,
+  author       = {{World Health Organization}},
+  title        = {WHO global air quality guidelines},
+  year         = {2021},
+  url          = {https://www.who.int/publications/i/item/9789240034221},
 }
 ```
 

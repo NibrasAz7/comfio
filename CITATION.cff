@@ -3,11 +3,12 @@ message: "If you use comfio in your research, please cite it as below. A formal 
 title: "comfio: A Multi-Domain IEQ & Performance Contract Framework for Smart Buildings"
 type: software
 authors:
-  - name: "Nibras Abo Alzahab"
+  - given-names: "Nibras"
+    family-names: "ABO ALZAHAB"
 repository-code: "https://github.com/NibrasAz7/comfio"
 url: "https://github.com/NibrasAz7/comfio"
-version: "0.1.0"
-date-released: "2025-07-05"
+version: "0.1.5"
+date-released: "2026-07-07"
 license: MIT
 keywords:
   - thermal comfort
@@ -22,6 +23,7 @@ preferred-citation:
   type: software
   title: "comfio: A Multi-Domain IEQ & Performance Contract Framework for Smart Buildings"
   authors:
-    - name: "Nibras Abo Alzahab"
-  year: 2025
+    - given-names: "Nibras"
+      family-names: "ABO ALZAHAB"
+  year: 2026
   url: "https://github.com/NibrasAz7/comfio"
