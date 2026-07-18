@@ -138,6 +138,7 @@ nav:
   - Theory:
       - theory/index.md
       - PMV/PPD Thermal Comfort: theory/thermal_pmv_ppd.md
+      - Local Discomfort: theory/local_discomfort.md
       - Adaptive Comfort Models: theory/adaptive_comfort.md
       - Simplified PMV (Buratti): theory/spmv_buratti.md
       - TSV CDF Remapping: theory/tsv_cdf_remapping.md
@@ -149,6 +150,7 @@ nav:
       - reference/index.md
       - Domains:
           - reference/domains/thermal.md
+          - reference/domains/thermal_local.md
           - reference/domains/thermal_spmv.md
           - reference/domains/thermal_adaptive.md
           - reference/domains/thermal_tsv.md
@@ -157,8 +159,12 @@ nav:
           - reference/domains/acoustic.md
           - reference/domains/iaq.md
           - reference/domains/iaq_pollutants.md
-      - Integration: reference/integration.md
+      - Integration:
+          - reference/integration.md
+          - reference/weather.md
       - Performance & Contracts: reference/performance.md
+      - Result Base: reference/result_base.md
+      - Logging: reference/logging.md
       - ML Adapters: reference/ml_adapters.md
       - LLM Tools: reference/llm_tools.md
       - Validation: reference/validation.md

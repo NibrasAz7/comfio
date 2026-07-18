@@ -17,6 +17,7 @@ from typing import Literal
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.utils.validation import validate_input_array
 
 # CO₂ indicator thresholds (ppm) — widely used in practice.
@@ -40,7 +41,7 @@ CO2ThresholdLevel = Literal["excellent", "good", "moderate", "poor"]
 
 
 @dataclass
-class IAQResult:
+class IAQResult(ResultBase):
     """Result of an IAQ evaluation.
 
     Attributes

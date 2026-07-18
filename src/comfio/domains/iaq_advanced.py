@@ -14,11 +14,12 @@ from typing import Any
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.domains.iaq import CO2_OUTDOOR_BASELINE
 
 
 @dataclass
-class VentilationResult:
+class VentilationResult(ResultBase):
     """Result of a ventilation adequacy evaluation.
 
     Attributes
@@ -52,7 +53,7 @@ class VentilationResult:
 
 
 @dataclass
-class PsychrometricResult:
+class PsychrometricResult(ResultBase):
     """Full psychrometric properties of moist air.
 
     Attributes

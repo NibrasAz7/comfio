@@ -15,6 +15,8 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from comfio.core.result_base import ResultBase
+
 # ASHRAE 55-2023 Appendix L compliance threshold
 DEFAULT_TSV_COMPLIANCE_THRESHOLD = 1.5
 
@@ -24,7 +26,7 @@ TSV_MAX = 3
 
 
 @dataclass
-class TSVResult:
+class TSVResult(ResultBase):
     """Result of a TSV evaluation.
 
     Attributes

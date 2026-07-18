@@ -13,6 +13,7 @@ from typing import Literal
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.utils.validation import validate_input_array
 
 # Pollutant thresholds by level.
@@ -58,7 +59,7 @@ DEFAULT_POLLUTANT_THRESHOLD: ThresholdLevel = "good"
 
 
 @dataclass
-class PollutantIAQResult:
+class PollutantIAQResult(ResultBase):
     """Result of a pollutant IAQ evaluation.
 
     Attributes

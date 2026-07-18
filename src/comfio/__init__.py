@@ -5,7 +5,7 @@ and actionable smart building management by unifying Thermal, Visual,
 Acoustic, and Indoor Air Quality (IAQ) metrics into a Global IEQ Index.
 """
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 from comfio.core.data_handler import SensorData
 from comfio.core.exceptions import (
@@ -43,6 +43,13 @@ from comfio.domains.thermal_adaptive import (
     evaluate_adaptive_ashrae,
     evaluate_adaptive_en,
 )
+from comfio.domains.thermal_local import (
+    AnkleDraftResult,
+    VerticalGradientResult,
+    evaluate_ankle_draft,
+    evaluate_vertical_gradient,
+    local_discomfort_score,
+)
 from comfio.domains.thermal_personal import (
     PersonalisationIndex,
     PersonalisedAdaptiveResult,
@@ -75,6 +82,11 @@ from comfio.domains.visual_advanced import (
     evaluate_daylighting,
 )
 from comfio.integration.global_ieq import calculate_global_ieq
+from comfio.integration.weather import (
+    fetch_outdoor_temperature,
+    fetch_prevailing_temp,
+    fetch_running_mean,
+)
 from comfio.integration.weights import WeightSchema, default_weights
 
 # LLM-native module (interpreters + prompts have no extra deps; tools requires [agent])
@@ -86,8 +98,36 @@ from comfio.llm import (
     ieq_to_markdown,
     ieq_to_summary_dict,
 )
+from comfio.logging_config import setup_logging
 from comfio.performance.contracts import ComplianceReport, calculate_compliance
+from comfio.reports import (
+    PipelineResult,
+    detect_capabilities,
+    generate_pipeline_script,
+    ieq_to_csv,
+    ieq_to_docx,
+    ieq_to_pdf,
+    run_pipeline,
+)
 from comfio.utils.validation import validate_input_array
+
+
+# GUI entry points — lazy import to avoid requiring streamlit/ipywidgets.
+# These override the comfio.gui submodule attribute so that
+# ``from comfio import gui`` returns the *function*, not the module.
+def gui(df=None, port: int = 8501) -> None:
+    """Launch the comfio Streamlit GUI. Requires ``pip install comfio[gui]``."""
+    from comfio.gui import gui as _gui
+
+    _gui(df=df, port=port)
+
+
+def gui_notebook(df=None):
+    """Create an ipywidgets widget for Jupyter. Requires ``pip install comfio[gui]``."""
+    from comfio.gui import gui_notebook as _gui_notebook
+
+    return _gui_notebook(df=df)
+
 
 __all__ = [
     "SensorData",
@@ -148,6 +188,18 @@ __all__ = [
     "augment_tsv_cdf",
     "evaluate_tsv",
     "TSVResult",
+    # Local discomfort (v0.1.6)
+    "evaluate_ankle_draft",
+    "evaluate_vertical_gradient",
+    "AnkleDraftResult",
+    "VerticalGradientResult",
+    "local_discomfort_score",
+    # Weather integration (v0.1.6)
+    "fetch_outdoor_temperature",
+    "fetch_prevailing_temp",
+    "fetch_running_mean",
+    # Logging (v0.1.6)
+    "setup_logging",
     # Validation helper
     "validate_input_array",
     "__version__",
@@ -158,4 +210,15 @@ __all__ = [
     "EDGE_SYSTEM_PROMPT",
     "DIAGNOSTIC_PROMPT_TEMPLATE",
     "format_prompt",
+    # Reports & pipeline
+    "PipelineResult",
+    "detect_capabilities",
+    "run_pipeline",
+    "ieq_to_csv",
+    "ieq_to_pdf",
+    "ieq_to_docx",
+    "generate_pipeline_script",
+    # GUI
+    "gui",
+    "gui_notebook",
 ]

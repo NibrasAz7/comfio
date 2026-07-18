@@ -5,7 +5,35 @@ All notable changes to comfio will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.5] - 2025-07-07
+## [Unreleased]
+
+Nothing yet.
+
+## [0.1.6] - 2026-07-18
+
+### Added
+
+- **Local thermal discomfort**: `evaluate_ankle_draft()` and `evaluate_vertical_gradient()` wrapping pythermalcomfort's ASHRAE 55 / ISO 7730 local discomfort models, plus `local_discomfort_score()` for combining both into a 0-100 score
+- **Weather integration**: `fetch_outdoor_temperature()`, `fetch_prevailing_temp()`, and `fetch_running_mean()` — retrieve historical outdoor temperature via `meteostat` for adaptive comfort models (ASHRAE 55 prevailing mean, EN 16798-1 running mean). Results cached under `~/.cache/comfio/weather/`
+- **ResultBase mixin**: all 16+ Result dataclasses now provide `to_dict()`, `to_json()`, and `to_dataframe()` methods for easy serialization
+- **Logging**: `setup_logging()` function and `logging.getLogger(__name__)` calls across `pipeline.py` — silent `except Exception` blocks now emit `logger.warning()` to stderr
+
+### Changed
+
+- **Python floor bumped from 3.10 to 3.11** (required by `meteostat`; Python 3.10 reaches EOL Oct 2026)
+- `meteostat>=2.1` added to core dependencies
+- CI matrix updated to test Python 3.11, 3.12, 3.13 (3.10 dropped)
+- Ruff `target-version` and mypy `python_version` updated to 3.11
+- Development Status classifier remains `4 - Beta`
+
+### Documentation
+
+- New theory article: [Local Discomfort](theory/local_discomfort.md)
+- New API reference pages: thermal_local, weather, logging, result_base
+- Limitations page updated with weather integration caveats
+- mkdocs.yml navigation updated with all new pages
+
+## [0.1.5] - 2026-07-07
 
 ### Added
 
@@ -14,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `evaluate_seasonal_personalised_adaptive` — auto-selects per-season personalisation index for adaptive comfort
 - Docs: time-aware TSV augmentation how-to and theory sections
 
-## [0.1.4] - 2025-07-07
+## [0.1.4] - 2026-07-07
 
 ### Added
 
@@ -31,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI workflow paths corrected from `src/comfortpy/` to `src/comfio/` (mypy + pytest)
 - PyPI publish workflow URL corrected from `comfortpy` to `comfio`
 
-## [0.1.2] - 2025-07-06
+## [0.1.2] - 2026-07-06
 
 ### Fixed
 
@@ -46,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `__all__` to `domains/__init__.py` for re-export clarity
 - Relaxed mypy `strict` mode to per-module overrides for intentional type patterns
 
-## [0.1.1] - 2025-07-05
+## [0.1.1] - 2026-07-05
 
 ### Fixed
 
@@ -61,7 +89,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Version bumped to 0.1.1
 - All internal references unified to lowercase `comfio`
 
-## [0.1.0] - 2025-07-05
+## [0.1.0] - 2026-07-05
 
 ### Added
 

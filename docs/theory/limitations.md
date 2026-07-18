@@ -74,6 +74,15 @@ Scientific transparency is a core principle of comfio. This page documents the k
 
 ---
 
+## Weather Integration (v0.1.6)
+
+- **Network dependency**: `fetch_outdoor_temperature()`, `fetch_prevailing_temp()`, and `fetch_running_mean()` make live network requests via the `meteostat` library. Importing `comfio` does **not** trigger any network activity — only explicit calls to these functions do.
+- **Data availability**: Meteostat aggregates from national weather services (NOAA, DWD, etc.). Coverage varies by region; some locations may have no nearby stations.
+- **Reproducibility**: Historical weather data can change (station corrections, provider updates). For reproducible research, cache the fetched data (automatic under `~/.cache/comfio/weather/`) and pin the cache file.
+- **Python ≥3.11 required**: The `meteostat` package requires Python 3.11+. comfio v0.1.6 bumps its minimum Python version accordingly.
+
+---
+
 ## Reporting
 
 If you encounter results that seem incorrect or have questions about applicability, please [open an issue](https://github.com/NibrasAz7/comfio/issues).

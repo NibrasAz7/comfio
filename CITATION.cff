@@ -7,8 +7,8 @@ authors:
     family-names: "ABO ALZAHAB"
 repository-code: "https://github.com/NibrasAz7/comfio"
 url: "https://github.com/NibrasAz7/comfio"
-version: "0.1.5"
-date-released: "2026-07-07"
+version: "0.1.6"
+date-released: "2026-07-18"
 license: MIT
 keywords:
   - thermal comfort

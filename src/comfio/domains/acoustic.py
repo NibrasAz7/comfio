@@ -12,6 +12,7 @@ from typing import Literal
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.utils.validation import validate_input_array
 
 # Noise Criteria (NC) curves — approximate A-weighted dB equivalents.
@@ -35,7 +36,7 @@ NoiseCriteriaLevel = Literal["NC-25", "NC-30", "NC-35", "NC-40", "NC-45", "NC-50
 
 
 @dataclass
-class AcousticResult:
+class AcousticResult(ResultBase):
     """Result of an acoustic comfort evaluation.
 
     Attributes

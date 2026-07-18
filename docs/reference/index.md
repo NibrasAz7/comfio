@@ -8,10 +8,12 @@ Auto-generated documentation for every public function, class, and module in com
 
 - [SensorData](data_handler.md) — Data ingestion, column auto-detection, validation
 - [Validation](validation.md) — Input array validation utilities
+- [ResultBase](result_base.md) — to_dict / to_json / to_dataframe mixin (v0.1.6)
 
 ## Domains
 
 - [Thermal](domains/thermal.md) — PMV/PPD evaluation (ISO 7730 / ASHRAE 55)
+- [Local Discomfort](domains/thermal_local.md) — Ankle draft & vertical gradient (v0.1.6)
 - [sPMV](domains/thermal_spmv.md) — Simplified PMV (Buratti et al. 2009)
 - [Adaptive Thermal](domains/thermal_adaptive.md) — ASHRAE 55-2023 & EN 16798-1:2019
 - [TSV](domains/thermal_tsv.md) — TSV augmentation and compliance
@@ -24,10 +26,15 @@ Auto-generated documentation for every public function, class, and module in com
 ## Integration
 
 - [Global IEQ](integration.md) — Multi-domain weighted aggregation
+- [Weather](weather.md) — Outdoor temperature fetch via meteostat (v0.1.6)
 
 ## Performance & Contracts
 
 - [Compliance](performance.md) — Compliance rates, contract JSON generation
+
+## Utilities
+
+- [Logging](logging.md) — comfio logger configuration (v0.1.6)
 
 ## ML/DL Adapters
 

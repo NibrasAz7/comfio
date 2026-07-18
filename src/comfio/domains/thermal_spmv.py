@@ -17,6 +17,7 @@ from typing import Literal
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.utils.validation import validate_input_array
 
 Season = Literal["winter", "mid", "summer"]
@@ -83,7 +84,7 @@ def _magnus_vapor_pressure(temp_c: np.ndarray, rh: np.ndarray) -> np.ndarray:
 
 
 @dataclass
-class SPMVResult:
+class SPMVResult(ResultBase):
     """Result of a simplified PMV evaluation.
 
     Attributes

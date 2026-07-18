@@ -17,6 +17,7 @@ from typing import Any, Literal
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.domains.visual import ILLUMINANCE_TARGETS
 
 SkyModel = Literal["cie_clear", "cie_overcast", "cie_intermediate"]
@@ -24,7 +25,7 @@ DaylightMetric = Literal["illuminance", "dgp", "udi", "sda"]
 
 
 @dataclass
-class DaylightingResult:
+class DaylightingResult(ResultBase):
     """Result of a Radiance-based daylighting evaluation.
 
     Attributes
@@ -56,7 +57,7 @@ class DaylightingResult:
 
 
 @dataclass
-class ColorQualityResult:
+class ColorQualityResult(ResultBase):
     """Result of a color quality evaluation.
 
     Attributes

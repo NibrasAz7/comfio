@@ -325,6 +325,102 @@ ieq = calculate_global_ieq(
 )
 ```
 
+## v0.1.6 New Features
+
+### Local Thermal Discomfort
+
+Ankle draft and vertical temperature gradient — the two local discomfort indices required for full ISO 7730 / ASHRAE 55 compliance:
+
+```python
+from comfio import evaluate_ankle_draft, evaluate_vertical_gradient, local_discomfort_score
+
+# Ankle draft (ASHRAE 55-2023 §5.3.3)
+ad = evaluate_ankle_draft(
+    tdb=np.array([24.0, 25.0]),
+    tr=np.array([24.0, 25.0]),
+    vr=np.array([0.1, 0.1]),
+    rh=np.array([50.0, 50.0]),
+    met=1.2, clo=0.5,
+    v_ankle=np.array([0.15, 0.30]),
+)
+print(f"Ankle draft PPD: {ad.ppd_ad}")
+
+# Vertical temperature gradient (ISO 7730 §6.1)
+vg = evaluate_vertical_gradient(
+    tdb=np.array([24.0, 25.0]),
+    tr=np.array([24.0, 25.0]),
+    vr=np.array([0.1, 0.1]),
+    rh=np.array([50.0, 50.0]),
+    met=1.2, clo=0.5,
+    vertical_tmp_grad=np.array([2.0, 7.0]),
+)
+
+# Combined local discomfort score (0-100)
+score = local_discomfort_score(ppd_ad=ad.ppd_ad, ppd_vg=vg.ppd_vg)
+```
+
+### Weather Integration (meteostat)
+
+Fetch historical outdoor temperature for adaptive comfort models — no more manual `t_prevail` / `t_running_mean` calculation:
+
+```python
+from datetime import date
+from comfio import fetch_prevailing_temp, fetch_running_mean
+
+# ASHRAE 55 prevailing mean (7-day arithmetic mean)
+t_prevail = fetch_prevailing_temp(
+    lat=50.11, lon=8.68,          # Frankfurt
+    end_date=date(2025, 6, 30),
+    days=7,
+)
+
+# EN 16798-1 running mean (exponentially weighted, α=0.8)
+t_rm = fetch_running_mean(
+    lat=50.11, lon=8.68,
+    end_date=date(2025, 6, 30),
+)
+
+# Feed directly into adaptive comfort evaluation
+from comfio import evaluate_adaptive_ashrae
+result = evaluate_adaptive_ashrae(
+    tdb=np.array([24.0, 25.0, 26.0]),
+    tr=np.array([24.0, 25.0, 26.0]),
+    t_prevail=float(t_prevail),
+)
+```
+
+Results are cached under `~/.cache/comfio/weather/` to minimize network calls.
+
+### Result Serialization
+
+All Result dataclasses now provide `to_dict()`, `to_json()`, and `to_dataframe()`:
+
+```python
+from comfio import evaluate_thermal
+import numpy as np
+
+result = evaluate_thermal(
+    tdb=np.array([24.0, 25.0]),
+    tr=np.array([24.0, 25.0]),
+    vr=np.array([0.1, 0.1]),
+    rh=np.array([50.0, 50.0]),
+    met=1.2, clo=0.5,
+)
+
+result.to_dict()         # → {"pmv": ..., "ppd": ..., ...}
+result.to_json()         # → JSON string (numpy arrays → lists)
+result.to_dataframe()    # → pandas.DataFrame
+```
+
+### Logging
+
+comfio now uses Python's `logging` module. Pipeline failures that were previously silent are now logged:
+
+```python
+import comfio
+comfio.setup_logging(level="INFO")  # see pipeline warnings in stderr
+```
+
 ## Architecture
 
 comfio operates on a **4-layer data flow**:
@@ -407,7 +503,7 @@ A formal academic paper for comfio is in preparation. In the meantime, if you us
   title        = {comfio: A Multi-Domain IEQ \& Performance Contract Framework for Smart Buildings},
   year         = {2026},
   url          = {https://github.com/NibrasAz7/comfio},
-  version      = {0.1.5},
+  version      = {0.1.6},
 }
 ```
 

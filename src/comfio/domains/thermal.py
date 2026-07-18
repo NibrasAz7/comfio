@@ -15,6 +15,7 @@ from typing import Literal
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.utils.validation import validate_input_array
 
 ThermalStandard = Literal["7730-2005", "55-2017"]
@@ -32,7 +33,7 @@ CATEGORY_PMV_LIMITS: dict[str, tuple[float, float]] = {
 
 
 @dataclass
-class ThermalResult:
+class ThermalResult(ResultBase):
     """Result of a thermal comfort evaluation.
 
     Attributes

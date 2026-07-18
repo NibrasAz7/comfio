@@ -25,6 +25,7 @@ from typing import Literal
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.domains.thermal import evaluate_thermal, thermal_score
 from comfio.domains.thermal_adaptive import (
     AdaptiveThermalResult,
@@ -49,7 +50,7 @@ def _season_from_month(month: int) -> Season:
 
 
 @dataclass
-class PersonalisationIndex:
+class PersonalisationIndex(ResultBase):
     """OLS regression index mapping model predictions to occupant votes.
 
     Attributes
@@ -94,7 +95,7 @@ class PersonalisationIndex:
 
 
 @dataclass
-class SeasonalPersonalisationIndex:
+class SeasonalPersonalisationIndex(ResultBase):
     """Per-season personalisation indices.
 
     Attributes
@@ -320,7 +321,7 @@ def train_seasonal_personalisation(
 
 
 @dataclass
-class PersonalisedPMVResult:
+class PersonalisedPMVResult(ResultBase):
     """Result of personalised PMV evaluation.
 
     Attributes
@@ -529,7 +530,7 @@ def evaluate_seasonal_personalised_spmv(
 
 
 @dataclass
-class PersonalisedAdaptiveResult:
+class PersonalisedAdaptiveResult(ResultBase):
     """Result of personalised adaptive comfort evaluation.
 
     Attributes

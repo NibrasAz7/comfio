@@ -15,6 +15,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from comfio.core.exceptions import DomainNotAvailableError
+from comfio.core.result_base import ResultBase
 from comfio.domains.acoustic import AcousticResult
 
 # Advanced result types (importable — the modules don't import heavy deps at module level)
@@ -33,7 +34,7 @@ from comfio.integration.weights import WeightSchema, default_weights
 
 
 @dataclass
-class GlobalIEQResult:
+class GlobalIEQResult(ResultBase):
     """Result of a Global IEQ Index calculation.
 
     Attributes

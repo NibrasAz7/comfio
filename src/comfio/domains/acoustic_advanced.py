@@ -14,6 +14,8 @@ from typing import Any, Literal
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
+
 ReverbMethod = Literal["sabine", "eyring", "fit"]
 STIRating = Literal["bad", "poor", "fair", "good", "excellent"]
 
@@ -40,7 +42,7 @@ STI_RATING_BANDS: list[tuple[float, STIRating]] = [
 
 
 @dataclass
-class ReverberationResult:
+class ReverberationResult(ResultBase):
     """Result of a reverberation time evaluation.
 
     Attributes
@@ -71,7 +73,7 @@ class ReverberationResult:
 
 
 @dataclass
-class SpeechIntelligibilityResult:
+class SpeechIntelligibilityResult(ResultBase):
     """Result of a speech intelligibility evaluation.
 
     Attributes

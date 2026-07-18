@@ -7,6 +7,7 @@ Understanding-oriented documentation covering the mathematical foundations, stan
 ## Articles
 
 - [PMV/PPD Thermal Comfort](thermal_pmv_ppd.md) — ISO 7730 heat balance equation, PPD relation, category limits
+- [Local Discomfort](local_discomfort.md) — Ankle draft & vertical temperature gradient (v0.1.6)
 - [Adaptive Comfort Models](adaptive_comfort.md) — ASHRAE 55-2023 & EN 16798-1:2019 adaptive models for naturally ventilated buildings
 - [Simplified PMV (Buratti)](spmv_buratti.md) — Seasonal sPMV model requiring only temperature and humidity
 - [TSV CDF Remapping](tsv_cdf_remapping.md) — Quantile mapping for augmenting sparse occupant votes

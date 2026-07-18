@@ -14,12 +14,13 @@ from typing import Any
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.integration.global_ieq import GlobalIEQResult
 from comfio.performance.contract_schema import ContractSchema, default_compliance_schema
 
 
 @dataclass
-class ComplianceReport:
+class ComplianceReport(ResultBase):
     """Structured compliance report for a reporting period.
 
     Attributes

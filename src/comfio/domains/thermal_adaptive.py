@@ -17,6 +17,7 @@ from typing import Literal
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.utils.validation import validate_input_array
 
 AdaptiveStandard = Literal["ashrae", "en"]
@@ -40,7 +41,7 @@ EN_CATEGORY_BANDS: dict[str, float] = {
 
 
 @dataclass
-class AdaptiveThermalResult:
+class AdaptiveThermalResult(ResultBase):
     """Result of an adaptive thermal comfort evaluation.
 
     Attributes

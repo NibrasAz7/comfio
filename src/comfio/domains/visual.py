@@ -12,6 +12,7 @@ from typing import Literal
 
 import numpy as np
 
+from comfio.core.result_base import ResultBase
 from comfio.utils.validation import validate_input_array
 
 # EN 12464-1 maintained illuminance targets (lux) per task type.
@@ -71,7 +72,7 @@ TaskType = Literal[
 
 
 @dataclass
-class VisualResult:
+class VisualResult(ResultBase):
     """Result of a visual comfort evaluation.
 
     Attributes
