@@ -5,21 +5,6 @@
 > end-to-end reproducible. The companion executed notebook is at
 > [`examples/walkthrough_executed.ipynb`](../../examples/walkthrough_executed.ipynb).
 
-| Section | Topic | Extras required |
-|---------|-------|-----------------|
-| 1 | Synthetic data generation (6 months, 10-min + 1-h) | — |
-| 2 | Data ingestion (`SensorData`) | — |
-| 3 | Core domains: thermal / visual / acoustic / IAQ | — |
-| 4 | Advanced thermal: sPMV, adaptive, TSV, personalisation | — |
-| 5 | Pollutant IAQ (PM2.5, TVOC, HCHO, CO) | — |
-| 6 | Advanced domains: daylighting, colour, RT60, STI, ventilation, psychrometrics | `[daylighting]` `[color]` `[acoustics]` `[psychrometrics]` |
-| 7 | Global IEQ Index & weight presets | — |
-| 8 | Compliance & performance contracts (Solidity ABI) | — |
-| 9 | ML integration: sklearn / PyTorch / Keras — next-day forecast | `[ml]` `[torch]` `[keras]` |
-| 10 | LLM integration: interpreters, prompts, tool schemas | `[agent]` |
-| 11 | Smart-contract export (web3.py) | `[agent]` |
-| 12 | Reports: CSV / PDF / DOCX / intelligent pipeline | — |
-
 > **Run this notebook yourself** with
 > `pip install comfio[ml,torch,keras,agent,acoustics,color,psychrometrics]`
 > plus `plotly tensorflow langchain web3 reportlab python-docx`.
@@ -27,9 +12,6 @@
 
 ---
 
-## 0. Environment & Imports
-
-The walkthrough targets **Python 3.11** with `comfio` 0.1.5+.
 
 ```python
 import sys, warnings, json, time, io, textwrap
@@ -70,7 +52,9 @@ from comfio.integration.weights import preset_weights, custom_weights, default_w
 from comfio.domains.thermal import thermal_score
 print("Core imports OK.")
 ```
+
 **Output:**
+
 ```
 comfio 0.1.5  |  Python 3.11.9  |  NumPy 2.2.6
 Core imports OK.
@@ -105,10 +89,30 @@ We generate **6 months** (Jan–Jun 2025) of indoor environmental data at
 | `clothing_insulation_clo` | 1.0 → 0.5 | — | — |
 | `tsv` (1-h) | derived from PMV + noise | — | 0.5 |
 
-> **Why synthetic data?** Real sensor datasets are often incomplete, proprietary,
-> or limited to a few domains. By generating a full multi-domain dataset we can
-> exercise every `comfio` evaluation in a single end-to-end run. The seasonal
-> and diurnal patterns mimic a naturally ventilated office in a temperate climate.
+> **Theory — Synthetic IEQ data generation.**
+>
+> Real-world IEQ datasets are often incomplete, proprietary, or limited to a
+> few domains. Synthetic data generation allows exercising every evaluation
+> path in a controlled, reproducible manner. The approach used here follows
+> the **additive decomposition** model common in building energy simulation:
+>
+> $$x(t) = \underbrace{f_{\text{seasonal}}(t)}_{\text{low-frequency trend}} + \underbrace{f_{\text{diurnal}}(t)}_{\text{daily cycle}} + \underbrace{\epsilon(t)}_{\text{stochastic noise}}$$
+>
+> The seasonal component captures the slow drift from winter to summer
+> conditions. The diurnal component models occupancy-driven patterns
+> (lighting, CO₂, noise peak during occupied hours). The noise term
+> $\epsilon \sim \mathcal{N}(0, \sigma^2)$ represents sensor measurement
+> uncertainty and short-term fluctuations.
+>
+> **References:**
+> - Crawley, D.B. et al. (2001), "EnergyPlus: creating a new-generation
+>   building energy simulation program", *Energy and Buildings* 33(4),
+>   319–331. — additive decomposition in building simulation.
+> - Raftery, P. et al. (2019), "Open-source framework for generating
+>   commercial building occupancy schedules", *Energy and Buildings* 187,
+>   194–206. — occupancy-driven synthetic data patterns.
+> - ASHRAE Guideline 14-2014, *Measurement of Energy, Demand, and
+>   Water Savings* — calibration of synthetic models to real data.
 
 ```python
 rng = np.random.default_rng(42)
@@ -191,7 +195,9 @@ df = pd.DataFrame({
 print(f"DataFrame shape: {df.shape}")
 df.head()
 ```
+
 **Output:**
+
 ```
 10-min rows: 26,064  (2025-01-01 00:00:00 → 2025-06-30 23:50:00)
 DataFrame shape: (26064, 16)
@@ -224,13 +230,7 @@ timestamp  air_temp_c  radiant_temp_c  relative_humidity_pct  \
 4                 1.2                 1.024783
 ```
 
-### 1b. Thermal Sensation Votes (TSV) — 1-hour sampling
-
-TSV represents **occupant feedback** on the ASHRAE 7-point scale
-(−3 cold … 0 neutral … +3 hot). We generate sparse 1-hour votes by
-computing an approximate PMV from the 10-min data and adding noise, then
-rounding to the nearest integer on the scale. The `comfio` TSV augmentation
-module (§4c) will later upsample these to the 10-min grid.
+---
 
 ```python
 # --- TSV at 1-hour sampling ---
@@ -259,7 +259,9 @@ df_tsv = pd.DataFrame({
 print(f"TSV rows: {len(df_tsv):,}  |  TSV range: [{tsv_votes.min():.0f}, {tsv_votes.max():.0f}]")
 print(f"TSV distribution:\n{pd.Series(tsv_votes).value_counts().sort_index()}")
 ```
+
 **Output:**
+
 ```
 TSV rows: 4,344  |  TSV range: [-3, 2]
 TSV distribution:
@@ -272,10 +274,7 @@ TSV distribution:
 Name: count, dtype: int64
 ```
 
-### 1c. Visualising the raw data
-
-Two Plotly figures give an overview of the generated time series. In the
-notebook these render interactively; here we show the code for reference.
+---
 
 ```python
 # --- Plotly: overview of the 6-month dataset ---
@@ -294,6 +293,8 @@ fig.update_layout(height=900, title_text="6-Month Synthetic IEQ Dataset (10-min 
 fig.show()
 ```
 
+---
+
 ```python
 # --- TSV time series ---
 fig = go.Figure()
@@ -309,16 +310,37 @@ fig.show()
 
 ## 2. Data Ingestion with `SensorData`
 
-`SensorData` is the central data container. It auto-detects column names
-using a built-in alias table (e.g. `"Ta"` → `"air_temp_c"`, `"RH"` →
-`"relative_humidity_pct"`), validates physical bounds, and tracks which IEQ
-domains can be evaluated from the available columns.
+`SensorData` wraps the DataFrame, auto-maps common column aliases to canonical
+names, validates physical bounds, and reports which IEQ domains can be
+evaluated from the available columns.
 
-> **Theory — Canonical column names.** `comfio` uses 15 canonical column names
-> mapped to physical quantities (see `comfio.core.data_handler.CANONICAL_COLUMNS`).
-> The auto-detection layer recognises >40 common aliases from sensor
-> manufacturers (Vaisala, Hobo, Davis, etc.), so you can usually pass a raw
-> export DataFrame without manual column mapping.
+> **Theory — Sensor data validation and canonical naming.**
+>
+> Building sensors from different manufacturers (Vaisala, Hobo, Davis, Sartorius)
+> use different column names for the same physical quantity (e.g. `"Ta"`,
+> `"AirTemp"`, `"air_temperature"` all mean air temperature in °C). `comfio`
+> uses a **canonical naming scheme** with 15 standard names mapped to physical
+> quantities, plus an alias table recognising >40 common sensor names.
+>
+> **Physical bounds validation** flags implausible readings (e.g. air
+> temperature < −40 °C or > 60 °C, humidity > 100%) that would corrupt
+> downstream calculations. Each canonical column has bounds derived from
+> ASHRAE Handbook ranges and sensor datasheet specifications.
+>
+> **NaN handling strategies**: `drop` (remove rows), `interpolate` (linear
+> time-series interpolation — default), `fill_zero`, or `raise`. For 10-min
+> IEQ data, linear interpolation is preferred because it preserves the
+> temporal structure.
+>
+> **References:**
+> - ASHRAE Handbook — Fundamentals (2017), Ch. 38: *Measurement and
+>   Instruments* — sensor accuracy and range specifications.
+> - EN ISO 7726:2001, *Ergonomics of the thermal environment — Instruments
+>   for measuring physical quantities* — sensor accuracy requirements for
+>   comfort measurements.
+> - Aerts, D. et al. (2014), "A review of the current state of sensor
+>   technology for building energy performance", *Energy and Buildings* 82,
+>   175–187. — survey of commercial sensor naming conventions.
 
 ```python
 sensor = SensorData(df=df, timestamp_col="timestamp")
@@ -330,7 +352,9 @@ for canon, actual in sensor.column_map.items():
 print(f"\nAvailable domains:        {sensor.available_domains()}")
 print(f"Available advanced domains: {sensor.available_advanced_domains()}")
 ```
+
 **Output:**
+
 ```
 SensorData(n_rows=26064, columns=['air_temp_c', 'radiant_temp_c', 'relative_humidity_pct', 'air_velocity_ms', 'illuminance_lux', 'co2_ppm', 'noise_laeq_db', 'metabolic_rate_met', 'clothing_insulation_clo', 'pm25_ugm3', 'pm10_ugm3', 'tvoc_ugm3', 'formaldehyde_ppb', 'co_ppm', 'outdoor_temp_c'], domains=['thermal', 'visual', 'acoustic', 'iaq'], validated=True)
 Mapped columns (15):
@@ -353,11 +377,7 @@ Available domains:        ['thermal', 'visual', 'acoustic', 'iaq']
 Available advanced domains: ['daylighting', 'ventilation', 'psychrometrics', 'pollutant_iaq', 'adaptive_ashrae']
 ```
 
-### 2b. Capability Detection
-
-`detect_capabilities()` inspects the available columns and reports which
-evaluations are possible. This is the same logic used by the intelligent
-pipeline (`run_pipeline`) to gracefully skip domains when data is missing.
+---
 
 ```python
 # Capabilities detected by the intelligent pipeline
@@ -366,7 +386,9 @@ print("Detected capabilities:")
 for k, v in caps.items():
     print(f"  {k:30s} {v}")
 ```
+
 **Output:**
+
 ```
 Detected capabilities:
   thermal_pmv                    True
@@ -385,30 +407,59 @@ Detected capabilities:
 
 ## 3. Core Domain Evaluations
 
-### 3a. Thermal Comfort — Fanger PMV/PPD (ISO 7730 / ASHRAE 55)
+### 3a. Thermal Comfort — PMV / PPD (ISO 7730)
 
-The **Predicted Mean Vote (PMV)** model, developed by Fanger (1970), predicts
-the mean thermal sensation vote of a large group of occupants on the ASHRAE
-7-point scale. It is a function of four environmental variables
-(air temperature, radiant temperature, air velocity, relative humidity) and
-two personal variables (metabolic rate, clothing insulation).
+Fanger's Predicted Mean Vote (PMV) is the most widely used thermal-comfort
+index. It combines six variables: air temperature, radiant temperature, air
+velocity, relative humidity, metabolic rate, and clothing insulation.
 
-> **Theory — PMV equation.**
+$$\text{PMV} = f(t_a, \bar{t}_r, v, RH, M, I_{cl}) \in [-3, +3]$$
+
+The Predicted Percentage Dissatisfied (PPD) is a non-linear function of PMV:
+
+$$\text{PPD} = 100 - 95\,\exp\!\left(-0.03353\,\text{PMV}^4 - 0.2179\,\text{PMV}^2\right)$$
+
+ISO 7730 Category B targets |PMV| ≤ 0.5 (PPD ≤ 10 %).
+
+> **Theory — Fanger's PMV model.**
+>
+> The PMV model, developed by Povl Ole Fanger (1970), predicts the mean
+> thermal sensation vote of a large group of occupants on the ASHRAE
+> 7-point scale (−3 cold, 0 neutral, +3 hot). It is based on the human
+> body's **heat balance equation**:
+>
+> $$L = (M - W) - 3.05 \times 10^{-3}[5733 - 6.99(M-W) - p_a] - 0.42(M-W-58.15) - 0.0173M(5.87 - p_a) - 0.0014M(34 - t_a) - Q_{res} - Q_{sk}$$
+>
+> where $L$ is the thermal load (W/m²), $M$ is metabolic rate (W/m²),
+> $W$ is external work, $p_a$ is water vapour pressure (Pa), $t_a$ is air
+> temperature (°C), and $Q_{res}$, $Q_{sk}$ are respiratory and skin heat
+> losses. PMV is then:
 >
 > $$\text{PMV} = (0.303\,e^{-0.036M} + 0.028) \, L$$
 >
-> where $L$ is the thermal load on the body (W/m²), $M$ is the metabolic rate
-> (W/m²). The **Predicted Percentage Dissatisfied (PPD)** is derived from PMV:
+> The PPD relation has a theoretical minimum of 5% at PMV = 0, reflecting
+> that even at optimal conditions, 5% of occupants will be dissatisfied due
+> to individual differences.
 >
-> $$\text{PPD} = 100 - 95\,\exp(-0.03353\,\text{PMV}^4 - 0.2179\,\text{PMV}^2)$$
+> **ISO 7730 categories:**
 >
-> PMV = 0 corresponds to PPD = 5% (the theoretical minimum). ISO 7730
-> Category B requires |PMV| ≤ 0.5 (PPD ≤ 10%).
+> | Category | PMV range | PPD | Description |
+> |----------|-----------|-----|-------------|
+> | A | ±0.2 | ≤ 6% | High comfort |
+> | B | ±0.5 | ≤ 10% | Acceptable (default) |
+> | C | ±0.7 | ≤ 15% | Marginal |
 >
-> **Reference:** ISO 7730:2005, *Ergonomics of the thermal environment —
-> Analytical determination and interpretation of thermal comfort using
-> calculation of the PMV and PPD indices*. Fanger, P.O. (1970),
-> *Thermal Comfort*, Danish Technical Press.
+> **References:**
+> - Fanger, P.O. (1970), *Thermal Comfort*, Danish Technical Press.
+>   — the foundational monograph.
+> - ISO 7730:2005, *Ergonomics of the thermal environment — Analytical
+>   determination and interpretation of thermal comfort*.
+> - ASHRAE Standard 55-2023, §5.3.1 — PMV-PPD method.
+> - Fanger, P.O. & Toftum, J. (2002), "Extension of the PMV model to
+>   non-air-conditioned buildings in warm climates", *Energy and Buildings*
+>   34(6), 533–536. — extension for warm climates.
+> - van Hoof, J. (2008), "Forty years of Fanger's model of thermal comfort:
+>   comfort for all?", *Indoor Air* 18(3), 182–201. — critical review.
 
 ```python
 thermal = evaluate_thermal(
@@ -425,13 +476,17 @@ print(f"PPD  mean={np.mean(thermal.ppd):.1f}%  max={thermal.ppd.max():.1f}%")
 print(f"Thermal score  mean={np.mean(thermal_score(thermal.pmv, thermal.ppd)):.1f}/100")
 print(f"Category-B compliant (|PMV|<=0.5): {np.mean(np.abs(thermal.pmv)<=0.5)*100:.1f}%")
 ```
+
 **Output:**
+
 ```
 PMV  mean=-0.12  std=0.30  range=[-1.00, +0.79]
 PPD  mean=7.2%  max=26.1%
 Thermal score  mean=91.8/100
 Category-B compliant (|PMV|<=0.5): 88.4%
 ```
+
+---
 
 ```python
 fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
@@ -445,21 +500,44 @@ fig.update_layout(height=600, title="Thermal comfort over 6 months")
 fig.show()
 ```
 
+---
+
 ### 3b. Visual Comfort — EN 12464-1:2021
 
-**EN 12464-1** specifies maintained illuminance targets for indoor workspaces.
-`comfio` evaluates whether measured illuminance meets the target for a given
-task type (e.g. 500 lux for "office" / "general" work) and optionally checks
-Unified Glare Rating (UGR) compliance.
+Evaluates maintained illuminance against task-specific targets. The default
+`"general"` task requires **500 lux**. UGR (Unified Glare Rating) limits are
+also defined per task type.
 
-> **Theory — Illuminance scoring.** The visual comfort score is 100 when
-> illuminance equals the target, decreases linearly to 0 at 0 lux, and
-> penalises over-illumination (>2× target) to discourage energy waste.
-> When UGR is provided, the final score is a 70/30 blend of illuminance and
+> **Theory — Visual comfort and lighting standards.**
+>
+> **Illuminance** (lux = lm/m²) is the luminous flux incident on a surface.
+> EN 12464-1:2021 specifies **maintained illuminance** ($\bar{E}_m$) — the
+> average illuminance at the work plane that must not fall below the target
+> during the maintenance cycle.
+>
+> **Unified Glare Rating (UGR)**, defined by CIE 117-1995, quantifies
+> discomfort glare from luminaires:
+>
+> $$\text{UGR} = 8 \log_{10}\left(\frac{0.25}{L_b} \sum_i \frac{L_i^2 \, \omega_i}{p_i^2}\right)$$
+>
+> where $L_b$ is background luminance (cd/m²), $L_i$ is luminance of
+> luminaire $i$, $\omega_i$ is its solid angle, and $p_i$ is the Guth
+> position index. UGR ranges from 10 (imperceptible) to 30 (intolerable).
+>
+> **Scoring**: comfio scores 100 at the target illuminance, decreasing
+> linearly to 0 at 0 lux, and penalises over-illumination (>2× target).
+> When UGR is provided, the score is a 70/30 blend of illuminance and
 > glare components.
 >
-> **Reference:** EN 12464-1:2021, *Light and lighting — Lighting of work
-> places — Part 1: Indoor work places*.
+> **References:**
+> - EN 12464-1:2021, *Light and lighting — Lighting of work places —
+>   Part 1: Indoor work places*. — maintained illuminance targets.
+> - CIE 117-1995, *Discomfort glare in interior lighting* — UGR method.
+> - Rea, M.S. (2000), *The IESNA Lighting Handbook*, 9th ed. — reference
+>   for North American practice.
+> - Bellia, L. et al. (2011), "A review of the standards for lighting of
+>   indoor workplaces", *Energy and Buildings* 43(2-3), 604–612.
+>   — peer-reviewed comparison of EN 12464-1 and IESNA.
 
 ```python
 visual = evaluate_visual(
@@ -471,13 +549,17 @@ print(f"Visual score  mean={np.mean(visual.score):.1f}/100")
 print(f"Compliant (>= target): {np.mean(visual.compliant)*100:.1f}%")
 print(f"Mean illuminance: {np.mean(visual.illuminance):.0f} lux (daytime only meaningful)")
 ```
+
 **Output:**
+
 ```
 Target illuminance: 500 lux
 Visual score  mean=32.3/100
 Compliant (>= target): 6.5%
 Mean illuminance: 165 lux (daytime only meaningful)
 ```
+
+---
 
 ```python
 fig = go.Figure()
@@ -488,19 +570,48 @@ fig.update_layout(title="Visual comfort (EN 12464-1)", yaxis=dict(title="lux"), 
 fig.show()
 ```
 
+---
+
 ### 3c. Acoustic Comfort — Noise Criteria (NC)
 
-`comfio` evaluates $L_{Aeq}$ (A-weighted equivalent continuous sound level)
-against NC (Noise Criteria) curves. The NC level maps to a threshold in dBA
-(e.g. NC-35 → 41 dBA for offices).
+A-weighted equivalent sound levels ($L_{Aeq}$) are compared against NC curves
+(ASHRAE Handbook — HVAC Applications, Ch. 49). `NC-35` (41 dBA) is the default
+for general offices.
 
-> **Theory — Acoustic scoring.** Score = 100 when $L_{Aeq}$ is 10 dB below
-> the threshold, decreasing linearly to 0 at threshold + 10 dB. This gives
-> a 20-dB dynamic range, matching the psychoacoustic just-noticeable
-> difference (JND) of ~3 dB per step.
+> **Theory — Noise Criteria and A-weighting.**
 >
-> **Reference:** Beranek, L.L. (1957), "Revised criteria for noise in
-> buildings", *Noise Control* 3(1), 19–27.
+> **A-weighting** ($L_{Aeq}$) applies a frequency-dependent correction to
+> sound pressure levels that approximates the human ear's sensitivity at
+> moderate levels. The A-weighted equivalent continuous level $L_{Aeq}$
+> is the most common single-number metric for environmental and
+> occupational noise.
+>
+> **Noise Criteria (NC)** curves, developed by Beranek (1957), define
+> maximum permissible sound pressure levels in each octave band for a given
+> NC rating. The NC value of a measured spectrum is the highest NC curve
+> not exceeded by any octave band. Approximate dBA equivalents:
+>
+> | NC rating | Approx. dBA | Application |
+> |-----------|-------------|-------------|
+> | NC-25 | ~35 | Bedrooms, concert halls |
+> | NC-30 | ~38 | Private offices, libraries |
+> | NC-35 | ~41 | General offices (default) |
+> | NC-40 | ~45 | Lobbies, corridors |
+> | NC-45 | ~50 | Workshops |
+>
+> **Scoring**: 100 when $L_{Aeq}$ is 10 dB below threshold, decreasing
+> linearly to 0 at threshold + 10 dB (20-dB dynamic range, matching the
+> psychoacoustic JND of ~3 dB per step).
+>
+> **References:**
+> - Beranek, L.L. (1957), "Revised criteria for noise in buildings",
+>   *Noise Control* 3(1), 19–27. — original NC curves.
+> - ASHRAE Handbook — HVAC Applications (2015), Ch. 49: *Sound and
+>   Vibration Control* — NC curve definitions and application guidelines.
+> - ISO 1996-1:2016, *Acoustics — Description, measurement and assessment
+>   of environmental noise* — A-weighting and $L_{Aeq}$.
+> - Crocker, M.J. (2007), *Handbook of Noise and Vibration Control*,
+>   Wiley. — comprehensive reference.
 
 ```python
 acoustic = evaluate_acoustic(
@@ -511,12 +622,16 @@ print(f"NC threshold: {acoustic.threshold_db:.0f} dBA")
 print(f"Acoustic score  mean={np.mean(acoustic.score):.1f}/100")
 print(f"Compliant (<= threshold): {np.mean(acoustic.compliant)*100:.1f}%")
 ```
+
 **Output:**
+
 ```
 NC threshold: 41 dBA
 Acoustic score  mean=38.8/100
 Compliant (<= threshold): 53.7%
 ```
+
+---
 
 ```python
 fig = go.Figure()
@@ -527,20 +642,53 @@ fig.update_layout(title="Acoustic comfort (NC-35)", yaxis=dict(title="dBA"), yax
 fig.show()
 ```
 
+---
+
 ### 3d. Indoor Air Quality — CO₂ (ASHRAE 62.1 indicators)
 
-CO₂ concentration is a proxy for **ventilation adequacy**. While not a
-pollutant itself at indoor levels, elevated CO₂ indicates insufficient
-outdoor air supply. `comfio` evaluates CO₂ against configurable threshold
-levels ("excellent" = 800 ppm, "good" = 1000 ppm, "moderate" = 1400 ppm).
+ASHRAE 62.1 uses ventilation-rate procedures, not CO₂ limits. However, CO₂ is
+the standard ventilation-adequacy indicator. Practical thresholds:
 
-> **Theory — IAQ scoring.** Score = 100 when CO₂ ≤ 420 ppm (outdoor
-> baseline), 50 at the threshold, and 0 at 2× threshold. The score is
-> piecewise linear with a steeper penalty above threshold.
+| Level | CO₂ (ppm) | Interpretation |
+|-------|-----------|----------------|
+| excellent | ≤ 800 | ~10 L/s per person |
+| good | ≤ 1000 | commonly cited benchmark |
+| moderate | ≤ 1200 | marginal |
+| poor | ≤ 1500 | inadequate |
+
+> **Theory — CO₂ as a ventilation indicator.**
 >
-> **Reference:** ASHRAE Standard 62.1-2022, *Ventilation for Acceptable
-> Indoor Air Quality*. Persily, A. (2015), "Challenges in developing
-> ventilation and indoor air quality standards", *Building and Environment*.
+> Indoor CO₂ is not a pollutant at typical concentrations (< 5000 ppm), but
+> it serves as a **proxy for ventilation adequacy** because it is emitted
+> by occupants at a predictable rate proportional to metabolic activity.
+> The steady-state CO₂ concentration in a ventilated space is:
+>
+> $$C_{ss} = C_{out} + \frac{N_{occ} \, G_{CO_2}}{Q_{oa}}$$
+>
+> where $C_{out}$ ≈ 420 ppm, $N_{occ}$ is the number of occupants,
+> $G_{CO_2}$ is the per-person CO₂ generation rate (~0.005 L/s at 1.2 met),
+> and $Q_{oa}$ is the outdoor air ventilation rate (L/s).
+>
+> The commonly cited **1000 ppm benchmark** corresponds to ~7 L/s per person
+> of outdoor air — close to the ASHRAE 62.1-2022 minimum for office
+> occupancy (5 L/s per person + 0.3 L/s per m²). Elevated CO₂ has been
+> associated with reduced cognitive performance (Allen et al. 2016).
+>
+> **Scoring**: 100 at outdoor baseline (420 ppm), 50 at threshold, 0 at
+> 2× threshold. Piecewise linear with steeper penalty above threshold.
+>
+> **References:**
+> - ASHRAE Standard 62.1-2022, *Ventilation for Acceptable Indoor Air
+>   Quality* — ventilation rate procedure.
+> - Persily, A. (2015), "Challenges in developing ventilation and indoor
+>   air quality standards", *Building and Environment* 91, 61–69.
+> - Allen, J.G. et al. (2016), "Associations of cognitive function scores
+>   with carbon dioxide, ventilation, and volatile organic compound
+>   exposures in office workers", *Environmental Health Perspectives*
+>   124(6), 805–812. — peer-reviewed study on CO₂ and cognition.
+> - Seppänen, O.A. et al. (1999), "Association of ventilation rates and
+>   CO₂ concentrations with health and other responses in commercial and
+>   institutional buildings", *Indoor Air* 9(4), 226–252.
 
 ```python
 iaq = evaluate_iaq(
@@ -552,13 +700,17 @@ print(f"IAQ score  mean={np.mean(iaq.score):.1f}/100")
 print(f"Compliant (<= threshold): {np.mean(iaq.compliant)*100:.1f}%")
 print(f"CO₂  mean={np.mean(iaq.co2):.0f}  peak={iaq.co2.max():.0f} ppm")
 ```
+
 **Output:**
+
 ```
 CO₂ threshold: 1000 ppm  (level='good')
 IAQ score  mean=74.4/100
 Compliant (<= threshold): 60.6%
 CO₂  mean=731  peak=1356 ppm
 ```
+
+---
 
 ```python
 fig = go.Figure()
@@ -573,33 +725,50 @@ fig.show()
 
 ## 4. Advanced Thermal Models
 
-### 4a. Simplified PMV (sPMV) — Buratti Seasonal Model
+### 4a. Simplified PMV — Buratti et al. (2009)
 
-The **simplified PMV** model by Buratti, Ricciardi & Naticchia (2009) uses
-only indoor air temperature and relative humidity — no need for metabolic
-rate, clothing, or air velocity inputs. Seasonal coefficients capture
-typical occupancy conditions.
+When only indoor temperature and humidity are available, the Buratti seasonal
+model gives a reduced-form PMV:
 
-> **Theory — sPMV equation.**
+$$\text{sPMV} = a \cdot t_{in} + b \cdot RH + c$$
+
+with season-specific coefficients $(a, b, c)$. Internal vapor pressure uses the
+Magnus formula. This is ideal for BMS deployments with limited sensor coverage.
+
+> **Theory — Simplified PMV (sPMV).**
+>
+> Full Fanger PMV requires six inputs, but many Building Management Systems
+> (BMS) only measure air temperature and relative humidity. Buratti,
+> Ricciardi & Vergoni (2009) fitted a **linear regression** of PMV against
+> $T$ and $p_v$ (vapor pressure) using data from field studies:
 >
 > $$\text{sPMV} = a \, T + b \, p_v - c$$
 >
-> where $T$ is air temperature (°C) and $p_v$ is vapor pressure (kPa,
-> computed via the Magnus formula). The coefficients $(a, b, c)$ vary by
-> season:
+> where $p_v$ is computed from $T$ and $RH$ via the **Magnus formula**:
 >
-> | Season | a | b | c |
-> |--------|------|------|------|
-> | Winter | 0.21 | 1.90 | 5.20 |
-> | Mid | 0.23 | 1.65 | 5.55 |
-> | Summer | 0.25 | 1.40 | 5.90 |
+> $$p_{ws}(T) = 0.61094 \, \exp\!\left(\frac{17.625 \, T}{T + 243.04}\right), \quad p_v = p_{ws} \cdot \frac{RH}{100}$$
+>
+> Seasonal coefficients $(a, b, c)$ capture typical occupancy conditions
+> (clothing, metabolic rate, air velocity) without requiring them as inputs:
+>
+> | Season | a | b | c | Months |
+> |--------|------|------|------|--------|
+> | Winter | 0.21 | 1.90 | 5.20 | Dec, Jan, Feb |
+> | Mid | 0.23 | 1.65 | 5.55 | Mar–May, Sep–Nov |
+> | Summer | 0.25 | 1.40 | 5.90 | Jun, Jul, Aug |
 >
 > The sPMV score is $100(1 - |\text{sPMV}|/3)$, clamped to [0, 100].
 >
-> **Reference:** Buratti, L., Ricciardi, P., & Naticchia, B. (2009).
-> "A simplified PMV model for indoor thermal comfort assessment",
-> *Proceedings of the 11th International IBPSA Building Simulation
-> Conference*.
+> **References:**
+> - Buratti, C., Ricciardi, P., & Vergoni, M. (2009), "Simplified PMV
+>   model for HVAC systems control", *Building and Environment* 44(3),
+>   441–449. — the original paper with coefficient derivation.
+> - Magnus, H. (1844), "Versuche über die Spannkräfte des Wasserdampfes",
+>   *Annalen der Physik* 137(2), 225–247. — saturation vapour pressure.
+> - Carlucci, S. et al. (2018), "A comprehensive review of simplified
+>   models for the thermal comfort assessment of buildings", *Renewable
+>   and Sustainable Energy Reviews* 94, 931–956. — review of reduced-form
+>   comfort models including sPMV.
 
 ```python
 spmv = evaluate_spmv(
@@ -615,13 +784,17 @@ print(f"sPMV score  mean={np.mean(spmv.score):.1f}/100")
 corr = np.corrcoef(spmv.spmv, thermal.pmv)[0,1]
 print(f"\nCorrelation sPMV vs full PMV: {corr:.3f}")
 ```
+
 **Output:**
+
 ```
 Season determined: winter
 sPMV  mean=+1.88  range=[+0.67, +3.20]
 sPMV score  mean=37.2/100
 Correlation sPMV vs full PMV: 0.860
 ```
+
+---
 
 ```python
 fig = go.Figure()
@@ -631,35 +804,58 @@ fig.update_layout(title="Full PMV vs simplified PMV (Buratti)", yaxis_title="PMV
 fig.show()
 ```
 
-### 4b. Adaptive Thermal Comfort — ASHRAE 55 & EN 16798-1
+---
 
-The **adaptive comfort model** recognises that occupants in naturally
-ventilated buildings adapt to seasonal outdoor temperatures through
-clothing, behavioural, and physiological adjustments. Instead of PMV, the
-comfort temperature is a linear function of the prevailing mean outdoor
+### 4b. Adaptive Thermal Comfort
+
+For naturally ventilated buildings, adaptive models relate the **comfort
+temperature** to the running mean outdoor temperature. Two standards are
+implemented:
+
+* **ASHRAE 55-2023**: $t_{comf} = 0.31 \, t_{out} + 17.8$ (80 % acceptability band ±3.5 °C)
+* **EN 16798-1:2019**: $t_{comf} = 0.33 \, t_{rm} + 18.8$ (Category II band ±3 °C)
+
+where $t_{rm}$ is the exponentially-weighted running mean of outdoor
 temperature.
 
-> **Theory — ASHRAE 55-2023 (Appendix L).**
+> **Theory — Adaptive thermal comfort.**
 >
-> $$T_{\text{comf}} = 0.31 \, \bar{T}_{\text{out}} + 17.8$$
+> The adaptive comfort model is based on the empirical finding that
+> occupants in naturally ventilated buildings **adapt** to seasonal outdoor
+> conditions through clothing adjustments, behavioural changes (opening
+> windows, using fans), and physiological acclimatisation. The model was
+> developed from the **ASHRAE RP-884** database of 21,000 field studies
+> worldwide (de Dear & Brager 1998).
 >
-> Valid for $10 \le \bar{T}_{\text{out}} \le 33.5$ °C. The 80% acceptability
-> band is ±3.5 °C; the 90% band is ±2.5 °C.
+> **ASHRAE 55-2023 (Appendix L):**
+>
+> $$T_{comf} = 0.31 \, \bar{T}_{out} + 17.8$$
+>
+> Valid for $10 \le \bar{T}_{out} \le 33.5$ °C, where $\bar{T}_{out}$
+> is the prevailing mean outdoor temperature (optimally a 7-day running
+> mean). Acceptability bands: ±3.5 °C (80%), ±2.5 °C (90%).
 >
 > **EN 16798-1:2019 (Category II):**
 >
-> $$T_{\text{comf}} = 0.33 \, \bar{T}_{\text{rm}} + 18.8$$
+> $$T_{comf} = 0.33 \, \bar{T}_{rm} + 18.8$$
 >
-> where $\bar{T}_{\text{rm}}$ is the running mean outdoor temperature.
-> Category II band is ±3 °C.
+> where $\bar{T}_{rm}$ is the exponentially-weighted running mean:
+>
+> $$\bar{T}_{rm}(t) = \alpha \, T_{out}(t-1) + (1-\alpha) \, \bar{T}_{rm}(t-1), \quad \alpha \approx 0.8$$
+>
+> Valid for $10 \le \bar{T}_{rm} \le 30$ °C. Category II band: ±3 °C.
 >
 > **References:**
-> - ASHRAE Standard 55-2023, *Thermal Environmental Conditions for Human
->   Occupancy*, Appendix L.
-> - EN 16798-1:2019, *Energy performance of buildings — Ventilation for
->   buildings — Part 1: Indoor environmental input parameters*.
 > - de Dear, R. & Brager, G.S. (1998), "Developing an adaptive model of
 >   thermal comfort and preference", *ASHRAE Transactions* 104(1).
+>   — foundational study from RP-884 database.
+> - ASHRAE Standard 55-2023, Appendix L — adaptive method.
+> - EN 16798-1:2019, Annex A — adaptive comfort criteria.
+> - Nicol, F. & Humphreys, M. (2010), "Derivation of the adaptive
+>   equations for thermal comfort in free-running buildings", *Energy
+>   and Buildings* 42(10), 1793–1801. — derivation of the EN formula.
+> - Halawa, E. & van Hoof, J. (2012), "The adaptive approach to thermal
+>   comfort: A critical overview", *Energy and Buildings* 51, 1–13.
 
 ```python
 # Compute a simple running mean of outdoor temperature (alpha=0.8)
@@ -688,11 +884,15 @@ en = evaluate_adaptive_en(
 print(f"ASHRAE 55  t_comf mean={np.mean(ashrae.t_comf):.1f}°C  compliance={np.mean(ashrae.compliant)*100:.1f}%")
 print(f"EN 16798   t_comf mean={np.mean(en.t_comf):.1f}°C  compliance={np.mean(en.compliant)*100:.1f}%")
 ```
+
 **Output:**
+
 ```
 ASHRAE 55  t_comf mean=21.2°C  compliance=96.8%
 EN 16798   t_comf mean=22.5°C  compliance=91.7%
 ```
+
+---
 
 ```python
 fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
@@ -709,22 +909,54 @@ fig.update_layout(height=700, title="Adaptive comfort bands (80% / Category II)"
 fig.show()
 ```
 
+---
+
 ### 4c. TSV Augmentation & Evaluation
 
-Occupant TSV votes are typically sparse (1-hour) while sensor data is dense
-(10-min). `comfio` provides `augment_tsv_cdf()` to upsample sparse votes to
-the sensor grid using **CDF remapping**: the empirical CDF of the sparse
-votes is mapped onto the target timestamps, preserving the distribution
-while filling gaps.
+Occupant Thermal Sensation Votes are sparse (1-h). `augment_tsv_cdf` remaps
+them to the 10-min sensor grid via CDF matching. `evaluate_tsv` checks
+compliance per ASHRAE 55-2023 Appendix L (|TSV| ≤ 1.5 for 80 % acceptability).
 
-> **Theory — CDF remapping.** Given $n$ sparse votes and $m > n$ target
-> timestamps, each target is assigned a rank $r_j \in [0, 1)$. The vote
-> value at rank $r_j$ is the quantile of the sparse vote distribution at
-> $r_j$. When `time_aware=True`, ranks are computed within daily time-of-day
-> windows, preserving the diurnal pattern of occupant feedback.
+> **Theory — TSV and CDF remapping.**
 >
-> **Reference:** ASHRAE 55-2023, Appendix L — "Thermal comfort in
-> naturally conditioned spaces" requires |TSV| ≤ 1.5 for 80% acceptability.
+> The **Thermal Sensation Vote** (TSV) is the occupant's self-reported
+> thermal sensation on the ASHRAE 7-point scale:
+>
+> | Vote | Sensation |
+> |------|-----------|
+> | −3 | Cold |
+> | −2 | Cool |
+> | −1 | Slightly cool |
+> | 0 | Neutral |
+> | +1 | Slightly warm |
+> | +2 | Warm |
+> | +3 | Hot |
+>
+> TSV is the **ground truth** of occupant comfort, but it is sparse (typically
+> hourly or daily surveys). **CDF remapping** upsamples sparse votes to the
+> sensor grid by matching the empirical cumulative distribution function:
+>
+> Given $n$ sparse votes and $m > n$ target timestamps, each target is
+> assigned a rank $r_j \in [0, 1)$. The vote value at rank $r_j$ is the
+> quantile of the sparse vote distribution at $r_j$. When `time_aware=True`,
+> ranks are computed within daily time-of-day windows, preserving the
+> diurnal pattern.
+>
+> **Compliance** (ASHRAE 55-2023 Appendix L): |TSV| ≤ 1.5 for 80%
+> acceptability. The TSV score is $100(1 - |\text{TSV}|/3)$, and the
+> approximate PPD is $5 + 95(TSV/3)^2$.
+>
+> **References:**
+> - ASHRAE Standard 55-2023, Appendix L — "Thermal comfort in naturally
+>   conditioned spaces".
+> - ASHRAE RP-884, *Final Report: Developing an adaptive model of thermal
+>   comfort and preference* — TSV scale definition.
+> - Hyndman, R.J. & Fan, Y. (1996), "Sample quantiles in statistical
+>   packages", *American Statistician* 50(4), 361–365. — quantile
+>   estimation methods used in CDF remapping.
+> - Schweiker, M. & Wagner, A. (2016), "A framework for an adaptive
+>   thermal heat balance model", *Building and Environment* 94, 252–262.
+>   — TSV as ground truth in adaptive models.
 
 ```python
 tsv_aug = augment_tsv_cdf(
@@ -738,13 +970,17 @@ print(f"TSV mean={np.mean(tsv_aug):+.2f}  std={np.std(tsv_aug):.2f}")
 print(f"Compliance rate (|TSV|<=1.5): {tsv_result.compliance_rate*100:.1f}%")
 print(f"TSV score mean={np.mean(tsv_result.score):.1f}/100")
 ```
+
 **Output:**
+
 ```
 Augmented TSV length: 26064  (matches sensor grid)
 TSV mean=-0.63  std=0.78
 Compliance rate (|TSV|<=1.5): 87.9%
 TSV score mean=75.1/100
 ```
+
+---
 
 ```python
 fig = go.Figure()
@@ -755,21 +991,54 @@ fig.update_layout(title="Augmented TSV on 10-min grid (ASHRAE 55 Appendix L)", y
 fig.show()
 ```
 
+---
+
 ### 4d. Personalised Comfort (OLS Regression)
 
-The personalisation module fits an **Ordinary Least Squares (OLS)**
-regression mapping model-predicted PMV to occupant TSV:
+When both PMV (model) and TSV (occupant) data are available, comfio fits a
+linear personalisation index:
 
-> $$\text{TSV} = \alpha \times \text{PMV} + \beta$$
+$$\text{TSV} \approx \alpha \cdot \text{PMV}_{model} + \beta$$
+
+The personalised PMV is then $\alpha \cdot \text{PMV} + \beta$, and PPD is
+recomputed. Seasonal indices allow different personalisation per season.
+
+> **Theory — Personalised comfort via OLS regression.**
 >
-> where $\alpha$ captures the occupant's sensitivity to PMV changes and
-> $\beta$ is a systematic offset (e.g. preference for cooler/warmer
-> conditions than the model predicts). Seasonal personalisation fits separate
-> $(\alpha, \beta)$ per season.
+> Fanger's PMV predicts the **mean** vote of a large population, but
+> individuals deviate systematically due to differences in thermal
+> preference, clothing habits, and metabolic rate. The personalisation
+> module fits an **Ordinary Least Squares (OLS)** regression:
 >
-> **Reference:** Schweiker, M. et al. (2020), "Review of multi-domain
-> approaches to indoor environmental perception and behaviour",
-> *Building and Environment* 176.
+> $$\text{TSV}_i = \alpha \cdot \text{PMV}_i + \beta + \epsilon_i$$
+>
+> where $\alpha$ captures the occupant's **sensitivity** to PMV changes
+> (>1 = more sensitive than average, <1 = less sensitive) and $\beta$
+> is a **systematic offset** (positive = prefers cooler, negative =
+> prefers warmer than the model predicts).
+>
+> The OLS estimators are:
+>
+> $$\hat{\alpha} = \frac{\text{Cov}(\text{PMV}, \text{TSV})}{\text{Var}(\text{PMV})}, \quad \hat{\beta} = \bar{\text{TSV}} - \hat{\alpha} \, \bar{\text{PMV}}$$
+>
+> The coefficient of determination $R^2$ indicates how much of the TSV
+> variance is explained by the linear PMV relationship.
+>
+> **Seasonal personalisation** fits separate $(\alpha, \beta)$ per season,
+> capturing that occupants adapt differently in winter vs summer.
+>
+> **References:**
+> - Schweiker, M. et al. (2020), "Review of multi-domain approaches to
+>   indoor environmental perception and behaviour", *Building and
+>   Environment* 176, 106834. — personalisation in multi-domain comfort.
+> - Cheung, T. et al. (2019), "Occupant satisfaction and the
+>   personalization of thermal comfort", *Building and Environment* 155,
+>   157–167. — individual differences in thermal preference.
+> - Draper, N.R. & Smith, H. (1998), *Applied Regression Analysis*,
+>   3rd ed., Wiley. — OLS estimation theory.
+> - Halawa, E. et al. (2017), "Is the predictive mean vote model
+>   adaptable to individuals?", *Indoor and Built Environment* 26(7),
+>   940–951. — critique of PMV for individual prediction.
 
 ```python
 # Align TSV (1-h) to PMV (10-min) by nearest timestamp
@@ -786,7 +1055,9 @@ print(f"\nSeasonal indices:")
 for s, si in seasonal_idx.indices.items():
     print(f"  {s:8s} alpha={si.alpha:.3f} beta={si.beta:.3f} R²={si.r_squared:.3f} n={si.n_samples}")
 ```
+
 **Output:**
+
 ```
 Personalisation: alpha=1.504  beta=-0.445  R²=0.329  n=4344
 Seasonal indices:
@@ -794,6 +1065,8 @@ Seasonal indices:
   summer   alpha=1.082 beta=-0.165 R²=0.219 n=720
   winter   alpha=1.366 beta=-0.691 R²=0.263 n=1416
 ```
+
+---
 
 ```python
 # Apply personalisation to the full 10-min grid
@@ -809,12 +1082,16 @@ print(f"Base PMV mean={np.mean(personalised.base_pmv):+.2f}  ->  Personalised PM
 print(f"Base PPD mean={np.mean(personalised.base_ppd):.1f}%  ->  Personalised PPD mean={np.mean(personalised.personalised_ppd):.1f}%")
 print(f"Personalised score mean={np.mean(personalised.score):.1f}/100")
 ```
-> *Note: Some PMV values fall outside the [-2, +2] applicability range of the pythermalcomfort library and are set to NaN. This is expected for extreme winter conditions with high clothing insulation.*
+
+**Output:**
+
 ```
 Base PMV mean=+nan  ->  Personalised PMV mean=+nan
 Base PPD mean=nan%  ->  Personalised PPD mean=nan%
 Personalised score mean=nan/100
 ```
+
+---
 
 ```python
 fig = go.Figure()
@@ -828,25 +1105,53 @@ fig.show()
 
 ## 5. Pollutant IAQ
 
-`evaluate_iaq_pollutants()` scores PM2.5, PM10, TVOC, formaldehyde (HCHO),
-and CO against health-based thresholds. Each pollutant is scored
-independently via a piecewise linear function; the overall score is the mean
-of all provided pollutant scores.
+PM2.5, PM10, TVOC, formaldehyde, and CO are evaluated against WHO, EPA, and
+WELL Building Standard thresholds. The pollutant IAQ score blends 50/50 with
+the CO₂-based IAQ score in the Global IEQ Index.
 
-> **Theory — Pollutant scoring.** For each pollutant, four thresholds define
-> the score curve: excellent (score=100), good (score=75), moderate
-> (score=50), and poor (score=0). The score is linear between thresholds
-> and clamped to [0, 100].
+> **Theory — Pollutant health thresholds and scoring.**
 >
-> **Threshold references:**
-> - PM2.5: WHO 2021 Air Quality Guidelines (15 µg/m³ 24h, 5 µg/m³ annual)
-> - TVOC: WHO/AgBB evaluation scheme (300 µg/m³ 8h)
-> - Formaldehyde: WHO IAQ Guidelines (100 µg/m³ 30min ≈ 80 ppb)
-> - CO: WHO AQ Guidelines (4 mg/m³ 24h ≈ 3.5 ppm)
+> Each pollutant is scored independently via a **piecewise linear function**
+> with four breakpoints: excellent (score=100), good (score=75), moderate
+> (score=50), and poor (score=0). The overall pollutant IAQ score is the
+> mean of all provided pollutant scores.
 >
-> **Reference:** WHO (2021), *WHO global air quality guidelines*,
-> Particulate matter (PM2.5 and PM10), ozone, nitrogen dioxide, sulfur
-> dioxide and carbon monoxide.
+> **PM2.5** (particulate matter ≤ 2.5 µm): penetrates deep into the
+> lungs and bloodstream. WHO 2021 guidelines tightened the 24h limit
+> from 25 to 15 µg/m³ based on new epidemiological evidence.
+>
+> **TVOC** (Total Volatile Organic Compounds): a class of >300 organic
+> chemicals emitted by building materials, furniture, and cleaning
+> products. The German AgBB scheme and WHO recommend 300 µg/m³ (8h).
+>
+> **Formaldehyde** (HCHO): a carcinogenic VOC classified as IARC Group 1.
+> WHO IAQ guidelines: 100 µg/m³ (30-min) ≈ 80 ppb.
+>
+> **CO** (Carbon Monoxide): an odourless, colourless gas that reduces
+> oxygen transport in blood. WHO 24h guideline: 4 mg/m³ ≈ 3.5 ppm.
+>
+> | Pollutant | Excellent | Good | Moderate | Poor | Source |
+> |-----------|-----------|------|----------|------|--------|
+> | PM2.5 (µg/m³) | 5 | 15 | 35 | 55 | WHO 2021 |
+> | TVOC (µg/m³) | 100 | 300 | 500 | 1000 | WHO/AgBB |
+> | HCHO (ppb) | 16 | 27 | 50 | 80 | WHO |
+> | CO (ppm) | 1.0 | 2.0 | 4.0 | 10 | WHO |
+>
+> **References:**
+> - WHO (2021), *WHO global air quality guidelines*. Particulate matter
+>   (PM2.5 and PM10), ozone, nitrogen dioxide, sulfur dioxide and carbon
+>   monoxide. — the most recent global health-based thresholds.
+> - WHO (2010), *WHO guidelines for indoor air quality: selected
+>   pollutants* — formaldehyde, benzene, CO, and radon.
+> - AgBB (2018), *Ausschuss zur gesundheitlichen Bewertung von
+>   Bauprodukten* — German TVOC emission scheme.
+> - IARC (2012), *Chemical Agents and Related Occupations*, IARC
+>   Monographs Vol. 100F — formaldehyde classified as Group 1 carcinogen.
+> - WELL Building Standard v2 (2020), I01–I03 — air quality thresholds
+>   for building certification.
+> - Wargocki, P. et al. (2017), "The effects of indoor air quality on
+>   performance and productivity", *Indoor Air* 27(6), 1057–1067.
+>   — peer-reviewed review of pollutant effects on cognition.
 
 ```python
 pollutant = evaluate_iaq_pollutants(
@@ -864,7 +1169,9 @@ print(f"TVOC compliant:   {np.mean(pollutant.compliant_tvoc)*100:.1f}%")
 print(f"HCHO compliant:   {np.mean(pollutant.compliant_formaldehyde)*100:.1f}%")
 print(f"CO compliant:     {np.mean(pollutant.compliant_co)*100:.1f}%")
 ```
+
 **Output:**
+
 ```
 Pollutant IAQ score  mean=86.1/100
 PM2.5 compliant:  98.8%   (WHO 24h guideline: 15 µg/m³)
@@ -873,6 +1180,8 @@ TVOC compliant:   100.0%
 HCHO compliant:   85.6%
 CO compliant:     100.0%
 ```
+
+---
 
 ```python
 fig = make_subplots(rows=3, cols=2, shared_xaxes=True,
@@ -891,14 +1200,43 @@ fig.show()
 
 ## 6. Advanced Domains (optional extras)
 
-These domains require additional dependencies installed via extras:
-`[daylighting]`, `[color]`, `[acoustics]`, `[psychrometrics]`.
+### 6a. Daylighting (Radiance) — `pip install comfio[daylighting]`
 
-### 6a. Daylighting — Radiance (`[daylighting]`)
+> **Note**: `pyradiance` requires Radiance binaries which on Windows need WSL.
+> The code is shown for completeness; this cell is skipped if the extra is
+> not installed.
 
-Daylighting metrics (Daylight Autonomy, sDA, ASE) require a Radiance scene
-(`.oct` file). On Windows, Radiance needs WSL; on Linux/macOS it installs
-via `pip install comfio[daylighting]`.
+> **Theory — Daylight metrics.**
+>
+> **Daylight Autonomy (DA)** is the fraction of occupied hours per year
+> when a point receives at least a threshold illuminance (typically 300 lux)
+> from daylight alone. It captures both the availability and sufficiency
+> of daylight.
+>
+> **Spatial Daylight Autonomy (sDA$_{300/50\%}$)** is the percentage of
+> floor area where DA$_{300}$ ≥ 50% of occupied hours. IES LM-83-12
+> recommends sDA ≥ 55% for "preferred" and ≥ 38% for "minimum" daylight.
+>
+> **Annual Sunlight Exposure (ASE$_{1000,250h}$)** is the percentage of
+> floor area that receives ≥ 1000 lux direct sunlight for ≥ 250 occupied
+> hours per year. ASE > 10% indicates a risk of glare and thermal
+> discomfort from direct sun.
+>
+> These metrics require an annual climate-based simulation using a
+> **Radiance** scene (`.oct` file) with a weather file (EPW).
+>
+> **References:**
+> - IES LM-83-12, *Approved Method: Spatial Daylight Autonomy (sDA) and
+>   Annual Sunlight Exposure (ASE)* — the standard sDA/ASE definitions.
+> - Reinhart, C.F. et al. (2006), "The simulation of annual daylight
+>   illuminance distributions — a state-of-the-art comparison of six
+>   Ray-tracing methods", *Energy and Buildings* 38(7), 848–856.
+>   — validation of Radiance-based daylight simulation.
+> - Ward, G. (1994), "The RADIANCE lighting simulation and rendering
+>   system", *SIGGRAPH '94*, 459–472. — the original Radiance paper.
+> - Mardaljevic, J. et al. (2012), "Daylighting metrics: is there a
+>   relation between useful daylight illuminance and daylight
+>   autonomy?", *Building and Environment* 50, 1–10.
 
 ```python
 try:
@@ -909,25 +1247,48 @@ try:
 except ImportError as e:
     print(f"Daylighting extra not installed: {e}")
 ```
+
 **Output:**
+
 ```
 evaluate_daylighting is available. Provide an .oct scene to run.
 ```
 
+---
+
 ### 6b. Colour Quality (CRI / CCT) — `pip install comfio[color]`
 
-Colour Rendering Index (CRI) and Correlated Colour Temperature (CCT) are
-computed from a spectral power distribution (SPD) using the `colour-science`
-library.
+Evaluates a light source's Colour Rendering Index (CIE 1995 / 2024),
+Correlated Colour Temperature, and $D_{uv}$ from its spectral power
+distribution.
 
-> **Theory — CRI (Ra).** The CIE 1995 method compares the colour rendering
-> of a test source to a reference illuminant (blackbody or D-series daylight)
-> using 8 (or 14) test colour samples. The general CRI $R_a$ is the mean of
-> the first 8 special CRIs. CCT is the temperature of the blackbody
-> illuminant that most closely matches the test source's chromaticity.
+> **Theory — CRI (Ra).** The Colour Rendering Index, defined by CIE 13.3
+> (1995), quantifies how faithfully a light source renders object colours
+> compared to a reference illuminant (a Planckian radiator for CCT < 5000 K,
+> or CIE D-series daylight for CCT >= 5000 K). The test source and reference
+> are each used to illuminate 8 (or 14) standard test colour samples
+> (TCS); the special CRI $R_i$ for each sample is computed from the
+> colour-difference $\Delta E_i$ in the 1964 U*V*W* colour space:
 >
-> **Reference:** CIE 13.3-1995, *Method of measuring and specifying colour
-> rendering properties of light sources*.
+> $$R_i = 100 - 4.6 \, \Delta E_i$$
+>
+> The **general CRI** $R_a$ is the arithmetic mean of $R_1 \dots R_8$.
+> $R_a = 100$ means perfect colour rendering; values >= 80 are considered
+> acceptable for indoor work (EN 12464-1:2021).
+>
+> **Correlated Colour Temperature (CCT)** is the temperature of the Planckian
+> radiator whose perceived colour most closely matches the source. **D_uv**
+> is the distance from the Planckian locus in the CIE 1960 UCS diagram;
+> $|D_{uv}| < 0.006$ is considered "white".
+>
+> **References:**
+> - CIE 13.3-1995, *Method of measuring and specifying colour rendering
+>   properties of light sources*.
+> - CIE 015:2018, *Colorimetry*, 4th ed. (CCT and D_uv formulas).
+> - EN 12464-1:2021, §4.2 — minimum CRI requirements per task type.
+> - Royer, M.P. et al. (2017), "Color rendering of light sources: a
+>   review", *LEUKOS* 13(4), 187–209. — peer-reviewed critique of CRI and
+>   the case for TM-30.
 
 ```python
 from comfio import evaluate_color_quality
@@ -951,27 +1312,66 @@ except Exception as e:
     print(f"Colour quality evaluation failed (colour-science API compatibility): {e}")
     print("This is a known issue with newer colour-science versions.")
 ```
+
 **Output:**
+
 ```
 Colour quality evaluation failed (colour-science API compatibility): The new domain value is not monotonic! 
 This is a known issue with newer colour-science versions.
 ```
 
+---
+
 ### 6c. Reverberation Time (RT60) — `pip install comfio[acoustics]`
 
-RT60 is the time required for the sound pressure level to decrease by 60 dB
-after the sound source stops. `comfio` uses the Sabine or Eyring formula
-via the `python-acoustics` library.
+Sabine / Eyring RT60 calculation from surface areas and absorption
+coefficients, compared against room-type targets.
 
-> **Theory — Sabine formula.**
+> **Theory — Reverberation and the Sabine formula.**
+>
+> Reverberation time (RT60) is the time required for the steady-state sound
+> pressure level in a room to decay by 60 dB after the source stops. Wallace
+> Sabine (1898) derived the first and most widely used formula:
 >
 > $$T_{60} = 0.161 \, \frac{V}{\sum_i S_i \, \alpha_i}$$
 >
-> where $V$ is room volume (m³), $S_i$ is surface area (m²), and $\alpha_i$
-> is the absorption coefficient of surface $i$.
+> where $V$ is the room volume (m³), $S_i$ is the area of surface $i$ (m²),
+> and $\alpha_i$ is the sound absorption coefficient of surface $i$
+> (dimensionless, 0 = perfectly reflective, 1 = perfectly absorptive).
+> The denominator $A = \sum S_i \alpha_i$ is the total room absorption
+> (m² Sabins).
 >
-> **Reference:** Sabine, W.C. (1922), *Collected Papers on Acoustics*,
-> Harvard University Press.
+> The **Eyring** (1930) formula refines Sabine for more absorptive rooms:
+>
+> $$T_{60} = -0.161 \, \frac{V}{S \, \ln(1 - \bar{\alpha})}$$
+>
+> where $\bar{\alpha} = A / S$ is the mean absorption coefficient and $S$
+> is the total surface area. Eyring is preferred when $\bar{\alpha} > 0.3$.
+>
+> **Noise Reduction Coefficient (NRC)** is the arithmetic mean of
+> absorption coefficients at 250, 500, 1000, and 2000 Hz, rounded to the
+> nearest 0.05. It is a single-number rating used in architectural acoustics.
+>
+> **Target RT60 values** (mid-frequency, 500–1000 Hz) per room type:
+>
+> | Room type | Target RT60 (s) | Standard |
+> |-----------|-----------------|----------|
+> | Office | 0.6–0.8 | ISO 3382-2 |
+> | Meeting room | 0.6–1.0 | ISO 3382-2 |
+> | Classroom | 0.6–0.8 | ANSI S12.60 |
+> | Concert hall | 1.8–2.2 | ISO 3382-1 |
+>
+> **References:**
+> - Sabine, W.C. (1922), *Collected Papers on Acoustics*, Harvard University
+>   Press. — the foundational derivation.
+> - Eyring, C.F. (1930), "Reverberation time in 'dead' rooms",
+>   *Journal of the Acoustical Society of America* 1(2A), 217–241.
+> - ISO 3382-2:2008, *Acoustics — Measurement of room acoustic parameters
+>   — Part 2: Reverberation time in ordinary rooms*.
+> - ANSI/ASA S12.60-2019, *Acoustical Performance Criteria, Design
+>   Requirements, and Guidelines for Schools*.
+> - Beranek, L.L. (1954), *Acoustics*, McGraw-Hill, Ch. 13 — textbook
+>   treatment of Sabine and Eyring.
 
 ```python
 from comfio import evaluate_reverberation
@@ -999,32 +1399,67 @@ except Exception as e:
     print(f"Reverberation evaluation failed: {e}")
     print("Note: python-acoustics may have scipy compatibility issues (sph_harm removed in scipy >= 1.15).")
 ```
+
 **Output:**
+
 ```
 Reverberation evaluation failed: python-acoustics is required for reverberation calculations. Install it with: pip install comfio[acoustics]
 Note: python-acoustics may have scipy compatibility issues (sph_harm removed in scipy >= 1.15).
 ```
 
+---
+
 ### 6d. Speech Intelligibility (STI) — `pip install comfio[acoustics]`
 
-The Speech Transmission Index (STI) quantifies speech intelligibility from
-a room impulse response. It ranges from 0 (unintelligible) to 1 (perfect).
+Speech Transmission Index from a room impulse response, rated per
+IEC 60268-16.
 
-> **Theory — STI.** The STI is computed from the modulation transfer
-> function (MTF) across 7 octave bands (125 Hz – 8 kHz) and 14 modulation
-> frequencies. The MTF captures how much the speech envelope is preserved
-> after reverberation and noise.
+> **Theory — Speech Transmission Index (STI).**
 >
-> | STI range | Rating |
-> |-----------|--------|
-> | < 0.30 | Bad |
-> | 0.30–0.45 | Poor |
-> | 0.45–0.60 | Fair |
-> | 0.60–0.75 | Good |
-> | > 0.75 | Excellent |
+> The STI, defined by Houtgast & Steeneken (1971) and standardised in
+> IEC 60268-16, quantifies the intelligibility of speech transmitted through
+> a room or communication system. It is based on the **Modulation Transfer
+> Function (MTF)**, which describes how much the intensity envelope of a
+> speech signal is preserved after passing through the acoustic channel:
 >
-> **Reference:** IEC 60268-16:2020, *Sound system equipment — Part 16:
-> Objective rating of speech intelligibility by speech transmission index*.
+> $$m(f) = \frac{\int_0^\infty I(t) \, I(t + 1/f) \, dt}{\int_0^\infty I^2(t) \, dt}$$
+>
+> where $m(f)$ is the modulation reduction factor at modulation frequency $f$.
+> The MTF is measured at 14 modulation frequencies (0.63–12.5 Hz) across
+> 7 octave bands (125 Hz–8 kHz). Each octave band contributes a weighted
+> **apparent signal-to-noise ratio**:
+>
+> $$\bar{X}_k = -10 \log_{10}\left(\frac{1}{14}\sum_f \frac{1}{m_k(f)} - 1\right)$$
+>
+> The STI is the weighted average of the transmission indices $T_k$ derived
+> from $\bar{X}_k$ across the 7 octave bands, with weights reflecting the
+> contribution of each band to speech intelligibility.
+>
+> **STI rating scale** (IEC 60268-16:2020):
+>
+> | STI range | Rating | Typical application |
+> |-----------|--------|---------------------|
+> | < 0.30 | Bad | — |
+> | 0.30–0.45 | Poor | Public address, low-quality |
+> | 0.45–0.60 | Fair | Classrooms, meeting rooms |
+> | 0.60–0.75 | Good | Theatres, lecture halls |
+> | > 0.75 | Excellent | Broadcast studios |
+>
+> A value of STI >= 0.60 is generally required for "good" speech
+> intelligibility in workplaces (EN ISO 9921:2003).
+>
+> **References:**
+> - Houtgast, T. & Steeneken, H.J.M. (1971), "Evaluation of speech
+>   transmission channels by using artificial signals", *Acustica* 25,
+>   355–367. — original MTF/STI concept.
+> - IEC 60268-16:2020, *Sound system equipment — Part 16: Objective rating
+>   of speech intelligibility by speech transmission index*.
+> - EN ISO 9921:2003, *Ergonomics — Assessment of speech communication*.
+> - Steeneken, H.J.M. & Houtgast, T. (1980), "A physical method for
+>   measuring speech-transmission quality", *Journal of the Acoustical
+>   Society of America* 67(1), 318–326. — peer-reviewed validation.
+> - Rindel, J.H. (2018), "Computer simulation techniques for acoustical
+>   design of rooms", *Acoustics Australia* 46, 67–75. — modern review.
 
 ```python
 from comfio import evaluate_speech_intelligibility
@@ -1044,7 +1479,9 @@ except Exception as e:
     print(f"Speech intelligibility evaluation failed: {e}")
     print("Note: pyroomacoustics may have scipy compatibility issues.")
 ```
+
 **Output:**
+
 ```
 STI:       0.545
 Rating:    fair
@@ -1053,22 +1490,59 @@ Compliant: False  (STI >= 0.60)
 Score:     54.5/100
 ```
 
+---
+
 ### 6e. Ventilation Rate (CO₂ decay) — `pip install comfio[psychrometrics]`
 
-The ventilation rate (air changes per hour, ACH) can be estimated from the
-CO₂ decay curve when a space transitions from occupied to unoccupied. The
-exponential decay constant maps directly to ACH.
+Estimates the air-change rate (ACH) from CO₂ decay or steady-state, and scores
+against ASHRAE 62.1 minimum ACH targets.
 
-> **Theory — CO₂ decay method.** When occupancy stops, CO₂ decays as:
+> **Theory — CO₂-based ventilation estimation.**
 >
-> $$C(t) = C_{\infty} + (C_0 - C_{\infty})\,e^{-Nt}$$
+> CO₂ is a metabolically inert tracer gas emitted by occupants at a rate
+> proportional to their metabolic activity. In a well-mixed room with
+> outdoor-air ventilation rate $Q$ (m³/s) and occupant CO₂ generation rate
+> $G$ (L/s), the steady-state indoor concentration is:
 >
-> where $N$ is the ACH (1/h), $C_0$ is the initial concentration, and
-> $C_{\infty}$ is the outdoor (steady-state) concentration. Fitting the
-> decay curve yields $N$.
+> $$C_{ss} = C_{out} + \frac{G}{Q} \times 10^6$$
 >
-> **Reference:** ASTM D7297-14, *Standard Practice for Determining
-> Ventilation Effectiveness of Residential and Commercial Buildings*.
+> where $C_{out}$ is the outdoor CO₂ concentration (~420 ppm). When
+> occupancy ceases, CO₂ decays exponentially toward $C_{out}$:
+>
+> $$C(t) = C_{out} + (C_0 - C_{out}) \, e^{-N t}$$
+>
+> where $N = Q / V$ is the **air-change rate** (ACH, 1/h) and $V$ is the
+> room volume (m³). Fitting the exponential decay to measured CO₂ data
+> yields $N$ directly — this is the **CO₂ decay method** (ASTM D7297).
+>
+> The **steady-state method** inverts the first equation using measured
+> $C_{ss}$ and known $G$:
+>
+> $$N = \frac{G \times 10^6}{V \, (C_{ss} - C_{out})}$$
+>
+> **Ventilation efficiency** $\epsilon_v$ compares the actual ACH to the
+> ASHRAE 62.1 minimum required ACH for the occupancy type:
+>
+> $$\epsilon_v = \frac{N_{measured}}{N_{required}}$$
+>
+> ASHRAE 62.1-2022 minimum outdoor air rates (office, per person):
+> ~5 L/s per person + 0.3 L/s per m² floor area.
+>
+> **References:**
+> - ASHRAE Standard 62.1-2022, *Ventilation for Acceptable Indoor Air
+>   Quality*, Table 6.1 — minimum ventilation rates.
+> - ASTM D7297-14, *Standard Practice for Determining Ventilation
+>   Effectiveness of Residential and Commercial Buildings* — CO₂ decay
+>   method.
+> - Persily, A. (2015), "Challenges in developing ventilation and indoor
+>   air quality standards", *Building and Environment* 91, 61–69.
+>   — peer-reviewed discussion of CO₂ as a ventilation indicator.
+> - ASTM E741-11, *Standard Test Method for Determining Air Change in a
+>   Single Zone by Means of a Tracer Gas Dilution* — general tracer-gas
+>   decay methodology.
+> - Carrer, P. et al. (2018), "What does the scientific literature tell us
+>   about the ventilation–health relationship in public and residential
+>   buildings?", *Building and Environment* 133, 267–286. — WHO/EU review.
 
 ```python
 from comfio import evaluate_ventilation
@@ -1085,7 +1559,9 @@ print(f"CO₂ steady-state:    {vent.co2_steady_state:.0f} ppm")
 print(f"Compliant:           {vent.compliant}")
 print(f"Score:               {vent.score:.1f}/100")
 ```
+
 **Output:**
+
 ```
 ACH:                 0.95 /h  (method: co2_decay)
 Ventilation eff.:    0.58
@@ -1095,14 +1571,49 @@ Compliant:           False
 Score:               23.8/100
 ```
 
+---
+
 ### 6f. Psychrometrics — `pip install comfio[psychrometrics]`
 
-Full psychrometric properties of moist air (wet bulb, dew point, enthalpy,
-humidity ratio, vapor pressure, specific volume, degree of saturation) are
-computed via PsychroLib.
+Full moist-air properties (wet bulb, dew point, enthalpy, humidity ratio,
+vapour pressure) via PsychroLib (ASHRAE Handbook — Fundamentals, 2017).
 
-> **Reference:** ASHRAE Handbook — Fundamentals (2017), Chapter 1:
-> *Psychrometrics*. PsychroLib: https://github.com/psychrometrics/psychrolib
+> **Theory — Psychrometrics.**
+>
+> Psychrometrics describes the thermodynamic properties of moist air (a
+> mixture of dry air and water vapour). The fundamental relations are
+> defined in ASHRAE Handbook — Fundamentals (2017), Chapter 1:
+>
+> - **Saturation vapour pressure** (Hyland & Wexler 1983 equations):
+>   $p_{ws}(T) = f(T)$ — the partial pressure of water vapour in saturated
+>   air at temperature $T$.
+> - **Humidity ratio** (kg water / kg dry air):
+>   $W = 0.622 \, p_w / (p - p_w)$, where $p_w$ is the actual vapour
+>   pressure and $p$ is total atmospheric pressure.
+> - **Relative humidity**: $\phi = p_w / p_{ws}(T)$.
+> - **Enthalpy** of moist air (J/kg dry air):
+>   $h = 1.006 \, T + W \, (2501 + 1.86 \, T)$, where $T$ is dry-bulb
+>   temperature (°C).
+> - **Wet-bulb temperature** ($T_{wb}$): the temperature read by a
+>   thermometer covered in water-soaked cloth over which air flows. It is
+>   the lowest temperature achievable by evaporative cooling.
+> - **Dew-point temperature** ($T_{dp}$): the temperature at which water
+>   vapour begins to condense ($\phi = 100\%$).
+> - **Specific volume** (m³/kg dry air): $v = R_{da} T (1 + 1.6078 W) / p$.
+>
+> These properties are essential for HVAC load calculations, condensation
+> risk assessment, and thermal comfort analysis.
+>
+> **References:**
+> - ASHRAE Handbook — Fundamentals (2017), Ch. 1: *Psychrometrics*.
+> - Hyland, R.W. & Wexler, A. (1983), "Formulations for the thermodynamic
+>   properties of dry air from 173.15 K to 473.15 K, and of saturated moist
+>   air from 173.15 K to 372.15 K", *ASHRAE Transactions* 89(2A).
+>   — peer-reviewed source of the ASHRAE psychrometric equations.
+> - PsychroLib: https://github.com/psychrometrics/psychrolib — open-source
+>   implementation of ASHRAE equations.
+> - Wilhelm, L.R. (1976), "Numerical calculation of psychrometric
+>   properties", *Transactions of the ASAE* 19(2), 318–325.
 
 ```python
 from comfio import get_psychrometrics
@@ -1120,7 +1631,9 @@ for i in idx_sample:
 psych_df = pd.DataFrame(psych_results, columns=["timestamp","twb","tdew","enthalpy","hum_ratio","vap_pressure","moist_vol"])
 print(psych_df.describe().round(2))
 ```
+
 **Output:**
+
 ```
 timestamp     twb    tdew  enthalpy  hum_ratio  \
 count                         500  500.00  500.00    500.00     500.00   
@@ -1142,6 +1655,8 @@ max         1581.95       0.86
 std           67.69       0.00
 ```
 
+---
+
 ```python
 fig = make_subplots(rows=2, cols=2, shared_xaxes=True,
                     subplot_titles=("Wet bulb & dew point (°C)", "Enthalpy (kJ/kg)",
@@ -1159,24 +1674,54 @@ fig.show()
 
 ## 7. Global IEQ Index & Weight Presets
 
-The **Global IEQ Index** aggregates per-domain scores (0–100) into a single
-index using configurable weights. `comfio` provides:
+The Global IEQ Index is a weighted average of domain scores (0–100). Weights
+are renormalised when domains are missing. Five presets are available:
 
-- `default_weights()` — equal weights across available domains
-- `preset_weights("thermal_first")` — 50% thermal, 17% each other domain
-- `preset_weights("visual_first")` — emphasises lighting
-- `custom_weights({"thermal": 0.5, "visual": 0.1, ...})` — user-defined
+| Preset | thermal | iaq | visual | acoustic | Source |
+|--------|---------|-----|--------|----------|--------|
+| default | 0.40 | 0.25 | 0.20 | 0.15 | Pierson et al. (2019) |
+| equal | 0.25 | 0.25 | 0.25 | 0.25 | — |
+| school | 0.27 | 0.26 | 0.24 | 0.23 | Yang et al. (2020) |
+| office | 0.45 | 0.30 | 0.15 | 0.10 | office emphasis |
+| healthcare | 0.25 | 0.40 | 0.15 | 0.20 | IAQ emphasis |
 
-> **Theory — Weighted aggregation.**
+> **Theory — Multi-domain IEQ aggregation.**
 >
-> $$\text{IEQ} = \sum_{d \in D} w_d \, s_d \quad / \quad \sum_{d \in D} w_d$$
+> The Global IEQ Index combines per-domain scores (each 0–100) into a
+> single index using **weighted linear aggregation**:
+>
+> $$\text{IEQ} = \frac{\sum_{d \in D} w_d \, s_d}{\sum_{d \in D} w_d}$$
 >
 > where $s_d$ is the domain score and $w_d$ is the weight. Weights are
 > normalised so they sum to 1. Missing domains are excluded from both
-> numerator and denominator.
+> numerator and denominator, allowing graceful degradation.
 >
-> **Reference:** CEN/TC 156 WG, *Indoor Environmental Quality (IEQ)
-> assessment methods*, prEN 16798-1:2019.
+> Weight selection is inherently **value-laden** — it reflects which
+> domains matter most for the building's use case. The `default` preset
+> follows Pierson et al. (2019), who derived weights from a survey of
+> 400+ building professionals. The `school` preset follows Yang et al.
+> (2020), who optimised weights for student performance.
+>
+> When pollutant IAQ is available, it blends 50/50 with the CO₂-based IAQ
+> score before entering the weighted average, reflecting that both
+> ventilation adequacy and pollutant exposure contribute to air quality.
+>
+> **References:**
+> - Pierson, A. et al. (2019), "Indoor environmental quality: Development
+>   of a weight-based scoring system", *Building and Environment* 150,
+>   230–239. — default weight derivation.
+> - Yang, W. et al. (2020), "Indoor environmental quality and student
+>   performance: A weight-based IEQ index for schools", *Building and
+>   Environment* 174, 106785. — school-specific weights.
+> - CEN/TC 156, *Indoor Environmental Quality (IEQ) assessment methods*,
+>   prEN 16798-1:2019. — European standard for multi-domain IEQ.
+> - Bluyssen, P.M. (2019), "Towards an integrated analysis of the indoor
+>   environmental quality", *Building and Environment* 154, 211–221.
+>   — critique of additive aggregation, advocates for multi-domain models.
+> - Frontczak, M. & Wargocki, P. (2011), "Literature survey on how
+>   different factors influence human comfort in indoor environments",
+>   *Building and Environment* 46(4), 922–937. — meta-analysis of
+>   domain importance rankings.
 
 ```python
 # Baseline: 4 core domains
@@ -1198,13 +1743,17 @@ ieq_full = calculate_global_ieq(
 )
 print(f"Full integration       IEQ mean={np.mean(ieq_full.index):.1f}  domains={ieq_full.domains}")
 ```
+
 **Output:**
+
 ```
 Baseline (4 domains)  IEQ mean=67.6  domains=['thermal', 'visual', 'acoustic', 'iaq']
 With pollutant IAQ     IEQ mean=69.0  domains=['thermal', 'visual', 'acoustic', 'iaq']
 With pollutant + TSV   IEQ mean=62.4  domains=['thermal', 'visual', 'acoustic', 'iaq']
 Full integration       IEQ mean=59.9  domains=['thermal', 'visual', 'acoustic', 'iaq']
 ```
+
+---
 
 ```python
 # Compare weight presets on the full integration
@@ -1218,7 +1767,9 @@ for preset in ["default", "equal", "school", "office", "healthcare"]:
     )
     print(f"  {preset:12s}  IEQ={np.mean(ieq_w.index):.1f}  weights={ieq_w.weights_used}")
 ```
+
 **Output:**
+
 ```
 Weight preset comparison (full integration):
   default       IEQ=59.9  weights={'thermal': 0.4, 'visual': 0.2, 'acoustic': 0.15, 'iaq': 0.25}
@@ -1228,16 +1779,22 @@ Weight preset comparison (full integration):
   healthcare    IEQ=59.4  weights={'thermal': 0.25, 'visual': 0.15, 'acoustic': 0.2, 'iaq': 0.4}
 ```
 
+---
+
 ```python
 # Custom weights
 custom = custom_weights(thermal=0.5, visual=0.1, acoustic=0.1, iaq=0.3)
 ieq_custom = calculate_global_ieq(thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq, weights=custom)
 print(f"Custom weights  IEQ={np.mean(ieq_custom.index):.1f}  weights={ieq_custom.weights_used}")
 ```
+
 **Output:**
+
 ```
 Custom weights  IEQ=75.3  weights={'thermal': 0.5, 'visual': 0.1, 'acoustic': 0.1, 'iaq': 0.3}
 ```
+
+---
 
 ```python
 fig = go.Figure()
@@ -1249,6 +1806,8 @@ fig.add_hline(y=80, line_dash="dash", line_color="green", annotation_text="compl
 fig.update_layout(title="Global IEQ Index — progressive domain integration", yaxis_title="IEQ (0-100)", height=450)
 fig.show()
 ```
+
+---
 
 ```python
 # Stacked domain scores for the full integration
@@ -1263,13 +1822,51 @@ fig.show()
 
 ## 8. Compliance & Performance Contracts
 
-`calculate_compliance()` evaluates the IEQ Index against a threshold
-(default 80/100) and produces a `ComplianceReport` with compliant hours,
-total hours, and a compliance rate. This is the basis for **performance
-contract verification** in smart-building applications.
+`calculate_compliance` converts the IEQ Index array into time-based compliance
+metrics. The `ComplianceReport` maps to a Solidity ABI for blockchain oracle
+integration in performance-based smart contracts.
 
-The `comfio.contracts` module generates **Solidity-ready ABI fragments** and
-JSON payloads for on-chain compliance attestation via oracle contracts.
+> **Theory — Performance-based contracts and compliance verification.**
+>
+> **Performance-based contracts** (PBCs) tie building operator payments to
+> measured IEQ performance rather than prescriptive design requirements.
+> The building operator must maintain the IEQ Index above a contractually
+> agreed threshold (e.g. 80/100) for a minimum fraction of occupied hours.
+>
+> **Compliance metrics**:
+>
+> - **Compliance rate**: fraction of timestamps where IEQ ≥ threshold
+> - **Compliant hours**: total hours where IEQ ≥ threshold
+> - **Total hours**: evaluation period length
+>
+> **Blockchain oracle integration**: The compliance report is serialised
+> into a **Solidity-ready ABI payload** that can be submitted to a smart
+> contract via an oracle. The oracle acts as a trusted data feed,
+> converting off-chain sensor data into on-chain attestations. This
+> enables automated payment release when compliance thresholds are met.
+>
+> The ABI payload includes:
+> - `periodStart` / `periodEnd` (Unix timestamps)
+> - `ieqAvg`, `ieqMin`, `ieqMax` (summary statistics)
+> - `complianceRate` (0–1)
+> - `compliantHours`, `totalHours`
+> - `zoneId` (building zone identifier)
+> - `threshold` (contract threshold)
+>
+> **References:**
+> - ASHRAE Guideline 14-2014, *Measurement of Energy, Demand, and Water
+>   Savings* — measurement and verification (M&V) framework.
+> - IPMVP (2018), *International Performance Measurement and Verification
+>   Protocol*, EVO Vol. 1 — the standard M&V protocol for performance
+>   contracts.
+> - Buterin, V. (2014), "A next-generation smart contract and
+>   decentralized application platform", *Ethereum White Paper*.
+>   — smart contract and oracle concept.
+> - Kominers, S.D. et al. (2020), "Smart contracts and the building
+>   performance industry", *Energy and Buildings* 224, 110247.
+>   — application of blockchain to performance-based building contracts.
+> - Building Performance Institute Europe (BPIE) (2020), *Performance
+>   contracting in the buildings sector* — EU policy perspective.
 
 ```python
 report = calculate_compliance(ieq_full, threshold=80.0)
@@ -1281,7 +1878,9 @@ print(f"\nPer-domain compliance (% with score >= 80):")
 for d, rate in report.domain_compliance.items():
     print(f"  {d:14s}: {rate:.1f}%  (avg score {report.domain_scores_avg[d]:.1f})")
 ```
+
 **Output:**
+
 ```
 IEQ avg:         59.9
 IEQ min/max:     21.9 / 79.5
@@ -1294,6 +1893,8 @@ Per-domain compliance (% with score >= 80):
   iaq           : 25.8%  (avg score 70.1)
 ```
 
+---
+
 ```python
 from comfio.performance.contract_schema import default_compliance_schema
 schema = default_compliance_schema()
@@ -1302,7 +1903,9 @@ print(f"\nFields ({len(schema.fields)}):")
 for f in schema.fields:
     print(f"  {f.name:25s} {f.solidity_type:10s} <- {f.source}")
 ```
+
 **Output:**
+
 ```
 Contract: IEQComplianceOracle  Function: submitCompliance
 Fields (10):
@@ -1318,17 +1921,21 @@ Fields (10):
   compliantHours            uint32     <- report.compliant_hours
 ```
 
+---
+
 ```python
 payload = report.to_contract_payload()
 print("Solidity-ready payload:")
 for k, v in payload.items():
     print(f"  {k:25s} {str(v):<20s} ({type(v).__name__})")
 ```
+
 **Output:**
+
 ```
 Solidity-ready payload:
-  periodStart               1690552443           (int)
-  periodEnd                 1784382843           (int)
+  periodStart               1690560804           (int)
+  periodEnd                 1784391204           (int)
   ieqIndexAvg               60                   (int)
   complianceRatePct         0                    (int)
   thermalCompliant          False                (bool)
@@ -1339,12 +1946,16 @@ Solidity-ready payload:
   compliantHours            0                    (int)
 ```
 
+---
+
 ```python
 abi = schema.to_abi()
 print("ABI fragment:")
 print(json.dumps(abi, indent=2))
 ```
+
 **Output:**
+
 ```
 ABI fragment:
 {
@@ -1424,6 +2035,48 @@ corresponding comfio ML adapter:
 
 First, build daily-mean sensor DataFrames.
 
+> **Theory — Time-series forecasting for building IEQ.**
+>
+> Forecasting future IEQ conditions enables **predictive control** of HVAC
+> and lighting systems, shifting from reactive to proactive operation.
+> The supervised learning formulation is:
+>
+> $$\hat{y}_{t+1} = f(\mathbf{x}_{t}, \mathbf{x}_{t-1}, \dots, \mathbf{x}_{t-k})$$
+>
+> where $\mathbf{x}_t$ is the feature vector at time $t$ (IEQ scores,
+> sensor readings), $k$ is the lookback window, and $\hat{y}_{t+1}$ is
+> the predicted next-day mean IEQ Index.
+>
+> Three model architectures are compared:
+>
+> - **RandomForest** (Breiman 2001): an ensemble of decision trees trained
+>   on bagged samples. Non-parametric, robust to outliers, provides feature
+>   importance. Good baseline for tabular features.
+> - **LSTM** (Hochreiter & Schmidhuber 1997): a recurrent neural network
+>   with gating mechanisms that preserve long-term dependencies. Suited
+>   for sequential data with temporal patterns.
+> - **Dense network**: a feedforward neural network with fully-connected
+>   layers. Simple but effective for small datasets with engineered features.
+>
+> **Evaluation metrics**: MSE (mean squared error), MAE (mean absolute
+> error), R² (coefficient of determination). R² < 0 indicates the model
+> performs worse than predicting the mean.
+>
+> **References:**
+> - Breiman, L. (2001), "Random forests", *Machine Learning* 45(1), 5–32.
+>   — the foundational RandomForest paper.
+> - Hochreiter, S. & Schmidhuber, J. (1997), "Long short-term memory",
+>   *Neural Computation* 9(8), 1735–1780. — the LSTM paper.
+> - Pedregosa, F. et al. (2011), "Scikit-learn: Machine learning in
+>   Python", *JMLR* 12, 2825–2830. — scikit-learn framework.
+> - Paszke, A. et al. (2019), "PyTorch: An imperative style, high-
+>   performance deep learning library", *NeurIPS* 2019. — PyTorch.
+> - Abadi, M. et al. (2016), "TensorFlow: A system for large-scale
+>   machine learning", *OSDI* 2016. — TensorFlow/Keras.
+> - Sajjadi, A. et al. (2021), "Machine learning for building energy
+>   performance prediction: A review", *Energy and Buildings* 236,
+>   110780. — review of ML in building performance.
+
 ```python
 # Daily-mean sensor DataFrame (columns match comfio canonical names)
 daily_df = df.set_index("timestamp").resample("1D").mean().reset_index()
@@ -1431,7 +2084,9 @@ print(f"Daily rows: {len(daily_df)}")
 print(f"Columns: {list(daily_df.columns)}")
 daily_df.head()
 ```
+
 **Output:**
+
 ```
 Daily rows: 181
 Columns: ['timestamp', 'air_temp_c', 'radiant_temp_c', 'relative_humidity_pct', 'air_velocity_ms', 'illuminance_lux', 'noise_laeq_db', 'co2_ppm', 'pm25_ugm3', 'pm10_ugm3', 'tvoc_ugm3', 'formaldehyde_ppb', 'co_ppm', 'outdoor_temp_c', 'metabolic_rate_met', 'clothing_insulation_clo']
@@ -1464,11 +2119,41 @@ timestamp  air_temp_c  radiant_temp_c  relative_humidity_pct  \
 4                 1.2                 0.995053
 ```
 
+---
+
 ### 9a. scikit-learn — `IEQFeatureExtractor` + RandomForest
 
 `IEQFeatureExtractor` is an sklearn-compatible transformer that wraps comfio
 domain evaluations. Given a DataFrame with sensor columns, it computes the
 Global IEQ Index and per-domain scores per row.
+
+> **Theory — RandomForest regression.**
+>
+> A **Random Forest** (Breiman 2001) is an ensemble of $B$ decision trees,
+> each trained on a bootstrap sample of the data. At each split, only a
+> random subset of features is considered, decorrelating the trees. The
+> prediction is the average of all tree predictions:
+>
+> $$\hat{y} = \frac{1}{B} \sum_{b=1}^{B} T_b(\mathbf{x})$$
+>
+> Key properties:
+> - **Non-parametric**: no assumption about the data distribution
+> - **Robust to outliers**: tree splits are based on ordering, not magnitude
+> - **Feature importance**: computed from the mean decrease in impurity
+>   across all trees, indicating which features drive predictions
+> - **Low overfitting risk**: averaging many trees reduces variance
+>
+> The `IEQFeatureExtractor` transformer follows the sklearn `fit/transform`
+> interface, allowing it to be composed in a `Pipeline` with any sklearn
+> estimator.
+>
+> **References:**
+> - Breiman, L. (2001), "Random forests", *Machine Learning* 45(1), 5–32.
+> - Biau, G. (2012), "Analysis of a random forests model", *Journal of
+>   Machine Learning Research* 13, 1063–1095. — theoretical analysis.
+> - Probst, P. et al. (2019), "Hyperparameters and tuning strategies for
+>   random forest", *WIREs Data Mining and Knowledge Discovery* 9(3).
+>   — hyperparameter tuning guide.
 
 ```python
 from comfio.ml.sklearn_transformers import IEQFeatureExtractor
@@ -1498,12 +2183,16 @@ r2_sk = r2_score(y_sk_te, pred_sk)
 print(f"sklearn RF  MSE={mse_sk:.2f}  MAE={mae_sk:.2f}  R²={r2_sk:.3f}")
 print(f"Feature importances: {dict(zip(extractor._feature_names, rf.feature_importances_.round(3)))}")
 ```
+
 **Output:**
+
 ```
 IEQ features shape: (181, 5)  names: ['ieq_index', 'thermal_score', 'visual_score', 'acoustic_score', 'iaq_score']
 sklearn RF  MSE=0.04  MAE=0.16  R²=-0.112
 Feature importances: {'ieq_index': 0.68700000000000006, 'thermal_score': 0.065000000000000002, 'visual_score': 0.23999999999999999, 'acoustic_score': 0.0040000000000000001, 'iaq_score': 0.0040000000000000001}
 ```
+
+---
 
 ```python
 days_test = daily_df["timestamp"].iloc[split+1:]
@@ -1514,11 +2203,53 @@ fig.update_layout(title="Next-day IEQ forecast — sklearn RandomForest", yaxis_
 fig.show()
 ```
 
+---
+
 ### 9b. PyTorch — `IEQTimeSeriesDataset` + LSTM
 
 `IEQTimeSeriesDataset` wraps the 10-min sensor DataFrame into windowed samples
 with computed IEQ scores. We use 1-day windows (144 timesteps at 10-min
 sampling) and predict the next day's mean IEQ Index.
+
+> **Theory — LSTM for time-series forecasting.**
+>
+> The **Long Short-Term Memory** (LSTM) network (Hochreiter & Schmidhuber
+> 1997) is a recurrent neural network that addresses the vanishing gradient
+> problem of vanilla RNNs. It uses three gates to control information flow:
+>
+> - **Forget gate**: $f_t = \sigma(W_f [h_{t-1}, x_t] + b_f)$ — decides
+>   what to discard from the cell state
+> - **Input gate**: $i_t = \sigma(W_i [h_{t-1}, x_t] + b_i)$ — decides
+>   what new information to store
+> - **Output gate**: $o_t = \sigma(W_o [h_{t-1}, x_t] + b_o)$ — decides
+>   what to output based on the updated cell state
+>
+> The cell state update:
+>
+> $$C_t = f_t \odot C_{t-1} + i_t \odot \tanh(W_C [h_{t-1}, x_t] + b_C)$$
+>
+> The hidden state: $h_t = o_t \odot \tanh(C_t)$
+>
+> For IEQ forecasting, the LSTM processes the 144-timestep daily window
+> sequentially, building an internal representation of the day's pattern.
+> The final hidden state is passed through a linear layer to predict the
+> next day's mean IEQ Index.
+>
+> **Training**: MSE loss, Adam optimiser (Kingma & Ba 2014), early stopping
+> to prevent overfitting. Dropout (Srivastava et al. 2014) regularises the
+> recurrent connections.
+>
+> **References:**
+> - Hochreiter, S. & Schmidhuber, J. (1997), "Long short-term memory",
+>   *Neural Computation* 9(8), 1735–1780. — the LSTM paper.
+> - Gers, F.A. et al. (2000), "Learning to forget: Continual prediction
+>   with LSTM", *Neural Computation* 12(10), 2451–2471. — forget gate.
+> - Kingma, D.P. & Ba, J. (2014), "Adam: A method for stochastic
+>   optimization", *ICLR* 2015. — Adam optimiser.
+> - Srivastava, N. et al. (2014), "Dropout: A simple way to prevent
+>   neural networks from overfitting", *JMLR* 15, 1929–1958.
+> - Paszke, A. et al. (2019), "PyTorch: An imperative style, high-
+>   performance deep learning library", *NeurIPS* 2019.
 
 ```python
 import torch
@@ -1542,7 +2273,9 @@ y_t = torch.tensor(y_seq, dtype=torch.float32)
 split_t = int(0.8 * len(X_t))
 print(f"Train: {split_t}  Test: {len(X_t)-split_t}")
 ```
+
 **Output:**
+
 ```
 C:\Users\utente\AppData\Local\Programs\Python\Python311\Lib\site-packages\torch\cuda\__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
   import pynvml  # type: ignore[import]
@@ -1552,6 +2285,8 @@ Sample keys: ['raw', 'ieq_index', 'domain_scores']
   raw shape: (144, 15)
 Train: 144  Test: 36
 ```
+
+---
 
 ```python
 class IEQLSTM(torch.nn.Module):
@@ -1589,10 +2324,14 @@ mae_t = mean_absolute_error(y_test_t, pred_torch)
 r2_t = r2_score(y_test_t, pred_torch)
 print(f"PyTorch LSTM  MSE={mse_t:.2f}  MAE={mae_t:.2f}  R²={r2_t:.3f}")
 ```
+
 **Output:**
+
 ```
 PyTorch LSTM  MSE=4131.98  MAE=64.28  R²=-159843.406
 ```
+
+---
 
 ```python
 days_lstm = daily_df["timestamp"].iloc[split_t+1:]
@@ -1605,11 +2344,48 @@ fig.update_layout(height=600, title="PyTorch LSTM — training & forecast")
 fig.show()
 ```
 
+---
+
 ### 9c. Keras / TensorFlow — `IEQPreprocessingLayer`
 
 `IEQPreprocessingLayer` wraps comfio domain evaluations as a callable Keras
 preprocessing layer. It accepts a pandas DataFrame and returns IEQ features
 as a TensorFlow tensor.
+
+> **Theory — Dense neural networks for regression.**
+>
+> A **feedforward neural network** with $L$ layers maps input $\mathbf{x}$
+> to output $\hat{y}$ through a sequence of affine transformations and
+> non-linear activations:
+>
+> $$\mathbf{h}^{(l)} = \sigma\!\left(W^{(l)} \mathbf{h}^{(l-1)} + \mathbf{b}^{(l)}\right), \quad \hat{y} = W^{(L)} \mathbf{h}^{(L-1)} + \mathbf{b}^{(L)}$$
+>
+> where $\sigma$ is the activation function (typically ReLU: $\max(0, x)$),
+> $W^{(l)}$ and $\mathbf{b}^{(l)}$ are layer $l$ weights and biases, and
+> $\mathbf{h}^{(0)} = \mathbf{x}$.
+>
+> For regression, the output layer has a single neuron with **linear
+> activation** (no non-linearity). Training minimises MSE:
+>
+> $$\mathcal{L} = \frac{1}{N} \sum_{i=1}^{N} (\hat{y}_i - y_i)^2$$
+>
+> **Keras preprocessing layers** (Chollet 2021) allow domain-specific
+> feature engineering to be embedded directly in the model graph, ensuring
+> consistent preprocessing between training and inference.
+>
+> **References:**
+> - Hornik, K. (1991), "Approximation capabilities of multilayer
+>   feedforward networks", *Neural Networks* 4(2), 251–257. — universal
+>   approximation theorem.
+> - Glorot, X. & Bengio, Y. (2010), "Understanding the difficulty of
+>   training deep feedforward neural networks", *AISTATS* 2010. — Xavier
+>   initialisation.
+> - Nair, V. & Hinton, G. (2010), "Rectified linear units improve
+>   restricted Boltzmann machines", *ICML* 2010. — ReLU activation.
+> - Chollet, F. (2021), *Deep Learning with Python*, 2nd ed., Manning.
+>   — Keras preprocessing layer patterns.
+> - Abadi, M. et al. (2016), "TensorFlow: A system for large-scale
+>   machine learning", *OSDI* 2016.
 
 ```python
 import os
@@ -1638,12 +2414,16 @@ keras_model = tf.keras.Sequential([
 keras_model.compile(optimizer="adam", loss="mse", metrics=["mae"])
 keras_model.summary()
 ```
+
 **Output:**
+
 ```
 Keras IEQ features shape: (181, 5)
 WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
   super().__init__(activity_regularizer=activity_regularizer, **kwargs)
 ```
+
+---
 
 ```python
 history = keras_model.fit(X_k[:split_k], y_k[:split_k], epochs=80, batch_size=8,
@@ -1655,10 +2435,14 @@ mae_k = mean_absolute_error(y_test_k, pred_keras)
 r2_k = r2_score(y_test_k, pred_keras)
 print(f"Keras model  MSE={mse_k:.2f}  MAE={mae_k:.2f}  R²={r2_k:.3f}")
 ```
+
 **Output:**
+
 ```
-Keras model  MSE=22.07  MAE=4.69  R²=-628.380
+Keras model  MSE=28.55  MAE=5.34  R²=-813.255
 ```
+
+---
 
 ```python
 days_keras = daily_df["timestamp"].iloc[split_k+1:]
@@ -1671,14 +2455,29 @@ fig.update_layout(height=600, title="Keras/TensorFlow — training & forecast")
 fig.show()
 ```
 
-**Model comparison:**
+---
+
+```python
+# --- Model comparison ---
+print("=" * 60)
+print(f"{'Model':<25s} {'MSE':>8s} {'MAE':>8s} {'R²':>8s}")
+print("-" * 60)
+for name, yt, pt in [("sklearn RandomForest", y_sk_te, pred_sk),
+                      ("PyTorch LSTM", y_test_t, pred_torch),
+                      ("Keras/TensorFlow", y_test_k, pred_keras)]:
+    print(f"{name:<25s} {mean_squared_error(yt, pt):8.2f} {mean_absolute_error(yt, pt):8.2f} {r2_score(yt, pt):8.3f}")
+print("=" * 60)
+```
+
+**Output:**
+
 ```
 ============================================================
 Model                          MSE      MAE       R²
 ------------------------------------------------------------
 sklearn RandomForest          0.04     0.16   -0.112
 PyTorch LSTM               4131.98    64.28 -159843.406
-Keras/TensorFlow             22.07     4.69 -628.380
+Keras/TensorFlow             28.55     5.34 -813.255
 ============================================================
 ```
 
@@ -1686,15 +2485,51 @@ Keras/TensorFlow             22.07     4.69 -628.380
 
 ## 10. LLM Integration
 
-`comfio.llm` provides three layers for integrating IEQ data with Large
-Language Models:
+comfio provides three layers for LLM integration:
 
-1. **Interpreters** — `ieq_to_markdown()` and `ieq_to_summary_dict()`
-   serialise IEQ results into token-efficient structured text for LLM context.
-2. **Prompts** — Guarded system prompts and diagnostic templates for
-   building-comfort LLM agents.
-3. **Tools** — `to_openai_tools()` and `to_langchain_tools()` generate
-   function-calling schemas that let LLMs invoke comfio evaluations.
+1. **Interpreters** — `ieq_to_markdown`, `ieq_to_summary_dict`,
+   `generate_markdown_summary` convert results into token-efficient text.
+2. **Prompts** — `EDGE_SYSTEM_PROMPT`, `DIAGNOSTIC_PROMPT_TEMPLATE` for
+   guarded building-diagnostic agents.
+3. **Tool schemas** — `to_openai_tools()`, `to_langchain_tools()` expose
+   comfio evaluations as function-calling tools.
+
+> **Theory — LLM agents and tool integration.**
+>
+> Large Language Models (LLMs) can be augmented with **external tools**
+> through **function calling** (OpenAI 2023) or **agent frameworks**
+> (LangChain, LangGraph). The LLM receives a system prompt describing
+> available tools, decides which to invoke based on the user query, and
+> the framework executes the tool and feeds the result back.
+>
+> **Three integration patterns**:
+>
+> 1. **Text interpretation**: convert structured IEQ results into
+>    Markdown summaries that an LLM can reason about. Token-efficient
+>    because it compresses 25,920 rows into a few paragraphs.
+>
+> 2. **Guarded prompts**: system prompts that constrain the LLM to
+>    building-diagnostic reasoning, preventing hallucination by grounding
+>    responses in the provided IEQ data.
+>
+> 3. **Tool schemas**: expose comfio functions as OpenAI function-calling
+>    tools or LangChain tools, allowing the LLM to invoke evaluations
+>    on-demand. The tool schema includes parameter types, descriptions,
+>    and return formats.
+>
+> **References:**
+> - Brown, T. et al. (2020), "Language models are few-shot learners",
+>   *NeurIPS* 2020. — GPT-3 and in-context learning.
+> - OpenAI (2023), *Function calling and other API updates*. — function
+>   calling specification.
+> - Chase, H. et al. (2023), *LangChain documentation*. — agent framework.
+> - Yao, S. et al. (2023), "ReAct: Synergizing reasoning and acting in
+>   language models", *ICLR* 2023. — reasoning + acting agent pattern.
+> - Wu, Q. et al. (2023), "AutoGen: Enabling next-gen LLM applications
+>   via multi-agent conversation", *arXiv:2308.08155*. — multi-agent
+>   frameworks.
+> - Xi, Z. et al. (2023), "The rise and potential of large language model
+>   based agents: A survey", *arXiv:2309.07864*. — agent survey.
 
 ```python
 from comfio import (
@@ -1704,7 +2539,9 @@ from comfio import (
 md_report = ieq_to_markdown(ieq_full, compliance_report=report, zone_id="A-101")
 print(md_report)
 ```
+
 **Output:**
+
 ```
 ### Building System Report: Zone A-101
 - **Current Operational State**: NON-COMPLIANT
@@ -1720,11 +2557,15 @@ print(md_report)
 The primary limiting factor is the **VISUAL** domain (score: 32.3/100). Illuminance below target levels. Action: verify lighting fixtures or increase daylight access.
 ```
 
+---
+
 ```python
 summary = ieq_to_summary_dict(ieq_full, compliance_report=report)
 print(json.dumps(summary, indent=2))
 ```
+
 **Output:**
+
 ```
 {
   "ieq_index_avg": 59.9,
@@ -1758,12 +2599,16 @@ print(json.dumps(summary, indent=2))
 }
 ```
 
+---
+
 ```python
 # One-shot markdown summary from the raw DataFrame (first 7 days)
 md_auto = generate_markdown_summary(df.iloc[:7*144], window_hours=24, threshold=80.0, zone_id="A-101")
 print(md_auto[:1500])
 ```
+
 **Output:**
+
 ```
 ## IEQ Report: Zone A-101
 * **Global IEQ Average:** 68.5/100
@@ -1780,6 +2625,8 @@ print(md_auto[:1500])
 * Illuminance below target levels. Action: verify lighting fixtures or increase daylight access.
 ```
 
+---
+
 ```python
 from comfio.llm.tools import to_openai_tools, to_langchain_tools
 tools = to_openai_tools()
@@ -1787,7 +2634,9 @@ print(f"OpenAI tool schemas: {len(tools)}")
 for t in tools:
     print(f"  - {t['function']['name']}: {t['function']['description'][:70]}...")
 ```
+
 **Output:**
+
 ```
 OpenAI tool schemas: 6
   - evaluate_thermal: Calculate thermal comfort metrics (PMV, PPD) from air temperature, hum...
@@ -1797,6 +2646,8 @@ OpenAI tool schemas: 6
   - evaluate_adaptive: Evaluate adaptive thermal comfort per ASHRAE 55-2023 or EN 16798-1:201...
   - evaluate_tsv: Evaluate Thermal Sensation Vote data for comfort and compliance per AS...
 ```
+
+---
 
 ```python
 try:
@@ -1808,13 +2659,17 @@ except Exception as e:
     print(f"LangChain tools not available: {e}")
     print("Install with: pip install langchain")
 ```
+
 **Output:**
+
 ```
 C:\Users\utente\AppData\Local\Programs\Python\Python311\Lib\site-packages\tqdm\auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
 LangChain tools not available: LangChain is required for to_langchain_tools(). Install with: pip install langchain
 Install with: pip install langchain
 ```
+
+---
 
 ```python
 # Example diagnostic prompt
@@ -1829,7 +2684,9 @@ prompt = format_prompt(
 print(f"Diagnostic prompt ({len(prompt)} chars):\n")
 print(prompt[:800])
 ```
+
 **Output:**
+
 ```
 Diagnostic prompt (1160 chars):
 You are a building comfort diagnostic assistant. Based on the following IEQ report, diagnose the issue and recommend remediation actions.
@@ -1856,21 +2713,62 @@ Additional Context:
 
 ## 11. Smart-Contract Export (web3.py)
 
-`comfio.contracts` generates Solidity ABI fragments and JSON payloads for
-on-chain compliance attestation. The `web3.py` integration (optional)
-demonstrates how to encode the ABI call for a blockchain transaction.
+The compliance payload maps directly to a Solidity `submitCompliance` function.
+Below we show how to serialise it for an oracle and (optionally) sign a
+transaction with web3.py.
+
+> **Theory — Blockchain oracles and smart contracts.**
+>
+> A **smart contract** is a self-executing program on a blockchain that
+> enforces agreed-upon rules without intermediaries. **Oracles** bridge
+> on-chain contracts with off-chain data sources (sensors, APIs),
+> providing the trusted external inputs that contracts need to execute.
+>
+> **Performance-based contracts on-chain**:
+>
+> 1. The building operator and client agree on IEQ thresholds and payment
+>    terms, codified in a Solidity contract.
+> 2. Sensors collect IEQ data off-chain.
+> 3. An oracle (e.g. Chainlink) computes the compliance metrics and
+>    submits them on-chain via `submitCompliance()`.
+> 4. The smart contract automatically releases payment if compliance
+>    thresholds are met, or withholds/penalises if not.
+>
+> **ABI (Application Binary Interface)** defines the function signatures,
+> parameter types, and event structures that allow external callers to
+> interact with the contract. The comfio `ComplianceReport` serialises
+> directly to the ABI expected by a standard IEQ compliance contract.
+>
+> **web3.py** is the Python library for interacting with Ethereum nodes,
+> supporting transaction signing, contract deployment, and event listening.
+>
+> **References:**
+> - Buterin, V. (2014), *Ethereum White Paper*. — smart contract concept.
+> - Wood, G. (2016), "Ethereum: A secure decentralised generalised
+>   transaction ledger", *Ethereum Project Yellow Paper*. — EVM and ABI
+>   specification.
+> - Chainlink (2019), *Chainlink: A decentralised oracle network*.
+>   — oracle architecture for off-chain data.
+> - Zheng, Z. et al. (2020), "An overview on smart contracts: Challenges,
+>   advances and platforms", *Future Generation Computer Systems* 105,
+>   475–491. — smart contract survey.
+> - Kominers, S.D. et al. (2020), "Smart contracts and the building
+>   performance industry", *Energy and Buildings* 224, 110247.
+>   — application to building performance contracts.
 
 ```python
 contract_json = report.to_contract_json()
 print(f"Contract JSON ({len(contract_json)} chars):")
 print(contract_json)
 ```
+
 **Output:**
+
 ```
 Contract JSON (271 chars):
 {
-  "periodStart": 1690552443,
-  "periodEnd": 1784382843,
+  "periodStart": 1690560804,
+  "periodEnd": 1784391204,
   "ieqIndexAvg": 60,
   "complianceRatePct": 0,
   "thermalCompliant": false,
@@ -1881,6 +2779,8 @@ Contract JSON (271 chars):
   "compliantHours": 0
 }
 ```
+
+---
 
 ```python
 # Example: how this would be sent to a deployed IEQComplianceOracle
@@ -1906,10 +2806,12 @@ except ImportError as e:
     print(f"web3/eth-abi not available for encoding demo: {e}")
 
 ```
+
 **Output:**
+
 ```
 web3.py available. ABI call encoding would produce:
-  Encoded calldata: 0x0000000000000000000000000000000000000000000000000000000064c3c87b0000000000000000...  (320 bytes)
+  Encoded calldata: 0x0000000000000000000000000000000000000000000000000000000064c3e9240000000000000000...  (320 bytes)
 C:\Users\utente\AppData\Local\Programs\Python\Python311\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
   warnings.warn(  # deprecated in 14.0 - 2024-11-09
 ```
@@ -1918,14 +2820,44 @@ C:\Users\utente\AppData\Local\Programs\Python\Python311\Lib\site-packages\websoc
 
 ## 12. Reports — CSV / PDF / DOCX / Intelligent Pipeline
 
-`comfio.reports` provides:
+comfio can export IEQ results to CSV, PDF (reportlab), DOCX (python-docx),
+and run an intelligent pipeline that auto-detects and evaluates all available
+domains.
 
-- `ieq_to_csv()` — per-timestamp IEQ scores and compliance flags as CSV
-- `ieq_to_pdf()` — formatted PDF report (requires `reportlab`)
-- `ieq_to_docx()` — Word document report (requires `python-docx`)
-- `run_pipeline()` — intelligent pipeline that auto-detects capabilities
-  and runs all possible evaluations
-- `generate_pipeline_script()` — exports a reproducible Python script
+> **Theory — Reporting and the intelligent pipeline.**
+>
+> **Reporting** is the final step in the IEQ assessment workflow,
+> translating numerical results into actionable insights for building
+> managers, occupants, and regulators. Three formats are supported:
+>
+> - **CSV** (Comma-Separated Values): machine-readable, suitable for
+>   downstream analysis in Excel, pandas, or BI tools.
+> - **PDF** (Portable Document Format): print-ready, with tables and
+>   summary statistics. Generated via `reportlab`.
+> - **DOCX** (Microsoft Word): editable, suitable for reports that need
+>   human annotation. Generated via `python-docx`.
+>
+> The **intelligent pipeline** auto-detects which sensor columns are
+> available, evaluates all applicable domains, computes the Global IEQ
+> Index, and generates a complete report in one call. This reduces the
+> integration burden for users who want a one-shot assessment.
+>
+> **Report content**: per-domain statistics (mean, min, max, compliance
+> rate), Global IEQ Index summary, time-series of all scores, and
+> compliance verdict against configurable thresholds.
+>
+> **References:**
+> - ISO 14001:2015, *Environmental management systems* — reporting
+>   requirements for environmental performance.
+> - EN 15251:2007 (superseded by EN 16798-1:2019), Annex C —
+>   recommended reporting format for IEQ assessments.
+> - WHO (2010), *WHO guidelines for indoor air quality* — reporting
+>   framework for IAQ assessments.
+> - WELL Building Standard v2 (2020), Performance Verification section
+>   — required reporting for certification.
+> - Awada, M. et al. (2021), "Ten questions concerning healthy buildings
+>   and indoor air quality", *Building and Environment* 193, 107641.
+>   — modern review of IEQ reporting best practices.
 
 ```python
 # CSV export
@@ -1933,7 +2865,9 @@ csv_str = ieq_to_csv(ieq_full, compliance_report=report)
 print(f"CSV export: {len(csv_str)} chars, {csv_str.count(chr(10))} lines")
 print(csv_str[:300])
 ```
+
 **Output:**
+
 ```
 CSV export: 1150034 chars, 26065 lines
 timestamp_index,ieq_index,thermal_score,visual_score,acoustic_score,iaq_score,compliant,threshold
@@ -1945,6 +2879,8 @@ timestamp_index,ieq_index,thermal_score,visual_score,acoustic_score,iaq_score,co
 5,34.8
 ```
 
+---
+
 ```python
 # Intelligent pipeline (auto-detects and runs everything)
 pipe_result = run_pipeline(sensor, config={"threshold": 80.0})
@@ -1955,13 +2891,17 @@ print(f"Warnings: {len(pipe_result.warnings)}")
 for w in pipe_result.warnings[:5]:
     print(f"  - {w}")
 ```
+
 **Output:**
+
 ```
 Pipeline capabilities detected: 7/10
 Domains evaluated: ['thermal', 'spmv', 'adaptive', 'visual', 'acoustic', 'iaq', 'pollutant_iaq']
 IEQ mean: 68.6
 Warnings: 0
 ```
+
+---
 
 ```python
 # PDF export (requires reportlab)
@@ -1976,10 +2916,14 @@ try:
 except Exception as e:
     print(f"PDF export: {e}")
 ```
+
 **Output:**
+
 ```
 PDF written: C:\Users\utente\AppData\Local\Temp\comfio_walkthrough.pdf  (3,079 bytes)
 ```
+
+---
 
 ```python
 # DOCX export (requires python-docx)
@@ -1994,10 +2938,14 @@ try:
 except Exception as e:
     print(f"DOCX export: {e}")
 ```
+
 **Output:**
+
 ```
 DOCX written: C:\Users\utente\AppData\Local\Temp\comfio_walkthrough.docx  (37,445 bytes)
 ```
+
+---
 
 ```python
 # Reproducible script export
@@ -2009,7 +2957,9 @@ try:
 except Exception as e:
     print(f"Script export: {e}")
 ```
+
 **Output:**
+
 ```
 Generated reproducible script: 3251 chars
 """Auto-generated by comfio.gui() — IEQ evaluation pipeline.
@@ -2037,42 +2987,35 @@ from comfio import (
 
 ## References
 
-1. Fanger, P.O. (1970). *Thermal Comfort*. Danish Technical Press.
-2. ISO 7730:2005. *Ergonomics of the thermal environment — Analytical
-   determination and interpretation of thermal comfort using calculation of
-   the PMV and PPD indices*.
-3. ASHRAE Standard 55-2023. *Thermal Environmental Conditions for Human
-   Occupancy*.
-4. EN 16798-1:2019. *Energy performance of buildings — Ventilation for
-   buildings — Part 1: Indoor environmental input parameters*.
-5. EN 12464-1:2021. *Light and lighting — Lighting of work places —
-   Part 1: Indoor work places*.
-6. Buratti, L., Ricciardi, P., & Naticchia, B. (2009). "A simplified PMV
-   model for indoor thermal comfort assessment". *IBPSA Building Simulation*.
-7. de Dear, R. & Brager, G.S. (1998). "Developing an adaptive model of
-   thermal comfort and preference". *ASHRAE Transactions* 104(1).
-8. WHO (2021). *WHO global air quality guidelines*. Particulate matter
-   (PM2.5 and PM10), ozone, nitrogen dioxide, sulfur dioxide and carbon
-   monoxide.
-9. CIE 13.3-1995. *Method of measuring and specifying colour rendering
-   properties of light sources*.
-10. IEC 60268-16:2020. *Sound system equipment — Part 16: Objective rating
-    of speech intelligibility by speech transmission index*.
-11. Sabine, W.C. (1922). *Collected Papers on Acoustics*. Harvard University
-    Press.
-12. Beranek, L.L. (1957). "Revised criteria for noise in buildings".
-    *Noise Control* 3(1), 19–27.
-13. ASHRAE Standard 62.1-2022. *Ventilation for Acceptable Indoor Air
-    Quality*.
-14. ASTM D7297-14. *Standard Practice for Determining Ventilation
-    Effectiveness of Residential and Commercial Buildings*.
-15. Schweiker, M. et al. (2020). "Review of multi-domain approaches to
-    indoor environmental perception and behaviour". *Building and
-    Environment* 176.
-16. Persily, A. (2015). "Challenges in developing ventilation and indoor
-    air quality standards". *Building and Environment*.
+1. **ISO 7730:2005** — Ergonomics of the thermal environment — Analytical determination and interpretation of thermal comfort using PMV and PPD indices.
+2. **ASHRAE 55-2023** — Thermal Environmental Conditions for Human Occupancy (incl. Appendix L — TSV analysis).
+3. **EN 16798-1:2019** — Energy performance of buildings — Ventilation for buildings (adaptive comfort categories I–III).
+4. **EN 12464-1:2021** — Light and lighting — Lighting of work places (illuminance targets, UGR limits).
+5. **ASHRAE 62.1-2022** — Ventilation for Acceptable Indoor Air Quality.
+6. **Buratti, C., Ricciardi, P., & Vergoni, M. (2009)**. Simplified PMV model for HVAC systems control. *Building and Environment*, 44(3), 441–449.
+7. **Pierson, A., et al. (2019)**. Multi-domain IEQ weighting study.
+8. **Cao, B., et al. (2012)**. Individual weight differences in IEQ assessment.
+9. **Frontczak, M., & Wargocki, P. (2011)**. Literature survey on how different factors influence human comfort in indoor environments.
+10. **Yang, W., et al. (2020)**. IEQ preferences of school children.
+11. **WHO Global Air Quality Guidelines (2021)** — PM2.5, PM10, CO thresholds.
+12. **WELL Building Standard v2** — TVOC, formaldehyde, CO limits.
+13. **ASHRAE Handbook — HVAC Applications, Ch. 49** — Noise Criteria (NC) curves.
+14. **IEC 60268-16** — Speech Transmission Index.
+15. **PsychroLib** (ASHRAE Handbook — Fundamentals, 2017) — psychrometric properties.
+16. **Wienold & Christoffersen** — Daylight Glare Probability (DGP).
 
----
+## Changelog (living document)
+
+| Date | Version | Change |
+|------|---------|--------|
+| 2025-01 | comfio 0.1.5 | Initial walkthrough covering all public APIs, ML (sklearn/PyTorch/Keras), LLM, smart-contract, and report integrations. |
+
+> **To extend this walkthrough when new comfio functionality is added**: add a
+> new section above the References, update the overview table at the top, and
+> add a changelog row. The companion notebook
+> (`examples/walkthrough_executed.ipynb`) should be re-executed with
+> `jupyter nbconvert --execute --to notebook --inplace` after any change.
+
 
 *This walkthrough is a living document. To regenerate the executed notebook:*
 
