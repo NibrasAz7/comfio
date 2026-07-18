@@ -331,7 +331,7 @@ Layer 4: Application & Contracts (performance/)
 ## Weighting Presets
 
 | Preset | Thermal | IAQ | Visual | Acoustic | Use Case |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `default` | 40% | 25% | 20% | 15% | General (Pierson et al. 2019) |
 | `equal` | 25% | 25% | 25% | 25% | Equal weighting |
 | `school` | 27% | 26% | 24% | 23% | School children (Yang et al. 2020) |
@@ -402,7 +402,7 @@ A formal academic paper for comfio is in preparation. In the meantime, if you us
 comfio wraps and implements methods from multiple peer-reviewed sources. When you use a specific function, **please also cite the underlying work**:
 
 | comfio function | Underlying method | Reference |
-|-----------------|-------------------|-----------|
+| ----------------- | ------------------- | ----------- |
 | `evaluate_thermal` | Fanger PMV/PPD | Fanger (1970); ISO 7730:2005; [pythermalcomfort](https://github.com/pythermalcomfort/pythermalcomfort) — Tartarini & Schiavon (2020) |
 | `evaluate_spmv` | Simplified PMV | Buratti, Ricciardi & Vergoni (2009), *Building and Environment* 44(3), 441–449 |
 | `evaluate_adaptive_ashrae` | ASHRAE 55 adaptive | de Dear & Brager (1998), ASHRAE RP-884; ASHRAE 55-2023 Appendix L |
