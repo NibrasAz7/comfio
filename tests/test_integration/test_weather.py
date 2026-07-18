@@ -18,9 +18,7 @@ def mock_hourly_df() -> pd.DataFrame:
     dates = pd.date_range("2025-06-23", "2025-06-30", freq="h")
     rng = np.random.default_rng(42)
     temps = (
-        20.0
-        + 5.0 * np.sin(np.linspace(0, 4 * np.pi, len(dates)))
-        + rng.normal(0, 1, len(dates))
+        20.0 + 5.0 * np.sin(np.linspace(0, 4 * np.pi, len(dates))) + rng.normal(0, 1, len(dates))
     )
     return pd.DataFrame(
         {
@@ -42,8 +40,10 @@ class TestFetchOutdoorTemperature:
             patch("meteostat.Point") as mock_point,
         ):
             df = weather.fetch_outdoor_temperature(
-                lat=50.11, lon=8.68,
-                start=date(2025, 6, 23), end=date(2025, 6, 30),
+                lat=50.11,
+                lon=8.68,
+                start=date(2025, 6, 23),
+                end=date(2025, 6, 30),
             )
             assert mock_point.call_count == 0  # No network
             assert "temp" in df.columns
@@ -64,8 +64,10 @@ class TestFetchOutdoorTemperature:
 
         with patch.dict("sys.modules", {"meteostat": mock_meteostat}):
             df = weather.fetch_outdoor_temperature(
-                lat=50.11, lon=8.68,
-                start=date(2025, 6, 23), end=date(2025, 6, 30),
+                lat=50.11,
+                lon=8.68,
+                start=date(2025, 6, 23),
+                end=date(2025, 6, 30),
             )
 
         assert "temp" in df.columns
@@ -85,8 +87,10 @@ class TestFetchOutdoorTemperature:
             pytest.raises(ValueError, match="No weather data"),
         ):
             weather.fetch_outdoor_temperature(
-                lat=0.0, lon=0.0,
-                start=date(2025, 1, 1), end=date(2025, 1, 2),
+                lat=0.0,
+                lon=0.0,
+                start=date(2025, 1, 1),
+                end=date(2025, 1, 2),
             )
 
     def test_datetime_inputs_accepted(
@@ -103,7 +107,8 @@ class TestFetchOutdoorTemperature:
 
         with patch.dict("sys.modules", {"meteostat": mock_meteostat}):
             df = weather.fetch_outdoor_temperature(
-                lat=50.11, lon=8.68,
+                lat=50.11,
+                lon=8.68,
                 start=datetime(2025, 6, 23, 12, 0),
                 end=datetime(2025, 6, 30, 12, 0),
             )
@@ -124,7 +129,8 @@ class TestFetchPrevailingTemp:
 
         with patch.dict("sys.modules", {"meteostat": mock_meteostat}):
             result = weather.fetch_prevailing_temp(
-                lat=50.11, lon=8.68,
+                lat=50.11,
+                lon=8.68,
                 end_date=date(2025, 6, 30),
                 days=7,
             )
@@ -148,7 +154,8 @@ class TestFetchRunningMean:
 
         with patch.dict("sys.modules", {"meteostat": mock_meteostat}):
             result = weather.fetch_running_mean(
-                lat=50.11, lon=8.68,
+                lat=50.11,
+                lon=8.68,
                 end_date=date(2025, 6, 30),
                 days=7,
             )
@@ -168,7 +175,8 @@ class TestFetchRunningMean:
 
         with patch.dict("sys.modules", {"meteostat": mock_meteostat}):
             result = weather.fetch_running_mean(
-                lat=50.11, lon=8.68,
+                lat=50.11,
+                lon=8.68,
                 end_date=date(2025, 6, 30),
                 alpha=0.9,
             )

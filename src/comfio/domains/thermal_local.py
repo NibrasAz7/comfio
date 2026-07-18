@@ -268,9 +268,7 @@ def evaluate_vertical_gradient(
         ppd_vals[i] = result.ppd_vg
         accept_vals[i] = result.acceptability
 
-    logger.debug(
-        "vertical_gradient: %d samples, mean PPD=%.1f%%", n, float(np.nanmean(ppd_vals))
-    )
+    logger.debug("vertical_gradient: %d samples, mean PPD=%.1f%%", n, float(np.nanmean(ppd_vals)))
 
     return VerticalGradientResult(
         ppd_vg=ppd_vals,

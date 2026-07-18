@@ -115,14 +115,14 @@ from comfio.utils.validation import validate_input_array
 # GUI entry points — lazy import to avoid requiring streamlit/ipywidgets.
 # These override the comfio.gui submodule attribute so that
 # ``from comfio import gui`` returns the *function*, not the module.
-def gui(df=None, port: int = 8501) -> None:
+def gui(df: object = None, port: int = 8501) -> None:
     """Launch the comfio Streamlit GUI. Requires ``pip install comfio[gui]``."""
     from comfio.gui import gui as _gui
 
     _gui(df=df, port=port)
 
 
-def gui_notebook(df=None):
+def gui_notebook(df: object = None) -> object:
     """Create an ipywidgets widget for Jupyter. Requires ``pip install comfio[gui]``."""
     from comfio.gui import gui_notebook as _gui_notebook
 

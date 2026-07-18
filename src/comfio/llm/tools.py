@@ -654,7 +654,7 @@ def to_langchain_tools() -> list[Any]:
     all_models = get_all_pydantic_models()
 
     try:
-        from langchain.tools import StructuredTool
+        from langchain.tools import StructuredTool  # type: ignore[attr-defined]
     except ImportError as exc:
         raise ImportError(
             "LangChain is required for to_langchain_tools(). Install with: pip install langchain"
