@@ -45,6 +45,20 @@ pip install comfio[acoustics]        # python-acoustics + pyroomacoustics (RT60,
 pip install comfio[psychrometrics]   # PsychroLib (psychrometric properties, CO₂ decay ACH)
 ```
 
+## Try on Google Colab
+
+Run the tutorials instantly in your browser — no local install required.
+
+| Notebook | Description | Open in Colab |
+| --- | --- | --- |
+| `walkthrough_executed.ipynb` | Complete end-to-end walkthrough: data gen, all domains, Global IEQ, compliance, ML, LLM, smart contracts, reports | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/12cJ2Yc_TQAS7ybTNy6JQotj9mHf9fh-s?usp=sharing) |
+| `simple_tutorial_executed.ipynb` | Quick start: core domains, Global IEQ Index, compliance | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1njZJI-Mt6FeXUhM-vSap5WuX_ppSPILV?usp=sharing) |
+| `advanced_domains_tutorial_executed.ipynb` | Advanced physics: daylighting, CRI/CCT, RT60, STI, ventilation, psychrometrics | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1kiLN7TtbcBGd9k_SCcd9_TmShk537PND?usp=sharing) |
+| `llm_tutorial_executed.ipynb` | LLM integration: interpreters, prompts, OpenAI/LangChain tool schemas | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Hez6Cb2TveppwRiC8JDpvgCWBcsHEsT5?usp=sharing) |
+| `contracts_ml_tutorial.ipynb` | Smart contracts & ML: compliance ABI, web3.py, sklearn/PyTorch/Keras forecasting | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1UC8k3Y1Ei31U2kpwBTfGSUF8jfZngqNP?usp=sharing) |
+
+> **Tip**: In Colab, run `!pip install comfio[all]` in the first cell to install all optional dependencies.
+
 ## Quick Start
 
 ### 1. Evaluate Individual Domains
