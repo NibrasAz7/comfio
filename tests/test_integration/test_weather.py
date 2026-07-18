@@ -17,7 +17,11 @@ def mock_hourly_df() -> pd.DataFrame:
     """Fake hourly weather data for 7 days."""
     dates = pd.date_range("2025-06-23", "2025-06-30", freq="h")
     rng = np.random.default_rng(42)
-    temps = 20.0 + 5.0 * np.sin(np.linspace(0, 4 * np.pi, len(dates))) + rng.normal(0, 1, len(dates))
+    temps = (
+        20.0
+        + 5.0 * np.sin(np.linspace(0, 4 * np.pi, len(dates)))
+        + rng.normal(0, 1, len(dates))
+    )
     return pd.DataFrame(
         {
             "temp": temps,
@@ -76,14 +80,18 @@ class TestFetchOutdoorTemperature:
         mock_ts.fetch.return_value = pd.DataFrame()
         mock_meteostat.hourly.return_value = mock_ts
 
-        with patch.dict("sys.modules", {"meteostat": mock_meteostat}):
-            with pytest.raises(ValueError, match="No weather data"):
-                weather.fetch_outdoor_temperature(
-                    lat=0.0, lon=0.0,
-                    start=date(2025, 1, 1), end=date(2025, 1, 2),
-                )
+        with (
+            patch.dict("sys.modules", {"meteostat": mock_meteostat}),
+            pytest.raises(ValueError, match="No weather data"),
+        ):
+            weather.fetch_outdoor_temperature(
+                lat=0.0, lon=0.0,
+                start=date(2025, 1, 1), end=date(2025, 1, 2),
+            )
 
-    def test_datetime_inputs_accepted(self, mock_hourly_df: pd.DataFrame, tmp_path, monkeypatch) -> None:
+    def test_datetime_inputs_accepted(
+        self, mock_hourly_df: pd.DataFrame, tmp_path, monkeypatch
+    ) -> None:
         """datetime.datetime inputs should be accepted (converted to date)."""
         cache_path = tmp_path / "dt.parquet"
         monkeypatch.setattr(weather, "_cache_key", lambda *a, **k: cache_path)
@@ -103,7 +111,9 @@ class TestFetchOutdoorTemperature:
 
 
 class TestFetchPrevailingTemp:
-    def test_returns_scalar_array(self, mock_hourly_df: pd.DataFrame, tmp_path, monkeypatch) -> None:
+    def test_returns_scalar_array(
+        self, mock_hourly_df: pd.DataFrame, tmp_path, monkeypatch
+    ) -> None:
         cache_path = tmp_path / "prevail.parquet"
         monkeypatch.setattr(weather, "_cache_key", lambda *a, **k: cache_path)
 
@@ -125,7 +135,9 @@ class TestFetchPrevailingTemp:
 
 
 class TestFetchRunningMean:
-    def test_returns_scalar_array(self, mock_hourly_df: pd.DataFrame, tmp_path, monkeypatch) -> None:
+    def test_returns_scalar_array(
+        self, mock_hourly_df: pd.DataFrame, tmp_path, monkeypatch
+    ) -> None:
         cache_path = tmp_path / "rm.parquet"
         monkeypatch.setattr(weather, "_cache_key", lambda *a, **k: cache_path)
 

@@ -16,14 +16,14 @@ from comfio.domains.thermal_local import (
 
 @pytest.fixture
 def base_inputs() -> dict:
-    return dict(
-        tdb=np.array([24.0, 25.0, 26.0]),
-        tr=np.array([24.0, 25.0, 26.0]),
-        vr=np.array([0.1, 0.1, 0.1]),
-        rh=np.array([50.0, 50.0, 50.0]),
-        met=1.2,
-        clo=0.5,
-    )
+    return {
+        "tdb": np.array([24.0, 25.0, 26.0]),
+        "tr": np.array([24.0, 25.0, 26.0]),
+        "vr": np.array([0.1, 0.1, 0.1]),
+        "rh": np.array([50.0, 50.0, 50.0]),
+        "met": 1.2,
+        "clo": 0.5,
+    }
 
 
 class TestEvaluateAnkleDraft:

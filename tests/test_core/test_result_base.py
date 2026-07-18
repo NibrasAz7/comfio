@@ -8,10 +8,10 @@ import numpy as np
 import pytest
 
 from comfio import (
-    evaluate_thermal,
-    evaluate_iaq,
-    evaluate_visual,
     evaluate_acoustic,
+    evaluate_iaq,
+    evaluate_thermal,
+    evaluate_visual,
 )
 from comfio.core.result_base import ResultBase, is_result_instance
 
