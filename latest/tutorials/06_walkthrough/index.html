@@ -2426,6 +2426,67 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#13-v016-local-discomfort-weather-resultbase-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. v0.1.6 — Local Discomfort, Weather, ResultBase, Logging
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. v0.1.6 — Local Discomfort, Weather, ResultBase, Logging">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#13a-local-thermal-discomfort-ankle-draft-vertical-gradient" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13a. Local Thermal Discomfort — Ankle Draft &amp; Vertical Gradient
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13b-weather-integration-outdoor-temperature-via-meteostat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13b. Weather Integration — Outdoor Temperature via meteostat
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13c-result-serialization-to_dict-to_json-to_dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13c. Result Serialization — to_dict() / to_json() / to_dataframe()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13d-logging-setup_logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13d. Logging — setup_logging()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2518,7 +2579,7 @@ On Windows, <code>[daylighting]</code> (Radiance) needs WSL.</p>
 </span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Core imports OK.&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <p><strong>Output:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>comfio 0.1.5  |  Python 3.11.9  |  NumPy 2.2.6
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>comfio 0.1.6  |  Python 3.11.9  |  NumPy 2.2.6
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Core imports OK.
 </span></code></pre></div>
 <hr />
@@ -4401,8 +4462,8 @@ enables automated payment release when compliance thresholds are met.</p>
 </span></code></pre></div>
 <p><strong>Output:</strong></p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-67-1"><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>Solidity-ready payload:
-</span><span id="__span-67-2"><a id="__codelineno-67-2" name="__codelineno-67-2" href="#__codelineno-67-2"></a>  periodStart               1690560804           (int)
-</span><span id="__span-67-3"><a id="__codelineno-67-3" name="__codelineno-67-3" href="#__codelineno-67-3"></a>  periodEnd                 1784391204           (int)
+</span><span id="__span-67-2"><a id="__codelineno-67-2" name="__codelineno-67-2" href="#__codelineno-67-2"></a>  periodStart               1690572705           (int)
+</span><span id="__span-67-3"><a id="__codelineno-67-3" name="__codelineno-67-3" href="#__codelineno-67-3"></a>  periodEnd                 1784403105           (int)
 </span><span id="__span-67-4"><a id="__codelineno-67-4" name="__codelineno-67-4" href="#__codelineno-67-4"></a>  ieqIndexAvg               60                   (int)
 </span><span id="__span-67-5"><a id="__codelineno-67-5" name="__codelineno-67-5" href="#__codelineno-67-5"></a>  complianceRatePct         0                    (int)
 </span><span id="__span-67-6"><a id="__codelineno-67-6" name="__codelineno-67-6" href="#__codelineno-67-6"></a>  thermalCompliant          False                (bool)
@@ -4831,7 +4892,7 @@ consistent preprocessing between training and inference.</p>
 </span><span id="__span-82-8"><a id="__codelineno-82-8" name="__codelineno-82-8" href="#__codelineno-82-8"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keras model  MSE=</span><span class="si">{</span><span class="n">mse_k</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  MAE=</span><span class="si">{</span><span class="n">mae_k</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  R²=</span><span class="si">{</span><span class="n">r2_k</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <p><strong>Output:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-83-1"><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a>Keras model  MSE=28.55  MAE=5.34  R²=-813.255
+<div class="language-text highlight"><pre><span></span><code><span id="__span-83-1"><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a>Keras model  MSE=45.34  MAE=6.73  R²=-1291.904
 </span></code></pre></div>
 <hr />
 <div class="language-python highlight"><pre><span></span><code><span id="__span-84-1"><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a><span class="n">days_keras</span> <span class="o">=</span> <span class="n">daily_df</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">split_k</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
@@ -4860,7 +4921,7 @@ consistent preprocessing between training and inference.</p>
 </span><span id="__span-86-3"><a id="__codelineno-86-3" name="__codelineno-86-3" href="#__codelineno-86-3"></a>------------------------------------------------------------
 </span><span id="__span-86-4"><a id="__codelineno-86-4" name="__codelineno-86-4" href="#__codelineno-86-4"></a>sklearn RandomForest          0.04     0.16   -0.112
 </span><span id="__span-86-5"><a id="__codelineno-86-5" name="__codelineno-86-5" href="#__codelineno-86-5"></a>PyTorch LSTM               4131.98    64.28 -159843.406
-</span><span id="__span-86-6"><a id="__codelineno-86-6" name="__codelineno-86-6" href="#__codelineno-86-6"></a>Keras/TensorFlow             28.55     5.34 -813.255
+</span><span id="__span-86-6"><a id="__codelineno-86-6" name="__codelineno-86-6" href="#__codelineno-86-6"></a>Keras/TensorFlow             45.34     6.73 -1291.904
 </span><span id="__span-86-7"><a id="__codelineno-86-7" name="__codelineno-86-7" href="#__codelineno-86-7"></a>============================================================
 </span></code></pre></div>
 <hr />
@@ -5105,8 +5166,8 @@ supporting transaction signing, contract deployment, and event listening.</p>
 <p><strong>Output:</strong></p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-100-1"><a id="__codelineno-100-1" name="__codelineno-100-1" href="#__codelineno-100-1"></a>Contract JSON (271 chars):
 </span><span id="__span-100-2"><a id="__codelineno-100-2" name="__codelineno-100-2" href="#__codelineno-100-2"></a>{
-</span><span id="__span-100-3"><a id="__codelineno-100-3" name="__codelineno-100-3" href="#__codelineno-100-3"></a>  &quot;periodStart&quot;: 1690560804,
-</span><span id="__span-100-4"><a id="__codelineno-100-4" name="__codelineno-100-4" href="#__codelineno-100-4"></a>  &quot;periodEnd&quot;: 1784391204,
+</span><span id="__span-100-3"><a id="__codelineno-100-3" name="__codelineno-100-3" href="#__codelineno-100-3"></a>  &quot;periodStart&quot;: 1690572705,
+</span><span id="__span-100-4"><a id="__codelineno-100-4" name="__codelineno-100-4" href="#__codelineno-100-4"></a>  &quot;periodEnd&quot;: 1784403105,
 </span><span id="__span-100-5"><a id="__codelineno-100-5" name="__codelineno-100-5" href="#__codelineno-100-5"></a>  &quot;ieqIndexAvg&quot;: 60,
 </span><span id="__span-100-6"><a id="__codelineno-100-6" name="__codelineno-100-6" href="#__codelineno-100-6"></a>  &quot;complianceRatePct&quot;: 0,
 </span><span id="__span-100-7"><a id="__codelineno-100-7" name="__codelineno-100-7" href="#__codelineno-100-7"></a>  &quot;thermalCompliant&quot;: false,
@@ -5142,7 +5203,7 @@ supporting transaction signing, contract deployment, and event listening.</p>
 </span></code></pre></div>
 <p><strong>Output:</strong></p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-102-1"><a id="__codelineno-102-1" name="__codelineno-102-1" href="#__codelineno-102-1"></a>web3.py available. ABI call encoding would produce:
-</span><span id="__span-102-2"><a id="__codelineno-102-2" name="__codelineno-102-2" href="#__codelineno-102-2"></a>  Encoded calldata: 0x0000000000000000000000000000000000000000000000000000000064c3e9240000000000000000...  (320 bytes)
+</span><span id="__span-102-2"><a id="__codelineno-102-2" name="__codelineno-102-2" href="#__codelineno-102-2"></a>  Encoded calldata: 0x0000000000000000000000000000000000000000000000000000000064c417a10000000000000000...  (320 bytes)
 </span><span id="__span-102-3"><a id="__codelineno-102-3" name="__codelineno-102-3" href="#__codelineno-102-3"></a>C:\Users\utente\AppData\Local\Programs\Python\Python311\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
 </span><span id="__span-102-4"><a id="__codelineno-102-4" name="__codelineno-102-4" href="#__codelineno-102-4"></a>  warnings.warn(  # deprecated in 14.0 - 2024-11-09
 </span></code></pre></div>
@@ -5286,6 +5347,299 @@ compliance verdict against configurable thresholds.</p>
 </span><span id="__span-112-20"><a id="__codelineno-112-20" name="__codelineno-112-20" href="#__codelineno-112-20"></a>    calculate_com
 </span></code></pre></div>
 <hr />
+<h2 id="13-v016-local-discomfort-weather-resultbase-logging">13. v0.1.6 — Local Discomfort, Weather, ResultBase, Logging<a class="headerlink" href="#13-v016-local-discomfort-weather-resultbase-logging" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><strong>Theory box — Local thermal discomfort (ISO 7730 §6.1 / ASHRAE 55 §5.3.3)</strong></p>
+<p>Whole-body PMV/PPD captures the <em>average</em> thermal sensation, but occupants
+can still be dissatisfied by <strong>local</strong> effects:</p>
+<ul>
+<li><strong>Ankle draft</strong>: cold air pooling at 0.1 m above the floor creates a
+  local draft. ASHRAE 55 limits PPD to ≤ 20% for sedentary occupants.</li>
+<li><strong>Vertical temperature gradient</strong>: stratification causes head-to-feet
+  temperature differences. ISO 7730 limits the gradient to ≤ 3 °C/m.</li>
+</ul>
+<p>Full ISO 7730 Category compliance requires <em>both</em> PMV/PPD and local
+discomfort checks.</p>
+<p><strong>References</strong>: ISO 7730:2005 §6.1; ASHRAE 55-2023 §5.3.3; Fanger et al.
+(1988) — ankle draft model; Olesen et al. (1979) — vertical gradient.</p>
+</blockquote>
+<h3 id="13a-local-thermal-discomfort-ankle-draft-vertical-gradient">13a. Local Thermal Discomfort — Ankle Draft &amp; Vertical Gradient<a class="headerlink" href="#13a-local-thermal-discomfort-ankle-draft-vertical-gradient" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-113-1"><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">comfio</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="__span-113-2"><a id="__codelineno-113-2" name="__codelineno-113-2" href="#__codelineno-113-2"></a>    <span class="n">evaluate_ankle_draft</span><span class="p">,</span>
+</span><span id="__span-113-3"><a id="__codelineno-113-3" name="__codelineno-113-3" href="#__codelineno-113-3"></a>    <span class="n">evaluate_vertical_gradient</span><span class="p">,</span>
+</span><span id="__span-113-4"><a id="__codelineno-113-4" name="__codelineno-113-4" href="#__codelineno-113-4"></a>    <span class="n">local_discomfort_score</span><span class="p">,</span>
+</span><span id="__span-113-5"><a id="__codelineno-113-5" name="__codelineno-113-5" href="#__codelineno-113-5"></a><span class="p">)</span>
+</span><span id="__span-113-6"><a id="__codelineno-113-6" name="__codelineno-113-6" href="#__codelineno-113-6"></a>
+</span><span id="__span-113-7"><a id="__codelineno-113-7" name="__codelineno-113-7" href="#__codelineno-113-7"></a><span class="c1"># Use a subset of the sensor data</span>
+</span><span id="__span-113-8"><a id="__codelineno-113-8" name="__codelineno-113-8" href="#__codelineno-113-8"></a><span class="n">tdb_sub</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">get_validated</span><span class="p">(</span><span class="s2">&quot;air_temp_c&quot;</span><span class="p">)[:</span><span class="mi">200</span><span class="p">]</span>
+</span><span id="__span-113-9"><a id="__codelineno-113-9" name="__codelineno-113-9" href="#__codelineno-113-9"></a><span class="n">tr_sub</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">get_validated</span><span class="p">(</span><span class="s2">&quot;radiant_temp_c&quot;</span><span class="p">)[:</span><span class="mi">200</span><span class="p">]</span>
+</span><span id="__span-113-10"><a id="__codelineno-113-10" name="__codelineno-113-10" href="#__codelineno-113-10"></a><span class="n">vr_sub</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">get_validated</span><span class="p">(</span><span class="s2">&quot;air_velocity_ms&quot;</span><span class="p">)[:</span><span class="mi">200</span><span class="p">]</span>
+</span><span id="__span-113-11"><a id="__codelineno-113-11" name="__codelineno-113-11" href="#__codelineno-113-11"></a><span class="n">rh_sub</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">get_validated</span><span class="p">(</span><span class="s2">&quot;relative_humidity_pct&quot;</span><span class="p">)[:</span><span class="mi">200</span><span class="p">]</span>
+</span><span id="__span-113-12"><a id="__codelineno-113-12" name="__codelineno-113-12" href="#__codelineno-113-12"></a>
+</span><span id="__span-113-13"><a id="__codelineno-113-13" name="__codelineno-113-13" href="#__codelineno-113-13"></a><span class="c1"># Ankle draft — simulate varying ankle-level air speed</span>
+</span><span id="__span-113-14"><a id="__codelineno-113-14" name="__codelineno-113-14" href="#__codelineno-113-14"></a><span class="n">v_ankle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">vr_sub</span> <span class="o">*</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">)</span>  <span class="c1"># higher at floor level</span>
+</span><span id="__span-113-15"><a id="__codelineno-113-15" name="__codelineno-113-15" href="#__codelineno-113-15"></a><span class="n">ad_result</span> <span class="o">=</span> <span class="n">evaluate_ankle_draft</span><span class="p">(</span>
+</span><span id="__span-113-16"><a id="__codelineno-113-16" name="__codelineno-113-16" href="#__codelineno-113-16"></a>    <span class="n">tdb</span><span class="o">=</span><span class="n">tdb_sub</span><span class="p">,</span> <span class="n">tr</span><span class="o">=</span><span class="n">tr_sub</span><span class="p">,</span> <span class="n">vr</span><span class="o">=</span><span class="n">vr_sub</span><span class="p">,</span> <span class="n">rh</span><span class="o">=</span><span class="n">rh_sub</span><span class="p">,</span>
+</span><span id="__span-113-17"><a id="__codelineno-113-17" name="__codelineno-113-17" href="#__codelineno-113-17"></a>    <span class="n">met</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">clo</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">v_ankle</span><span class="o">=</span><span class="n">v_ankle</span><span class="p">,</span>
+</span><span id="__span-113-18"><a id="__codelineno-113-18" name="__codelineno-113-18" href="#__codelineno-113-18"></a><span class="p">)</span>
+</span><span id="__span-113-19"><a id="__codelineno-113-19" name="__codelineno-113-19" href="#__codelineno-113-19"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ankle draft PPD: mean=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ad_result</span><span class="o">.</span><span class="n">ppd_ad</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%, &quot;</span>
+</span><span id="__span-113-20"><a id="__codelineno-113-20" name="__codelineno-113-20" href="#__codelineno-113-20"></a>      <span class="sa">f</span><span class="s2">&quot;max=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">ad_result</span><span class="o">.</span><span class="n">ppd_ad</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+</span><span id="__span-113-21"><a id="__codelineno-113-21" name="__codelineno-113-21" href="#__codelineno-113-21"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Acceptable (PPD ≤ 20%): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ad_result</span><span class="o">.</span><span class="n">acceptability</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ad_result</span><span class="o">.</span><span class="n">acceptability</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-113-22"><a id="__codelineno-113-22" name="__codelineno-113-22" href="#__codelineno-113-22"></a>
+</span><span id="__span-113-23"><a id="__codelineno-113-23" name="__codelineno-113-23" href="#__codelineno-113-23"></a><span class="c1"># Vertical temperature gradient — simulate 2-5 °C/m stratification</span>
+</span><span id="__span-113-24"><a id="__codelineno-113-24" name="__codelineno-113-24" href="#__codelineno-113-24"></a><span class="n">vtg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">tdb_sub</span><span class="p">))</span>
+</span><span id="__span-113-25"><a id="__codelineno-113-25" name="__codelineno-113-25" href="#__codelineno-113-25"></a><span class="n">vg_result</span> <span class="o">=</span> <span class="n">evaluate_vertical_gradient</span><span class="p">(</span>
+</span><span id="__span-113-26"><a id="__codelineno-113-26" name="__codelineno-113-26" href="#__codelineno-113-26"></a>    <span class="n">tdb</span><span class="o">=</span><span class="n">tdb_sub</span><span class="p">,</span> <span class="n">tr</span><span class="o">=</span><span class="n">tr_sub</span><span class="p">,</span> <span class="n">vr</span><span class="o">=</span><span class="n">vr_sub</span><span class="p">,</span> <span class="n">rh</span><span class="o">=</span><span class="n">rh_sub</span><span class="p">,</span>
+</span><span id="__span-113-27"><a id="__codelineno-113-27" name="__codelineno-113-27" href="#__codelineno-113-27"></a>    <span class="n">met</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">clo</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">vertical_tmp_grad</span><span class="o">=</span><span class="n">vtg</span><span class="p">,</span>
+</span><span id="__span-113-28"><a id="__codelineno-113-28" name="__codelineno-113-28" href="#__codelineno-113-28"></a><span class="p">)</span>
+</span><span id="__span-113-29"><a id="__codelineno-113-29" name="__codelineno-113-29" href="#__codelineno-113-29"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Vertical gradient PPD: mean=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">vg_result</span><span class="o">.</span><span class="n">ppd_vg</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+</span><span id="__span-113-30"><a id="__codelineno-113-30" name="__codelineno-113-30" href="#__codelineno-113-30"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Acceptable: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vg_result</span><span class="o">.</span><span class="n">acceptability</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">vg_result</span><span class="o">.</span><span class="n">acceptability</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-113-31"><a id="__codelineno-113-31" name="__codelineno-113-31" href="#__codelineno-113-31"></a>
+</span><span id="__span-113-32"><a id="__codelineno-113-32" name="__codelineno-113-32" href="#__codelineno-113-32"></a><span class="c1"># Combined local discomfort score (0-100, higher is better)</span>
+</span><span id="__span-113-33"><a id="__codelineno-113-33" name="__codelineno-113-33" href="#__codelineno-113-33"></a><span class="n">ld_score</span> <span class="o">=</span> <span class="n">local_discomfort_score</span><span class="p">(</span>
+</span><span id="__span-113-34"><a id="__codelineno-113-34" name="__codelineno-113-34" href="#__codelineno-113-34"></a>    <span class="n">ppd_ad</span><span class="o">=</span><span class="n">ad_result</span><span class="o">.</span><span class="n">ppd_ad</span><span class="p">,</span> <span class="n">ppd_vg</span><span class="o">=</span><span class="n">vg_result</span><span class="o">.</span><span class="n">ppd_vg</span><span class="p">,</span>
+</span><span id="__span-113-35"><a id="__codelineno-113-35" name="__codelineno-113-35" href="#__codelineno-113-35"></a><span class="p">)</span>
+</span><span id="__span-113-36"><a id="__codelineno-113-36" name="__codelineno-113-36" href="#__codelineno-113-36"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Local discomfort score: mean=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ld_score</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, &quot;</span>
+</span><span id="__span-113-37"><a id="__codelineno-113-37" name="__codelineno-113-37" href="#__codelineno-113-37"></a>      <span class="sa">f</span><span class="s2">&quot;min=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">ld_score</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>Output:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-114-1"><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a>Ankle draft PPD: mean=40.4%, max=61.1%
+</span><span id="__span-114-2"><a id="__codelineno-114-2" name="__codelineno-114-2" href="#__codelineno-114-2"></a>Acceptable (PPD ≤ 20%): 0/200
+</span><span id="__span-114-3"><a id="__codelineno-114-3" name="__codelineno-114-3" href="#__codelineno-114-3"></a>Vertical gradient PPD: mean=26.3%
+</span><span id="__span-114-4"><a id="__codelineno-114-4" name="__codelineno-114-4" href="#__codelineno-114-4"></a>Acceptable: 0/200
+</span><span id="__span-114-5"><a id="__codelineno-114-5" name="__codelineno-114-5" href="#__codelineno-114-5"></a>Local discomfort score: mean=66.7, min=49.5
+</span><span id="__span-114-6"><a id="__codelineno-114-6" name="__codelineno-114-6" href="#__codelineno-114-6"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-7"><a id="__codelineno-114-7" name="__codelineno-114-7" href="#__codelineno-114-7"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-8"><a id="__codelineno-114-8" name="__codelineno-114-8" href="#__codelineno-114-8"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-9"><a id="__codelineno-114-9" name="__codelineno-114-9" href="#__codelineno-114-9"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-10"><a id="__codelineno-114-10" name="__codelineno-114-10" href="#__codelineno-114-10"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-11"><a id="__codelineno-114-11" name="__codelineno-114-11" href="#__codelineno-114-11"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-12"><a id="__codelineno-114-12" name="__codelineno-114-12" href="#__codelineno-114-12"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-13"><a id="__codelineno-114-13" name="__codelineno-114-13" href="#__codelineno-114-13"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-14"><a id="__codelineno-114-14" name="__codelineno-114-14" href="#__codelineno-114-14"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-15"><a id="__codelineno-114-15" name="__codelineno-114-15" href="#__codelineno-114-15"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-16"><a id="__codelineno-114-16" name="__codelineno-114-16" href="#__codelineno-114-16"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-17"><a id="__codelineno-114-17" name="__codelineno-114-17" href="#__codelineno-114-17"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-18"><a id="__codelineno-114-18" name="__codelineno-114-18" href="#__codelineno-114-18"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-19"><a id="__codelineno-114-19" name="__codelineno-114-19" href="#__codelineno-114-19"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-20"><a id="__codelineno-114-20" name="__codelineno-114-20" href="#__codelineno-114-20"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-21"><a id="__codelineno-114-21" name="__codelineno-114-21" href="#__codelineno-114-21"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-22"><a id="__codelineno-114-22" name="__codelineno-114-22" href="#__codelineno-114-22"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-23"><a id="__codelineno-114-23" name="__codelineno-114-23" href="#__codelineno-114-23"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-24"><a id="__codelineno-114-24" name="__codelineno-114-24" href="#__codelineno-114-24"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-25"><a id="__codelineno-114-25" name="__codelineno-114-25" href="#__codelineno-114-25"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-26"><a id="__codelineno-114-26" name="__codelineno-114-26" href="#__codelineno-114-26"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-27"><a id="__codelineno-114-27" name="__codelineno-114-27" href="#__codelineno-114-27"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-28"><a id="__codelineno-114-28" name="__codelineno-114-28" href="#__codelineno-114-28"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-29"><a id="__codelineno-114-29" name="__codelineno-114-29" href="#__codelineno-114-29"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-30"><a id="__codelineno-114-30" name="__codelineno-114-30" href="#__codelineno-114-30"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-31"><a id="__codelineno-114-31" name="__codelineno-114-31" href="#__codelineno-114-31"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-32"><a id="__codelineno-114-32" name="__codelineno-114-32" href="#__codelineno-114-32"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-33"><a id="__codelineno-114-33" name="__codelineno-114-33" href="#__codelineno-114-33"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-34"><a id="__codelineno-114-34" name="__codelineno-114-34" href="#__codelineno-114-34"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-35"><a id="__codelineno-114-35" name="__codelineno-114-35" href="#__codelineno-114-35"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-36"><a id="__codelineno-114-36" name="__codelineno-114-36" href="#__codelineno-114-36"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-37"><a id="__codelineno-114-37" name="__codelineno-114-37" href="#__codelineno-114-37"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-38"><a id="__codelineno-114-38" name="__codelineno-114-38" href="#__codelineno-114-38"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-39"><a id="__codelineno-114-39" name="__codelineno-114-39" href="#__codelineno-114-39"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-40"><a id="__codelineno-114-40" name="__codelineno-114-40" href="#__codelineno-114-40"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-41"><a id="__codelineno-114-41" name="__codelineno-114-41" href="#__codelineno-114-41"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-42"><a id="__codelineno-114-42" name="__codelineno-114-42" href="#__codelineno-114-42"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-43"><a id="__codelineno-114-43" name="__codelineno-114-43" href="#__codelineno-114-43"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-44"><a id="__codelineno-114-44" name="__codelineno-114-44" href="#__codelineno-114-44"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-45"><a id="__codelineno-114-45" name="__codelineno-114-45" href="#__codelineno-114-45"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-46"><a id="__codelineno-114-46" name="__codelineno-114-46" href="#__codelineno-114-46"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-47"><a id="__codelineno-114-47" name="__codelineno-114-47" href="#__codelineno-114-47"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-48"><a id="__codelineno-114-48" name="__codelineno-114-48" href="#__codelineno-114-48"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-49"><a id="__codelineno-114-49" name="__codelineno-114-49" href="#__codelineno-114-49"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-50"><a id="__codelineno-114-50" name="__codelineno-114-50" href="#__codelineno-114-50"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-51"><a id="__codelineno-114-51" name="__codelineno-114-51" href="#__codelineno-114-51"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-52"><a id="__codelineno-114-52" name="__codelineno-114-52" href="#__codelineno-114-52"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-53"><a id="__codelineno-114-53" name="__codelineno-114-53" href="#__codelineno-114-53"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-54"><a id="__codelineno-114-54" name="__codelineno-114-54" href="#__codelineno-114-54"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-55"><a id="__codelineno-114-55" name="__codelineno-114-55" href="#__codelineno-114-55"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-56"><a id="__codelineno-114-56" name="__codelineno-114-56" href="#__codelineno-114-56"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-57"><a id="__codelineno-114-57" name="__codelineno-114-57" href="#__codelineno-114-57"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-58"><a id="__codelineno-114-58" name="__codelineno-114-58" href="#__codelineno-114-58"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-59"><a id="__codelineno-114-59" name="__codelineno-114-59" href="#__codelineno-114-59"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-60"><a id="__codelineno-114-60" name="__codelineno-114-60" href="#__codelineno-114-60"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-61"><a id="__codelineno-114-61" name="__codelineno-114-61" href="#__codelineno-114-61"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-62"><a id="__codelineno-114-62" name="__codelineno-114-62" href="#__codelineno-114-62"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-63"><a id="__codelineno-114-63" name="__codelineno-114-63" href="#__codelineno-114-63"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-64"><a id="__codelineno-114-64" name="__codelineno-114-64" href="#__codelineno-114-64"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-65"><a id="__codelineno-114-65" name="__codelineno-114-65" href="#__codelineno-114-65"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-66"><a id="__codelineno-114-66" name="__codelineno-114-66" href="#__codelineno-114-66"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-67"><a id="__codelineno-114-67" name="__codelineno-114-67" href="#__codelineno-114-67"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-68"><a id="__codelineno-114-68" name="__codelineno-114-68" href="#__codelineno-114-68"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-69"><a id="__codelineno-114-69" name="__codelineno-114-69" href="#__codelineno-114-69"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-70"><a id="__codelineno-114-70" name="__codelineno-114-70" href="#__codelineno-114-70"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-71"><a id="__codelineno-114-71" name="__codelineno-114-71" href="#__codelineno-114-71"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-72"><a id="__codelineno-114-72" name="__codelineno-114-72" href="#__codelineno-114-72"></a>  return self.pyfunc(*the_args, **kwargs)
+</span><span id="__span-114-73"><a id="__codelineno-114-73" name="__codelineno-114-73" href="#__codelineno-114-73"></a>  return self.pyfunc(
+</span><span id="__span-114-74"><a id="__codelineno-114-74" name="__codelineno-114-74" href="#__codelineno-114-74"></a>... (truncated)
+</span></code></pre></div>
+<hr />
+<h3 id="13b-weather-integration-outdoor-temperature-via-meteostat">13b. Weather Integration — Outdoor Temperature via meteostat<a class="headerlink" href="#13b-weather-integration-outdoor-temperature-via-meteostat" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p><strong>Theory box — Prevailing mean vs. running mean outdoor temperature</strong></p>
+<p>Adaptive comfort models require an outdoor temperature reference:</p>
+<ul>
+<li><strong>ASHRAE 55 prevailing mean</strong> (<span class="arithmatex">\(\bar{t}_{prevail}\)</span>): arithmetic mean
+  of daily mean outdoor temperatures over the previous 7 days.</li>
+</ul>
+<p>$<span class="arithmatex">\(\bar{t}_{prevail} = \frac{1}{n} \sum_{i=1}^{n} \bar{t}_{out,i}\)</span>$</p>
+<ul>
+<li><strong>EN 16798-1 running mean</strong> (<span class="arithmatex">\(t_{rm}\)</span>): exponentially weighted moving
+  average with <span class="arithmatex">\(\alpha = 0.8\)</span> (recent days matter more).</li>
+</ul>
+<p>$<span class="arithmatex">\(t_{rm} = (1-\alpha)\left(t_{ed-1} + \alpha t_{ed-2} + \alpha^2 t_{ed-3} + \cdots\right)\)</span>$</p>
+<p>comfio v0.1.6 wraps <a href="https://dev.meteostat.net/">meteostat</a> to fetch
+historical weather data and compute both automatically.</p>
+<p><strong>References</strong>: ASHRAE 55-2023 §5.4.2; EN 16798-1:2019 Annex A;
+meteostat 2.x documentation.</p>
+</blockquote>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-115-1"><a id="__codelineno-115-1" name="__codelineno-115-1" href="#__codelineno-115-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">comfio</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_prevailing_temp</span><span class="p">,</span> <span class="n">fetch_running_mean</span>
+</span><span id="__span-115-2"><a id="__codelineno-115-2" name="__codelineno-115-2" href="#__codelineno-115-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+</span><span id="__span-115-3"><a id="__codelineno-115-3" name="__codelineno-115-3" href="#__codelineno-115-3"></a>
+</span><span id="__span-115-4"><a id="__codelineno-115-4" name="__codelineno-115-4" href="#__codelineno-115-4"></a><span class="c1"># Fetch outdoor temperature for a sample location (Frankfurt)</span>
+</span><span id="__span-115-5"><a id="__codelineno-115-5" name="__codelineno-115-5" href="#__codelineno-115-5"></a><span class="c1"># NOTE: This makes a network request — skip if offline</span>
+</span><span id="__span-115-6"><a id="__codelineno-115-6" name="__codelineno-115-6" href="#__codelineno-115-6"></a><span class="k">try</span><span class="p">:</span>
+</span><span id="__span-115-7"><a id="__codelineno-115-7" name="__codelineno-115-7" href="#__codelineno-115-7"></a>    <span class="n">t_prevail</span> <span class="o">=</span> <span class="n">fetch_prevailing_temp</span><span class="p">(</span>
+</span><span id="__span-115-8"><a id="__codelineno-115-8" name="__codelineno-115-8" href="#__codelineno-115-8"></a>        <span class="n">lat</span><span class="o">=</span><span class="mf">50.11</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="mf">8.68</span><span class="p">,</span>
+</span><span id="__span-115-9"><a id="__codelineno-115-9" name="__codelineno-115-9" href="#__codelineno-115-9"></a>        <span class="n">end_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+</span><span id="__span-115-10"><a id="__codelineno-115-10" name="__codelineno-115-10" href="#__codelineno-115-10"></a>        <span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+</span><span id="__span-115-11"><a id="__codelineno-115-11" name="__codelineno-115-11" href="#__codelineno-115-11"></a>    <span class="p">)</span>
+</span><span id="__span-115-12"><a id="__codelineno-115-12" name="__codelineno-115-12" href="#__codelineno-115-12"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ASHRAE 55 prevailing mean (7-day): </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">t_prevail</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> °C&quot;</span><span class="p">)</span>
+</span><span id="__span-115-13"><a id="__codelineno-115-13" name="__codelineno-115-13" href="#__codelineno-115-13"></a>
+</span><span id="__span-115-14"><a id="__codelineno-115-14" name="__codelineno-115-14" href="#__codelineno-115-14"></a>    <span class="n">t_rm</span> <span class="o">=</span> <span class="n">fetch_running_mean</span><span class="p">(</span>
+</span><span id="__span-115-15"><a id="__codelineno-115-15" name="__codelineno-115-15" href="#__codelineno-115-15"></a>        <span class="n">lat</span><span class="o">=</span><span class="mf">50.11</span><span class="p">,</span> <span class="n">lon</span><span class="o">=</span><span class="mf">8.68</span><span class="p">,</span>
+</span><span id="__span-115-16"><a id="__codelineno-115-16" name="__codelineno-115-16" href="#__codelineno-115-16"></a>        <span class="n">end_date</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+</span><span id="__span-115-17"><a id="__codelineno-115-17" name="__codelineno-115-17" href="#__codelineno-115-17"></a>    <span class="p">)</span>
+</span><span id="__span-115-18"><a id="__codelineno-115-18" name="__codelineno-115-18" href="#__codelineno-115-18"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;EN 16798-1 running mean (α=0.8): </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">t_rm</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> °C&quot;</span><span class="p">)</span>
+</span><span id="__span-115-19"><a id="__codelineno-115-19" name="__codelineno-115-19" href="#__codelineno-115-19"></a>
+</span><span id="__span-115-20"><a id="__codelineno-115-20" name="__codelineno-115-20" href="#__codelineno-115-20"></a>    <span class="c1"># Feed into adaptive comfort</span>
+</span><span id="__span-115-21"><a id="__codelineno-115-21" name="__codelineno-115-21" href="#__codelineno-115-21"></a>    <span class="n">adaptive_with_weather</span> <span class="o">=</span> <span class="n">evaluate_adaptive_ashrae</span><span class="p">(</span>
+</span><span id="__span-115-22"><a id="__codelineno-115-22" name="__codelineno-115-22" href="#__codelineno-115-22"></a>        <span class="n">tdb</span><span class="o">=</span><span class="n">tdb_sub</span><span class="p">,</span> <span class="n">tr</span><span class="o">=</span><span class="n">tr_sub</span><span class="p">,</span>
+</span><span id="__span-115-23"><a id="__codelineno-115-23" name="__codelineno-115-23" href="#__codelineno-115-23"></a>        <span class="n">t_prevail</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">t_prevail</span><span class="p">),</span>
+</span><span id="__span-115-24"><a id="__codelineno-115-24" name="__codelineno-115-24" href="#__codelineno-115-24"></a>        <span class="n">acceptability</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span>
+</span><span id="__span-115-25"><a id="__codelineno-115-25" name="__codelineno-115-25" href="#__codelineno-115-25"></a>    <span class="p">)</span>
+</span><span id="__span-115-26"><a id="__codelineno-115-26" name="__codelineno-115-26" href="#__codelineno-115-26"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Adaptive comfort (weather-fed): &quot;</span>
+</span><span id="__span-115-27"><a id="__codelineno-115-27" name="__codelineno-115-27" href="#__codelineno-115-27"></a>          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">adaptive_with_weather</span><span class="o">.</span><span class="n">compliant</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">adaptive_with_weather</span><span class="o">.</span><span class="n">compliant</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+</span><span id="__span-115-28"><a id="__codelineno-115-28" name="__codelineno-115-28" href="#__codelineno-115-28"></a>          <span class="sa">f</span><span class="s2">&quot;compliant at 80% acceptability&quot;</span><span class="p">)</span>
+</span><span id="__span-115-29"><a id="__codelineno-115-29" name="__codelineno-115-29" href="#__codelineno-115-29"></a><span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="__span-115-30"><a id="__codelineno-115-30" name="__codelineno-115-30" href="#__codelineno-115-30"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Weather fetch skipped (network unavailable): </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>Output:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-116-1"><a id="__codelineno-116-1" name="__codelineno-116-1" href="#__codelineno-116-1"></a>Weather fetch skipped (network unavailable): No weather data available for (50.11, 8.68) from 2025-06-23 to 2025-06-30. Check the location and date range.
+</span></code></pre></div>
+<hr />
+<h3 id="13c-result-serialization-to_dict-to_json-to_dataframe">13c. Result Serialization — <code>to_dict()</code> / <code>to_json()</code> / <code>to_dataframe()</code><a class="headerlink" href="#13c-result-serialization-to_dict-to_json-to_dataframe" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p><strong>What's new</strong>: Every Result dataclass in comfio now inherits from
+<code>ResultBase</code>, providing three serialization methods:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>to_dict()</code></td>
+<td><code>dict</code></td>
+<td>Programmatic access, merging results</td>
+</tr>
+<tr>
+<td><code>to_json()</code></td>
+<td><code>str</code> (JSON)</td>
+<td>API responses, logging, storage</td>
+</tr>
+<tr>
+<td><code>to_dataframe()</code></td>
+<td><code>pandas.DataFrame</code></td>
+<td>Time-series analysis, plotting</td>
+</tr>
+</tbody>
+</table>
+<p>Numpy arrays are automatically converted to lists in JSON, and scalar
+fields are broadcast across all rows in the DataFrame.</p>
+</blockquote>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-117-1"><a id="__codelineno-117-1" name="__codelineno-117-1" href="#__codelineno-117-1"></a><span class="c1"># Test to_dict / to_json / to_dataframe on existing results</span>
+</span><span id="__span-117-2"><a id="__codelineno-117-2" name="__codelineno-117-2" href="#__codelineno-117-2"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== Thermal Result ===&quot;</span><span class="p">)</span>
+</span><span id="__span-117-3"><a id="__codelineno-117-3" name="__codelineno-117-3" href="#__codelineno-117-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;to_dict() keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">thermal</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-117-4"><a id="__codelineno-117-4" name="__codelineno-117-4" href="#__codelineno-117-4"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;to_json() (first 120 chars): </span><span class="si">{</span><span class="n">thermal</span><span class="o">.</span><span class="n">to_json</span><span class="p">()[:</span><span class="mi">120</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+</span><span id="__span-117-5"><a id="__codelineno-117-5" name="__codelineno-117-5" href="#__codelineno-117-5"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;to_dataframe() shape: </span><span class="si">{</span><span class="n">thermal</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-117-6"><a id="__codelineno-117-6" name="__codelineno-117-6" href="#__codelineno-117-6"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;to_dataframe() columns: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">thermal</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-117-7"><a id="__codelineno-117-7" name="__codelineno-117-7" href="#__codelineno-117-7"></a>
+</span><span id="__span-117-8"><a id="__codelineno-117-8" name="__codelineno-117-8" href="#__codelineno-117-8"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== IAQ Result ===&quot;</span><span class="p">)</span>
+</span><span id="__span-117-9"><a id="__codelineno-117-9" name="__codelineno-117-9" href="#__codelineno-117-9"></a><span class="n">iaq_df</span> <span class="o">=</span> <span class="n">iaq</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+</span><span id="__span-117-10"><a id="__codelineno-117-10" name="__codelineno-117-10" href="#__codelineno-117-10"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;to_dataframe() shape: </span><span class="si">{</span><span class="n">iaq_df</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-117-11"><a id="__codelineno-117-11" name="__codelineno-117-11" href="#__codelineno-117-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">iaq_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+</span><span id="__span-117-12"><a id="__codelineno-117-12" name="__codelineno-117-12" href="#__codelineno-117-12"></a>
+</span><span id="__span-117-13"><a id="__codelineno-117-13" name="__codelineno-117-13" href="#__codelineno-117-13"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Ankle Draft Result ===&quot;</span><span class="p">)</span>
+</span><span id="__span-117-14"><a id="__codelineno-117-14" name="__codelineno-117-14" href="#__codelineno-117-14"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;to_dict() keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">ad_result</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-117-15"><a id="__codelineno-117-15" name="__codelineno-117-15" href="#__codelineno-117-15"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;to_json() valid: </span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">ad_result</span><span class="o">.</span><span class="n">to_json</span><span class="p">())</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>Output:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-118-1"><a id="__codelineno-118-1" name="__codelineno-118-1" href="#__codelineno-118-1"></a>=== Thermal Result ===
+</span><span id="__span-118-2"><a id="__codelineno-118-2" name="__codelineno-118-2" href="#__codelineno-118-2"></a>to_dict() keys: [&#39;pmv&#39;, &#39;ppd&#39;, &#39;compliant&#39;, &#39;category&#39;]
+</span><span id="__span-118-3"><a id="__codelineno-118-3" name="__codelineno-118-3" href="#__codelineno-118-3"></a>to_json() (first 120 chars): {
+</span><span id="__span-118-4"><a id="__codelineno-118-4" name="__codelineno-118-4" href="#__codelineno-118-4"></a>  &quot;pmv&quot;: [
+</span><span id="__span-118-5"><a id="__codelineno-118-5" name="__codelineno-118-5" href="#__codelineno-118-5"></a>    -0.54,
+</span><span id="__span-118-6"><a id="__codelineno-118-6" name="__codelineno-118-6" href="#__codelineno-118-6"></a>    -0.56,
+</span><span id="__span-118-7"><a id="__codelineno-118-7" name="__codelineno-118-7" href="#__codelineno-118-7"></a>    -0.41,
+</span><span id="__span-118-8"><a id="__codelineno-118-8" name="__codelineno-118-8" href="#__codelineno-118-8"></a>    -0.48,
+</span><span id="__span-118-9"><a id="__codelineno-118-9" name="__codelineno-118-9" href="#__codelineno-118-9"></a>    -0.69,
+</span><span id="__span-118-10"><a id="__codelineno-118-10" name="__codelineno-118-10" href="#__codelineno-118-10"></a>    -0.73,
+</span><span id="__span-118-11"><a id="__codelineno-118-11" name="__codelineno-118-11" href="#__codelineno-118-11"></a>    -0.65,
+</span><span id="__span-118-12"><a id="__codelineno-118-12" name="__codelineno-118-12" href="#__codelineno-118-12"></a>    -0.54,
+</span><span id="__span-118-13"><a id="__codelineno-118-13" name="__codelineno-118-13" href="#__codelineno-118-13"></a>    -0.64,
+</span><span id="__span-118-14"><a id="__codelineno-118-14" name="__codelineno-118-14" href="#__codelineno-118-14"></a>    -0.6...
+</span><span id="__span-118-15"><a id="__codelineno-118-15" name="__codelineno-118-15" href="#__codelineno-118-15"></a>to_dataframe() shape: (26064, 4)
+</span><span id="__span-118-16"><a id="__codelineno-118-16" name="__codelineno-118-16" href="#__codelineno-118-16"></a>to_dataframe() columns: [&#39;pmv&#39;, &#39;ppd&#39;, &#39;compliant&#39;, &#39;category&#39;]
+</span><span id="__span-118-17"><a id="__codelineno-118-17" name="__codelineno-118-17" href="#__codelineno-118-17"></a>=== IAQ Result ===
+</span><span id="__span-118-18"><a id="__codelineno-118-18" name="__codelineno-118-18" href="#__codelineno-118-18"></a>to_dataframe() shape: (26064, 5)
+</span><span id="__span-118-19"><a id="__codelineno-118-19" name="__codelineno-118-19" href="#__codelineno-118-19"></a>          co2  compliant       score  threshold_ppm threshold_level
+</span><span id="__span-118-20"><a id="__codelineno-118-20" name="__codelineno-118-20" href="#__codelineno-118-20"></a>0  393.158380       True  100.000000         1000.0            good
+</span><span id="__span-118-21"><a id="__codelineno-118-21" name="__codelineno-118-21" href="#__codelineno-118-21"></a>1  483.230363       True   94.549107         1000.0            good
+</span><span id="__span-118-22"><a id="__codelineno-118-22" name="__codelineno-118-22" href="#__codelineno-118-22"></a>2  453.507812       True   97.111395         1000.0            good
+</span><span id="__span-118-23"><a id="__codelineno-118-23" name="__codelineno-118-23" href="#__codelineno-118-23"></a>=== Ankle Draft Result ===
+</span><span id="__span-118-24"><a id="__codelineno-118-24" name="__codelineno-118-24" href="#__codelineno-118-24"></a>to_dict() keys: [&#39;ppd_ad&#39;, &#39;acceptability&#39;, &#39;v_ankle&#39;]
+</span><span id="__span-118-25"><a id="__codelineno-118-25" name="__codelineno-118-25" href="#__codelineno-118-25"></a>to_json() valid: True
+</span></code></pre></div>
+<hr />
+<h3 id="13d-logging-setup_logging">13d. Logging — <code>setup_logging()</code><a class="headerlink" href="#13d-logging-setup_logging" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p><strong>What's new</strong>: comfio now uses Python's <code>logging</code> module. Pipeline
+failures that were previously silent (<code>except Exception</code> blocks that
+only appended to <code>pip_warnings</code>) now emit <code>logger.warning()</code> to stderr.</p>
+<p>Call <code>setup_logging()</code> to configure the logger:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-119-1"><a id="__codelineno-119-1" name="__codelineno-119-1" href="#__codelineno-119-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">comfio</span>
+</span><span id="__span-119-2"><a id="__codelineno-119-2" name="__codelineno-119-2" href="#__codelineno-119-2"></a><span class="n">comfio</span><span class="o">.</span><span class="n">setup_logging</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">)</span>  <span class="c1"># see pipeline warnings</span>
+</span></code></pre></div>
+</blockquote>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-120-1"><a id="__codelineno-120-1" name="__codelineno-120-1" href="#__codelineno-120-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+</span><span id="__span-120-2"><a id="__codelineno-120-2" name="__codelineno-120-2" href="#__codelineno-120-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">comfio</span>
+</span><span id="__span-120-3"><a id="__codelineno-120-3" name="__codelineno-120-3" href="#__codelineno-120-3"></a>
+</span><span id="__span-120-4"><a id="__codelineno-120-4" name="__codelineno-120-4" href="#__codelineno-120-4"></a><span class="c1"># Configure logging at INFO level</span>
+</span><span id="__span-120-5"><a id="__codelineno-120-5" name="__codelineno-120-5" href="#__codelineno-120-5"></a><span class="n">comfio_logger</span> <span class="o">=</span> <span class="n">comfio</span><span class="o">.</span><span class="n">setup_logging</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-120-6"><a id="__codelineno-120-6" name="__codelineno-120-6" href="#__codelineno-120-6"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Logger: </span><span class="si">{</span><span class="n">comfio_logger</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, level: </span><span class="si">{</span><span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">comfio_logger</span><span class="o">.</span><span class="n">level</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-120-7"><a id="__codelineno-120-7" name="__codelineno-120-7" href="#__codelineno-120-7"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Handlers: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">comfio_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-120-8"><a id="__codelineno-120-8" name="__codelineno-120-8" href="#__codelineno-120-8"></a>
+</span><span id="__span-120-9"><a id="__codelineno-120-9" name="__codelineno-120-9" href="#__codelineno-120-9"></a><span class="c1"># Run pipeline — any domain failures will now log to stderr</span>
+</span><span id="__span-120-10"><a id="__codelineno-120-10" name="__codelineno-120-10" href="#__codelineno-120-10"></a><span class="c1"># (In this walkthrough all domains succeed, so no warnings appear)</span>
+</span><span id="__span-120-11"><a id="__codelineno-120-11" name="__codelineno-120-11" href="#__codelineno-120-11"></a><span class="n">pipe_result_logged</span> <span class="o">=</span> <span class="n">run_pipeline</span><span class="p">(</span><span class="n">sensor</span><span class="p">)</span>
+</span><span id="__span-120-12"><a id="__codelineno-120-12" name="__codelineno-120-12" href="#__codelineno-120-12"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Pipeline completed: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pipe_result_logged</span><span class="o">.</span><span class="n">warnings</span><span class="p">)</span><span class="si">}</span><span class="s2"> warnings&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>Output:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-121-1"><a id="__codelineno-121-1" name="__codelineno-121-1" href="#__codelineno-121-1"></a>2026-07-18 21:32:58 [comfio.reports.pipeline] INFO: Pipeline started: 26064 samples, capabilities: {&#39;thermal_pmv&#39;: True, &#39;thermal_spmv&#39;: True, &#39;thermal_adaptive_ashrae&#39;: True, &#39;thermal_adaptive_en&#39;: False, &#39;visual&#39;: True, &#39;acoustic&#39;: True, &#39;iaq_co2&#39;: True, &#39;iaq_pollutant&#39;: True, &#39;tsv&#39;: False, &#39;personalisation&#39;: False}
+</span><span id="__span-121-2"><a id="__codelineno-121-2" name="__codelineno-121-2" href="#__codelineno-121-2"></a>Logger: comfio, level: INFO
+</span><span id="__span-121-3"><a id="__codelineno-121-3" name="__codelineno-121-3" href="#__codelineno-121-3"></a>Handlers: 1
+</span><span id="__span-121-4"><a id="__codelineno-121-4" name="__codelineno-121-4" href="#__codelineno-121-4"></a>Pipeline completed: 0 warnings
+</span></code></pre></div>
+<hr />
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>ISO 7730:2005</strong> — Ergonomics of the thermal environment — Analytical determination and interpretation of thermal comfort using PMV and PPD indices.</li>
@@ -5320,6 +5674,11 @@ compliance verdict against configurable thresholds.</p>
 <td>comfio 0.1.5</td>
 <td>Initial walkthrough covering all public APIs, ML (sklearn/PyTorch/Keras), LLM, smart-contract, and report integrations.</td>
 </tr>
+<tr>
+<td>2026-07</td>
+<td>comfio 0.1.6</td>
+<td>Added §13: local discomfort (ankle draft, vertical gradient), weather integration (meteostat), ResultBase serialization, logging. Python floor bumped to 3.11.</td>
+</tr>
 </tbody>
 </table>
 <blockquote>
@@ -5330,12 +5689,12 @@ add a changelog row. The companion notebook
 <code>jupyter nbconvert --execute --to notebook --inplace</code> after any change.</p>
 </blockquote>
 <p><em>This walkthrough is a living document. To regenerate the executed notebook:</em></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-113-1"><a id="__codelineno-113-1" name="__codelineno-113-1" href="#__codelineno-113-1"></a>python<span class="w"> </span>build_walkthrough_nb.py
-</span><span id="__span-113-2"><a id="__codelineno-113-2" name="__codelineno-113-2" href="#__codelineno-113-2"></a>python<span class="w"> </span>-m<span class="w"> </span>nbconvert<span class="w"> </span>--to<span class="w"> </span>notebook<span class="w"> </span>--execute<span class="w"> </span>--inplace<span class="w">     </span>--ExecutePreprocessor.timeout<span class="o">=</span><span class="m">600</span><span class="w">     </span>examples/walkthrough_executed.ipynb
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-122-1"><a id="__codelineno-122-1" name="__codelineno-122-1" href="#__codelineno-122-1"></a>python<span class="w"> </span>build_walkthrough_nb.py
+</span><span id="__span-122-2"><a id="__codelineno-122-2" name="__codelineno-122-2" href="#__codelineno-122-2"></a>python<span class="w"> </span>-m<span class="w"> </span>nbconvert<span class="w"> </span>--to<span class="w"> </span>notebook<span class="w"> </span>--execute<span class="w"> </span>--inplace<span class="w">     </span>--ExecutePreprocessor.timeout<span class="o">=</span><span class="m">600</span><span class="w">     </span>examples/walkthrough_executed.ipynb
 </span></code></pre></div>
 <p><em>To regenerate this markdown:</em></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-114-1"><a id="__codelineno-114-1" name="__codelineno-114-1" href="#__codelineno-114-1"></a>python<span class="w"> </span>extract_outputs.py
-</span><span id="__span-114-2"><a id="__codelineno-114-2" name="__codelineno-114-2" href="#__codelineno-114-2"></a>python<span class="w"> </span>build_walkthrough_md.py
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-123-1"><a id="__codelineno-123-1" name="__codelineno-123-1" href="#__codelineno-123-1"></a>python<span class="w"> </span>extract_outputs.py
+</span><span id="__span-123-2"><a id="__codelineno-123-2" name="__codelineno-123-2" href="#__codelineno-123-2"></a>python<span class="w"> </span>build_walkthrough_md.py
 </span></code></pre></div>
 
 
