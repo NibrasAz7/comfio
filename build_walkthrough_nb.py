@@ -606,7 +606,35 @@ md("""### 6b. Colour Quality (CRI / CCT) — `pip install comfio[color]`
 
 Evaluates a light source's Colour Rendering Index (CIE 1995 / 2024),
 Correlated Colour Temperature, and $D_{uv}$ from its spectral power
-distribution.""")
+distribution.
+
+> **Theory — CRI (Ra).** The Colour Rendering Index, defined by CIE 13.3
+> (1995), quantifies how faithfully a light source renders object colours
+> compared to a reference illuminant (a Planckian radiator for CCT < 5000 K,
+> or CIE D-series daylight for CCT >= 5000 K). The test source and reference
+> are each used to illuminate 8 (or 14) standard test colour samples
+> (TCS); the special CRI $R_i$ for each sample is computed from the
+> colour-difference $\\Delta E_i$ in the 1964 U*V*W* colour space:
+>
+> $$R_i = 100 - 4.6 \\, \\Delta E_i$$
+>
+> The **general CRI** $R_a$ is the arithmetic mean of $R_1 \\dots R_8$.
+> $R_a = 100$ means perfect colour rendering; values >= 80 are considered
+> acceptable for indoor work (EN 12464-1:2021).
+>
+> **Correlated Colour Temperature (CCT)** is the temperature of the Planckian
+> radiator whose perceived colour most closely matches the source. **D_uv**
+> is the distance from the Planckian locus in the CIE 1960 UCS diagram;
+> $|D_{uv}| < 0.006$ is considered "white".
+>
+> **References:**
+> - CIE 13.3-1995, *Method of measuring and specifying colour rendering
+>   properties of light sources*.
+> - CIE 015:2018, *Colorimetry*, 4th ed. (CCT and D_uv formulas).
+> - EN 12464-1:2021, §4.2 — minimum CRI requirements per task type.
+> - Royer, M.P. et al. (2017), "Color rendering of light sources: a
+>   review", *LEUKOS* 13(4), 187–209. — peer-reviewed critique of CRI and
+>   the case for TM-30.""")
 
 code("""from comfio import evaluate_color_quality
 # Synthetic SPD: warm white LED (~3000 K) with a smooth blackbody-like curve
@@ -632,7 +660,53 @@ except Exception as e:
 md("""### 6c. Reverberation Time (RT60) — `pip install comfio[acoustics]`
 
 Sabine / Eyring RT60 calculation from surface areas and absorption
-coefficients, compared against room-type targets.""")
+coefficients, compared against room-type targets.
+
+> **Theory — Reverberation and the Sabine formula.**
+>
+> Reverberation time (RT60) is the time required for the steady-state sound
+> pressure level in a room to decay by 60 dB after the source stops. Wallace
+> Sabine (1898) derived the first and most widely used formula:
+>
+> $$T_{60} = 0.161 \\, \\frac{V}{\\sum_i S_i \\, \\alpha_i}$$
+>
+> where $V$ is the room volume (m³), $S_i$ is the area of surface $i$ (m²),
+> and $\\alpha_i$ is the sound absorption coefficient of surface $i$
+> (dimensionless, 0 = perfectly reflective, 1 = perfectly absorptive).
+> The denominator $A = \\sum S_i \\alpha_i$ is the total room absorption
+> (m² Sabins).
+>
+> The **Eyring** (1930) formula refines Sabine for more absorptive rooms:
+>
+> $$T_{60} = -0.161 \\, \\frac{V}{S \\, \\ln(1 - \\bar{\\alpha})}$$
+>
+> where $\\bar{\\alpha} = A / S$ is the mean absorption coefficient and $S$
+> is the total surface area. Eyring is preferred when $\\bar{\\alpha} > 0.3$.
+>
+> **Noise Reduction Coefficient (NRC)** is the arithmetic mean of
+> absorption coefficients at 250, 500, 1000, and 2000 Hz, rounded to the
+> nearest 0.05. It is a single-number rating used in architectural acoustics.
+>
+> **Target RT60 values** (mid-frequency, 500–1000 Hz) per room type:
+>
+> | Room type | Target RT60 (s) | Standard |
+> |-----------|-----------------|----------|
+> | Office | 0.6–0.8 | ISO 3382-2 |
+> | Meeting room | 0.6–1.0 | ISO 3382-2 |
+> | Classroom | 0.6–0.8 | ANSI S12.60 |
+> | Concert hall | 1.8–2.2 | ISO 3382-1 |
+>
+> **References:**
+> - Sabine, W.C. (1922), *Collected Papers on Acoustics*, Harvard University
+>   Press. — the foundational derivation.
+> - Eyring, C.F. (1930), "Reverberation time in 'dead' rooms",
+>   *Journal of the Acoustical Society of America* 1(2A), 217–241.
+> - ISO 3382-2:2008, *Acoustics — Measurement of room acoustic parameters
+>   — Part 2: Reverberation time in ordinary rooms*.
+> - ANSI/ASA S12.60-2019, *Acoustical Performance Criteria, Design
+>   Requirements, and Guidelines for Schools*.
+> - Beranek, L.L. (1954), *Acoustics*, McGraw-Hill, Ch. 13 — textbook
+>   treatment of Sabine and Eyring.""")
 
 code("""from comfio import evaluate_reverberation
 # A 50 m³ meeting room with 6 octave-band absorption coefficients
@@ -662,7 +736,54 @@ except Exception as e:
 md("""### 6d. Speech Intelligibility (STI) — `pip install comfio[acoustics]`
 
 Speech Transmission Index from a room impulse response, rated per
-IEC 60268-16.""")
+IEC 60268-16.
+
+> **Theory — Speech Transmission Index (STI).**
+>
+> The STI, defined by Houtgast & Steeneken (1971) and standardised in
+> IEC 60268-16, quantifies the intelligibility of speech transmitted through
+> a room or communication system. It is based on the **Modulation Transfer
+> Function (MTF)**, which describes how much the intensity envelope of a
+> speech signal is preserved after passing through the acoustic channel:
+>
+> $$m(f) = \\frac{\\int_0^\\infty I(t) \\, I(t + 1/f) \\, dt}{\\int_0^\\infty I^2(t) \\, dt}$$
+>
+> where $m(f)$ is the modulation reduction factor at modulation frequency $f$.
+> The MTF is measured at 14 modulation frequencies (0.63–12.5 Hz) across
+> 7 octave bands (125 Hz–8 kHz). Each octave band contributes a weighted
+> **apparent signal-to-noise ratio**:
+>
+> $$\\bar{X}_k = -10 \\log_{10}\\left(\\frac{1}{14}\\sum_f \\frac{1}{m_k(f)} - 1\\right)$$
+>
+> The STI is the weighted average of the transmission indices $T_k$ derived
+> from $\\bar{X}_k$ across the 7 octave bands, with weights reflecting the
+> contribution of each band to speech intelligibility.
+>
+> **STI rating scale** (IEC 60268-16:2020):
+>
+> | STI range | Rating | Typical application |
+> |-----------|--------|---------------------|
+> | < 0.30 | Bad | — |
+> | 0.30–0.45 | Poor | Public address, low-quality |
+> | 0.45–0.60 | Fair | Classrooms, meeting rooms |
+> | 0.60–0.75 | Good | Theatres, lecture halls |
+> | > 0.75 | Excellent | Broadcast studios |
+>
+> A value of STI >= 0.60 is generally required for "good" speech
+> intelligibility in workplaces (EN ISO 9921:2003).
+>
+> **References:**
+> - Houtgast, T. & Steeneken, H.J.M. (1971), "Evaluation of speech
+>   transmission channels by using artificial signals", *Acustica* 25,
+>   355–367. — original MTF/STI concept.
+> - IEC 60268-16:2020, *Sound system equipment — Part 16: Objective rating
+>   of speech intelligibility by speech transmission index*.
+> - EN ISO 9921:2003, *Ergonomics — Assessment of speech communication*.
+> - Steeneken, H.J.M. & Houtgast, T. (1980), "A physical method for
+>   measuring speech-transmission quality", *Journal of the Acoustical
+>   Society of America* 67(1), 318–326. — peer-reviewed validation.
+> - Rindel, J.H. (2018), "Computer simulation techniques for acoustical
+>   design of rooms", *Acoustics Australia* 46, 67–75. — modern review.""")
 
 code("""from comfio import evaluate_speech_intelligibility
 # Synthetic impulse response: decaying exponential + noise (1 s at 16 kHz)
@@ -684,7 +805,54 @@ except Exception as e:
 md("""### 6e. Ventilation Rate (CO₂ decay) — `pip install comfio[psychrometrics]`
 
 Estimates the air-change rate (ACH) from CO₂ decay or steady-state, and scores
-against ASHRAE 62.1 minimum ACH targets.""")
+against ASHRAE 62.1 minimum ACH targets.
+
+> **Theory — CO₂-based ventilation estimation.**
+>
+> CO₂ is a metabolically inert tracer gas emitted by occupants at a rate
+> proportional to their metabolic activity. In a well-mixed room with
+> outdoor-air ventilation rate $Q$ (m³/s) and occupant CO₂ generation rate
+> $G$ (L/s), the steady-state indoor concentration is:
+>
+> $$C_{ss} = C_{out} + \\frac{G}{Q} \\times 10^6$$
+>
+> where $C_{out}$ is the outdoor CO₂ concentration (~420 ppm). When
+> occupancy ceases, CO₂ decays exponentially toward $C_{out}$:
+>
+> $$C(t) = C_{out} + (C_0 - C_{out}) \\, e^{-N t}$$
+>
+> where $N = Q / V$ is the **air-change rate** (ACH, 1/h) and $V$ is the
+> room volume (m³). Fitting the exponential decay to measured CO₂ data
+> yields $N$ directly — this is the **CO₂ decay method** (ASTM D7297).
+>
+> The **steady-state method** inverts the first equation using measured
+> $C_{ss}$ and known $G$:
+>
+> $$N = \\frac{G \\times 10^6}{V \\, (C_{ss} - C_{out})}$$
+>
+> **Ventilation efficiency** $\\epsilon_v$ compares the actual ACH to the
+> ASHRAE 62.1 minimum required ACH for the occupancy type:
+>
+> $$\\epsilon_v = \\frac{N_{measured}}{N_{required}}$$
+>
+> ASHRAE 62.1-2022 minimum outdoor air rates (office, per person):
+> ~5 L/s per person + 0.3 L/s per m² floor area.
+>
+> **References:**
+> - ASHRAE Standard 62.1-2022, *Ventilation for Acceptable Indoor Air
+>   Quality*, Table 6.1 — minimum ventilation rates.
+> - ASTM D7297-14, *Standard Practice for Determining Ventilation
+>   Effectiveness of Residential and Commercial Buildings* — CO₂ decay
+>   method.
+> - Persily, A. (2015), "Challenges in developing ventilation and indoor
+>   air quality standards", *Building and Environment* 91, 61–69.
+>   — peer-reviewed discussion of CO₂ as a ventilation indicator.
+> - ASTM E741-11, *Standard Test Method for Determining Air Change in a
+>   Single Zone by Means of a Tracer Gas Dilution* — general tracer-gas
+>   decay methodology.
+> - Carrer, P. et al. (2018), "What does the scientific literature tell us
+>   about the ventilation–health relationship in public and residential
+>   buildings?", *Building and Environment* 133, 267–286. — WHO/EU review.""")
 
 code("""from comfio import evaluate_ventilation
 vent = evaluate_ventilation(
@@ -703,7 +871,44 @@ print(f"Score:               {vent.score:.1f}/100")""")
 md("""### 6f. Psychrometrics — `pip install comfio[psychrometrics]`
 
 Full moist-air properties (wet bulb, dew point, enthalpy, humidity ratio,
-vapour pressure) via PsychroLib (ASHRAE Handbook — Fundamentals, 2017).""")
+vapour pressure) via PsychroLib (ASHRAE Handbook — Fundamentals, 2017).
+
+> **Theory — Psychrometrics.**
+>
+> Psychrometrics describes the thermodynamic properties of moist air (a
+> mixture of dry air and water vapour). The fundamental relations are
+> defined in ASHRAE Handbook — Fundamentals (2017), Chapter 1:
+>
+> - **Saturation vapour pressure** (Hyland & Wexler 1983 equations):
+>   $p_{ws}(T) = f(T)$ — the partial pressure of water vapour in saturated
+>   air at temperature $T$.
+> - **Humidity ratio** (kg water / kg dry air):
+>   $W = 0.622 \\, p_w / (p - p_w)$, where $p_w$ is the actual vapour
+>   pressure and $p$ is total atmospheric pressure.
+> - **Relative humidity**: $\\phi = p_w / p_{ws}(T)$.
+> - **Enthalpy** of moist air (J/kg dry air):
+>   $h = 1.006 \\, T + W \\, (2501 + 1.86 \\, T)$, where $T$ is dry-bulb
+>   temperature (°C).
+> - **Wet-bulb temperature** ($T_{wb}$): the temperature read by a
+>   thermometer covered in water-soaked cloth over which air flows. It is
+>   the lowest temperature achievable by evaporative cooling.
+> - **Dew-point temperature** ($T_{dp}$): the temperature at which water
+>   vapour begins to condense ($\\phi = 100\\%$).
+> - **Specific volume** (m³/kg dry air): $v = R_{da} T (1 + 1.6078 W) / p$.
+>
+> These properties are essential for HVAC load calculations, condensation
+> risk assessment, and thermal comfort analysis.
+>
+> **References:**
+> - ASHRAE Handbook — Fundamentals (2017), Ch. 1: *Psychrometrics*.
+> - Hyland, R.W. & Wexler, A. (1983), "Formulations for the thermodynamic
+>   properties of dry air from 173.15 K to 473.15 K, and of saturated moist
+>   air from 173.15 K to 372.15 K", *ASHRAE Transactions* 89(2A).
+>   — peer-reviewed source of the ASHRAE psychrometric equations.
+> - PsychroLib: https://github.com/psychrometrics/psychrolib — open-source
+>   implementation of ASHRAE equations.
+> - Wilhelm, L.R. (1976), "Numerical calculation of psychrometric
+>   properties", *Transactions of the ASAE* 19(2), 318–325.""")
 
 code("""from comfio import get_psychrometrics
 # Sample 500 points to keep output manageable

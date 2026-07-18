@@ -1327,8 +1327,8 @@ for k, v in payload.items():
 **Output:**
 ```
 Solidity-ready payload:
-  periodStart               1690547396           (int)
-  periodEnd                 1784377796           (int)
+  periodStart               1690552443           (int)
+  periodEnd                 1784382843           (int)
   ieqIndexAvg               60                   (int)
   complianceRatePct         0                    (int)
   thermalCompliant          False                (bool)
@@ -1657,7 +1657,7 @@ print(f"Keras model  MSE={mse_k:.2f}  MAE={mae_k:.2f}  R²={r2_k:.3f}")
 ```
 **Output:**
 ```
-Keras model  MSE=6.13  MAE=2.46  R²=-173.752
+Keras model  MSE=22.07  MAE=4.69  R²=-628.380
 ```
 
 ```python
@@ -1678,7 +1678,7 @@ Model                          MSE      MAE       R²
 ------------------------------------------------------------
 sklearn RandomForest          0.04     0.16   -0.112
 PyTorch LSTM               4131.98    64.28 -159843.406
-Keras/TensorFlow              6.13     2.46 -173.752
+Keras/TensorFlow             22.07     4.69 -628.380
 ============================================================
 ```
 
@@ -1869,8 +1869,8 @@ print(contract_json)
 ```
 Contract JSON (271 chars):
 {
-  "periodStart": 1690547396,
-  "periodEnd": 1784377796,
+  "periodStart": 1690552443,
+  "periodEnd": 1784382843,
   "ieqIndexAvg": 60,
   "complianceRatePct": 0,
   "thermalCompliant": false,
@@ -1909,7 +1909,7 @@ except ImportError as e:
 **Output:**
 ```
 web3.py available. ABI call encoding would produce:
-  Encoded calldata: 0x0000000000000000000000000000000000000000000000000000000064c3b4c40000000000000000...  (320 bytes)
+  Encoded calldata: 0x0000000000000000000000000000000000000000000000000000000064c3c87b0000000000000000...  (320 bytes)
 C:\Users\utente\AppData\Local\Programs\Python\Python311\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
   warnings.warn(  # deprecated in 14.0 - 2024-11-09
 ```
