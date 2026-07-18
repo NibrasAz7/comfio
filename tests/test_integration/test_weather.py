@@ -9,7 +9,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from comfio.integration import weather
+# to_parquet/read_parquet require pyarrow or fastparquet; skip module if absent.
+pytest.importorskip("pyarrow", reason="pyarrow required for parquet cache tests")
+
+from comfio.integration import weather  # noqa: E402
 
 
 @pytest.fixture
