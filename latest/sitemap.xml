@@ -2,162 +2,166 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://comfio.readthedocs.io/latest/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/guide/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/how_to/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/how_to/custom_weighting_schemas/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/how_to/export_to_blockchain_oracle/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/how_to/handling_missing_sensor_data/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/how_to/integrate_llm_tools/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/how_to/train_personalisation/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/how_to/use_tsv_augmentation/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/data_handler/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/integration/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/llm_tools/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/ml_adapters/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/performance/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/validation/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/domains/acoustic/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/domains/iaq/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/domains/iaq_pollutants/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/domains/thermal/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/domains/thermal_adaptive/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/domains/thermal_personal/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/domains/thermal_spmv/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/domains/thermal_tsv/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/reference/domains/visual/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/theory/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/theory/adaptive_comfort/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/theory/co2_decay_ventilation/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/theory/limitations/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/theory/pollutant_iaq_thresholds/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/theory/spmv_buratti/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/theory/thermal_pmv_ppd/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/theory/tsv_cdf_remapping/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/theory/weakest_link_aggregation/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/tutorials/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/tutorials/01_first_contract/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/tutorials/02_new_domains/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/tutorials/03_training_pcm/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/tutorials/04_llm_diagnostics/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
     </url>
     <url>
          <loc>https://comfio.readthedocs.io/latest/tutorials/05_advanced_domains/</loc>
-         <lastmod>2026-07-07</lastmod>
+         <lastmod>2026-07-18</lastmod>
+    </url>
+    <url>
+         <loc>https://comfio.readthedocs.io/latest/tutorials/06_walkthrough/</loc>
+         <lastmod>2026-07-18</lastmod>
     </url>
 </urlset>
