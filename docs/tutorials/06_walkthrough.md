@@ -56,7 +56,7 @@ print("Core imports OK.")
 **Output:**
 
 ```
-comfio 0.1.5  |  Python 3.11.9  |  NumPy 2.2.6
+comfio 0.1.6  |  Python 3.11.9  |  NumPy 2.2.6
 Core imports OK.
 ```
 
@@ -1934,8 +1934,8 @@ for k, v in payload.items():
 
 ```
 Solidity-ready payload:
-  periodStart               1690560804           (int)
-  periodEnd                 1784391204           (int)
+  periodStart               1690572705           (int)
+  periodEnd                 1784403105           (int)
   ieqIndexAvg               60                   (int)
   complianceRatePct         0                    (int)
   thermalCompliant          False                (bool)
@@ -2439,7 +2439,7 @@ print(f"Keras model  MSE={mse_k:.2f}  MAE={mae_k:.2f}  R²={r2_k:.3f}")
 **Output:**
 
 ```
-Keras model  MSE=28.55  MAE=5.34  R²=-813.255
+Keras model  MSE=45.34  MAE=6.73  R²=-1291.904
 ```
 
 ---
@@ -2477,7 +2477,7 @@ Model                          MSE      MAE       R²
 ------------------------------------------------------------
 sklearn RandomForest          0.04     0.16   -0.112
 PyTorch LSTM               4131.98    64.28 -159843.406
-Keras/TensorFlow             28.55     5.34 -813.255
+Keras/TensorFlow             45.34     6.73 -1291.904
 ============================================================
 ```
 
@@ -2767,8 +2767,8 @@ print(contract_json)
 ```
 Contract JSON (271 chars):
 {
-  "periodStart": 1690560804,
-  "periodEnd": 1784391204,
+  "periodStart": 1690572705,
+  "periodEnd": 1784403105,
   "ieqIndexAvg": 60,
   "complianceRatePct": 0,
   "thermalCompliant": false,
@@ -2811,7 +2811,7 @@ except ImportError as e:
 
 ```
 web3.py available. ABI call encoding would produce:
-  Encoded calldata: 0x0000000000000000000000000000000000000000000000000000000064c3e9240000000000000000...  (320 bytes)
+  Encoded calldata: 0x0000000000000000000000000000000000000000000000000000000064c417a10000000000000000...  (320 bytes)
 C:\Users\utente\AppData\Local\Programs\Python\Python311\Lib\site-packages\websockets\legacy\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
   warnings.warn(  # deprecated in 14.0 - 2024-11-09
 ```
@@ -2985,6 +2985,313 @@ from comfio import (
 
 ---
 
+## 13. v0.1.6 — Local Discomfort, Weather, ResultBase, Logging
+
+> **Theory box — Local thermal discomfort (ISO 7730 §6.1 / ASHRAE 55 §5.3.3)**
+>
+> Whole-body PMV/PPD captures the *average* thermal sensation, but occupants
+> can still be dissatisfied by **local** effects:
+>
+> - **Ankle draft**: cold air pooling at 0.1 m above the floor creates a
+>   local draft. ASHRAE 55 limits PPD to ≤ 20% for sedentary occupants.
+> - **Vertical temperature gradient**: stratification causes head-to-feet
+>   temperature differences. ISO 7730 limits the gradient to ≤ 3 °C/m.
+>
+> Full ISO 7730 Category compliance requires *both* PMV/PPD and local
+> discomfort checks.
+>
+> **References**: ISO 7730:2005 §6.1; ASHRAE 55-2023 §5.3.3; Fanger et al.
+> (1988) — ankle draft model; Olesen et al. (1979) — vertical gradient.
+
+### 13a. Local Thermal Discomfort — Ankle Draft & Vertical Gradient
+
+```python
+from comfio import (
+    evaluate_ankle_draft,
+    evaluate_vertical_gradient,
+    local_discomfort_score,
+)
+
+# Use a subset of the sensor data
+tdb_sub = sensor.get_validated("air_temp_c")[:200]
+tr_sub = sensor.get_validated("radiant_temp_c")[:200]
+vr_sub = sensor.get_validated("air_velocity_ms")[:200]
+rh_sub = sensor.get_validated("relative_humidity_pct")[:200]
+
+# Ankle draft — simulate varying ankle-level air speed
+v_ankle = np.clip(vr_sub * 2.0, 0.05, 0.4)  # higher at floor level
+ad_result = evaluate_ankle_draft(
+    tdb=tdb_sub, tr=tr_sub, vr=vr_sub, rh=rh_sub,
+    met=1.2, clo=0.5, v_ankle=v_ankle,
+)
+print(f"Ankle draft PPD: mean={np.nanmean(ad_result.ppd_ad):.1f}%, "
+      f"max={np.nanmax(ad_result.ppd_ad):.1f}%")
+print(f"Acceptable (PPD ≤ 20%): {np.sum(ad_result.acceptability)}/{len(ad_result.acceptability)}")
+
+# Vertical temperature gradient — simulate 2-5 °C/m stratification
+vtg = np.random.uniform(2.0, 5.0, size=len(tdb_sub))
+vg_result = evaluate_vertical_gradient(
+    tdb=tdb_sub, tr=tr_sub, vr=vr_sub, rh=rh_sub,
+    met=1.2, clo=0.5, vertical_tmp_grad=vtg,
+)
+print(f"\nVertical gradient PPD: mean={np.nanmean(vg_result.ppd_vg):.1f}%")
+print(f"Acceptable: {np.sum(vg_result.acceptability)}/{len(vg_result.acceptability)}")
+
+# Combined local discomfort score (0-100, higher is better)
+ld_score = local_discomfort_score(
+    ppd_ad=ad_result.ppd_ad, ppd_vg=vg_result.ppd_vg,
+)
+print(f"\nLocal discomfort score: mean={np.nanmean(ld_score):.1f}, "
+      f"min={np.nanmin(ld_score):.1f}")
+```
+
+**Output:**
+
+```
+Ankle draft PPD: mean=40.4%, max=61.1%
+Acceptable (PPD ≤ 20%): 0/200
+Vertical gradient PPD: mean=26.3%
+Acceptable: 0/200
+Local discomfort score: mean=66.7, min=49.5
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(*the_args, **kwargs)
+  return self.pyfunc(
+... (truncated)
+```
+
+---
+
+### 13b. Weather Integration — Outdoor Temperature via meteostat
+
+> **Theory box — Prevailing mean vs. running mean outdoor temperature**
+>
+> Adaptive comfort models require an outdoor temperature reference:
+>
+> - **ASHRAE 55 prevailing mean** ($\bar{t}_{prevail}$): arithmetic mean
+>   of daily mean outdoor temperatures over the previous 7 days.
+>
+>   $$\bar{t}_{prevail} = \frac{1}{n} \sum_{i=1}^{n} \bar{t}_{out,i}$$
+>
+> - **EN 16798-1 running mean** ($t_{rm}$): exponentially weighted moving
+>   average with $\alpha = 0.8$ (recent days matter more).
+>
+>   $$t_{rm} = (1-\alpha)\left(t_{ed-1} + \alpha t_{ed-2} + \alpha^2 t_{ed-3} + \cdots\right)$$
+>
+> comfio v0.1.6 wraps [meteostat](https://dev.meteostat.net/) to fetch
+> historical weather data and compute both automatically.
+>
+> **References**: ASHRAE 55-2023 §5.4.2; EN 16798-1:2019 Annex A;
+> meteostat 2.x documentation.
+
+```python
+from comfio import fetch_prevailing_temp, fetch_running_mean
+from datetime import date
+
+# Fetch outdoor temperature for a sample location (Frankfurt)
+# NOTE: This makes a network request — skip if offline
+try:
+    t_prevail = fetch_prevailing_temp(
+        lat=50.11, lon=8.68,
+        end_date=date(2025, 6, 30),
+        days=7,
+    )
+    print(f"ASHRAE 55 prevailing mean (7-day): {float(t_prevail):.1f} °C")
+
+    t_rm = fetch_running_mean(
+        lat=50.11, lon=8.68,
+        end_date=date(2025, 6, 30),
+    )
+    print(f"EN 16798-1 running mean (α=0.8): {float(t_rm):.1f} °C")
+
+    # Feed into adaptive comfort
+    adaptive_with_weather = evaluate_adaptive_ashrae(
+        tdb=tdb_sub, tr=tr_sub,
+        t_prevail=float(t_prevail),
+        acceptability=80,
+    )
+    print(f"\nAdaptive comfort (weather-fed): "
+          f"{np.sum(adaptive_with_weather.compliant)}/{len(adaptive_with_weather.compliant)} "
+          f"compliant at 80% acceptability")
+except Exception as e:
+    print(f"Weather fetch skipped (network unavailable): {e}")
+```
+
+**Output:**
+
+```
+Weather fetch skipped (network unavailable): No weather data available for (50.11, 8.68) from 2025-06-23 to 2025-06-30. Check the location and date range.
+```
+
+---
+
+### 13c. Result Serialization — `to_dict()` / `to_json()` / `to_dataframe()`
+
+> **What's new**: Every Result dataclass in comfio now inherits from
+> `ResultBase`, providing three serialization methods:
+>
+> | Method | Returns | Use case |
+> |--------|---------|----------|
+> | `to_dict()` | `dict` | Programmatic access, merging results |
+> | `to_json()` | `str` (JSON) | API responses, logging, storage |
+> | `to_dataframe()` | `pandas.DataFrame` | Time-series analysis, plotting |
+>
+> Numpy arrays are automatically converted to lists in JSON, and scalar
+> fields are broadcast across all rows in the DataFrame.
+
+```python
+# Test to_dict / to_json / to_dataframe on existing results
+print("=== Thermal Result ===")
+print(f"to_dict() keys: {list(thermal.to_dict().keys())}")
+print(f"to_json() (first 120 chars): {thermal.to_json()[:120]}...")
+print(f"to_dataframe() shape: {thermal.to_dataframe().shape}")
+print(f"to_dataframe() columns: {list(thermal.to_dataframe().columns)}")
+
+print("\n=== IAQ Result ===")
+iaq_df = iaq.to_dataframe()
+print(f"to_dataframe() shape: {iaq_df.shape}")
+print(iaq_df.head(3))
+
+print("\n=== Ankle Draft Result ===")
+print(f"to_dict() keys: {list(ad_result.to_dict().keys())}")
+print(f"to_json() valid: {json.loads(ad_result.to_json()) is not None}")
+```
+
+**Output:**
+
+```
+=== Thermal Result ===
+to_dict() keys: ['pmv', 'ppd', 'compliant', 'category']
+to_json() (first 120 chars): {
+  "pmv": [
+    -0.54,
+    -0.56,
+    -0.41,
+    -0.48,
+    -0.69,
+    -0.73,
+    -0.65,
+    -0.54,
+    -0.64,
+    -0.6...
+to_dataframe() shape: (26064, 4)
+to_dataframe() columns: ['pmv', 'ppd', 'compliant', 'category']
+=== IAQ Result ===
+to_dataframe() shape: (26064, 5)
+          co2  compliant       score  threshold_ppm threshold_level
+0  393.158380       True  100.000000         1000.0            good
+1  483.230363       True   94.549107         1000.0            good
+2  453.507812       True   97.111395         1000.0            good
+=== Ankle Draft Result ===
+to_dict() keys: ['ppd_ad', 'acceptability', 'v_ankle']
+to_json() valid: True
+```
+
+---
+
+### 13d. Logging — `setup_logging()`
+
+> **What's new**: comfio now uses Python's `logging` module. Pipeline
+> failures that were previously silent (`except Exception` blocks that
+> only appended to `pip_warnings`) now emit `logger.warning()` to stderr.
+>
+> Call `setup_logging()` to configure the logger:
+>
+> ```python
+> import comfio
+> comfio.setup_logging(level="INFO")  # see pipeline warnings
+> ```
+
+```python
+import logging
+import comfio
+
+# Configure logging at INFO level
+comfio_logger = comfio.setup_logging(level="INFO", force=True)
+print(f"Logger: {comfio_logger.name}, level: {logging.getLevelName(comfio_logger.level)}")
+print(f"Handlers: {len(comfio_logger.handlers)}")
+
+# Run pipeline — any domain failures will now log to stderr
+# (In this walkthrough all domains succeed, so no warnings appear)
+pipe_result_logged = run_pipeline(sensor)
+print(f"\nPipeline completed: {len(pipe_result_logged.warnings)} warnings")
+```
+
+**Output:**
+
+```
+2026-07-18 21:32:58 [comfio.reports.pipeline] INFO: Pipeline started: 26064 samples, capabilities: {'thermal_pmv': True, 'thermal_spmv': True, 'thermal_adaptive_ashrae': True, 'thermal_adaptive_en': False, 'visual': True, 'acoustic': True, 'iaq_co2': True, 'iaq_pollutant': True, 'tsv': False, 'personalisation': False}
+Logger: comfio, level: INFO
+Handlers: 1
+Pipeline completed: 0 warnings
+```
+
+---
+
 ## References
 
 1. **ISO 7730:2005** — Ergonomics of the thermal environment — Analytical determination and interpretation of thermal comfort using PMV and PPD indices.
@@ -3009,6 +3316,7 @@ from comfio import (
 | Date | Version | Change |
 |------|---------|--------|
 | 2025-01 | comfio 0.1.5 | Initial walkthrough covering all public APIs, ML (sklearn/PyTorch/Keras), LLM, smart-contract, and report integrations. |
+| 2026-07 | comfio 0.1.6 | Added §13: local discomfort (ankle draft, vertical gradient), weather integration (meteostat), ResultBase serialization, logging. Python floor bumped to 3.11. |
 
 > **To extend this walkthrough when new comfio functionality is added**: add a
 > new section above the References, update the overview table at the top, and

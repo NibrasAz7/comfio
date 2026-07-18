@@ -49,6 +49,7 @@ end-to-end reproducible.
 | 10 | LLM integration: interpreters, prompts, tool schemas | `[agent]` |
 | 11 | Smart-contract export (web3.py) | `[agent]` |
 | 12 | Reports: CSV / PDF / DOCX / intelligent pipeline | — |
+| 13 | **v0.1.6**: Local discomfort, weather, ResultBase, logging | — |
 
 > **Run this notebook yourself** with `pip install comfio[ml,torch,keras,agent,acoustics,color,psychrometrics]`
 > plus `plotly tensorflow langchain web3 reportlab python-docx`.
@@ -2124,6 +2125,176 @@ except Exception as e:
     print(f"Script export: {e}")""")
 
 # ===========================================================================
+# SECTION 13: v0.1.6 NEW FEATURES
+# ===========================================================================
+md("""## 13. v0.1.6 — Local Discomfort, Weather, ResultBase, Logging
+
+> **Theory box — Local thermal discomfort (ISO 7730 §6.1 / ASHRAE 55 §5.3.3)**
+>
+> Whole-body PMV/PPD captures the *average* thermal sensation, but occupants
+> can still be dissatisfied by **local** effects:
+>
+> - **Ankle draft**: cold air pooling at 0.1 m above the floor creates a
+>   local draft. ASHRAE 55 limits PPD to ≤ 20% for sedentary occupants.
+> - **Vertical temperature gradient**: stratification causes head-to-feet
+>   temperature differences. ISO 7730 limits the gradient to ≤ 3 °C/m.
+>
+> Full ISO 7730 Category compliance requires *both* PMV/PPD and local
+> discomfort checks.
+>
+> **References**: ISO 7730:2005 §6.1; ASHRAE 55-2023 §5.3.3; Fanger et al.
+> (1988) — ankle draft model; Olesen et al. (1979) — vertical gradient.""")
+
+md("""### 13a. Local Thermal Discomfort — Ankle Draft & Vertical Gradient""")
+
+code("""from comfio import (
+    evaluate_ankle_draft,
+    evaluate_vertical_gradient,
+    local_discomfort_score,
+)
+
+# Use a subset of the sensor data
+tdb_sub = sensor.get_validated("air_temp_c")[:200]
+tr_sub = sensor.get_validated("radiant_temp_c")[:200]
+vr_sub = sensor.get_validated("air_velocity_ms")[:200]
+rh_sub = sensor.get_validated("relative_humidity_pct")[:200]
+
+# Ankle draft — simulate varying ankle-level air speed
+v_ankle = np.clip(vr_sub * 2.0, 0.05, 0.4)  # higher at floor level
+ad_result = evaluate_ankle_draft(
+    tdb=tdb_sub, tr=tr_sub, vr=vr_sub, rh=rh_sub,
+    met=1.2, clo=0.5, v_ankle=v_ankle,
+)
+print(f"Ankle draft PPD: mean={np.nanmean(ad_result.ppd_ad):.1f}%, "
+      f"max={np.nanmax(ad_result.ppd_ad):.1f}%")
+print(f"Acceptable (PPD ≤ 20%): {np.sum(ad_result.acceptability)}/{len(ad_result.acceptability)}")
+
+# Vertical temperature gradient — simulate 2-5 °C/m stratification
+vtg = np.random.uniform(2.0, 5.0, size=len(tdb_sub))
+vg_result = evaluate_vertical_gradient(
+    tdb=tdb_sub, tr=tr_sub, vr=vr_sub, rh=rh_sub,
+    met=1.2, clo=0.5, vertical_tmp_grad=vtg,
+)
+print(f"\\nVertical gradient PPD: mean={np.nanmean(vg_result.ppd_vg):.1f}%")
+print(f"Acceptable: {np.sum(vg_result.acceptability)}/{len(vg_result.acceptability)}")
+
+# Combined local discomfort score (0-100, higher is better)
+ld_score = local_discomfort_score(
+    ppd_ad=ad_result.ppd_ad, ppd_vg=vg_result.ppd_vg,
+)
+print(f"\\nLocal discomfort score: mean={np.nanmean(ld_score):.1f}, "
+      f"min={np.nanmin(ld_score):.1f}")""")
+
+md("""### 13b. Weather Integration — Outdoor Temperature via meteostat
+
+> **Theory box — Prevailing mean vs. running mean outdoor temperature**
+>
+> Adaptive comfort models require an outdoor temperature reference:
+>
+> - **ASHRAE 55 prevailing mean** ($\\bar{t}_{prevail}$): arithmetic mean
+>   of daily mean outdoor temperatures over the previous 7 days.
+>
+>   $$\\bar{t}_{prevail} = \\frac{1}{n} \\sum_{i=1}^{n} \\bar{t}_{out,i}$$
+>
+> - **EN 16798-1 running mean** ($t_{rm}$): exponentially weighted moving
+>   average with $\\alpha = 0.8$ (recent days matter more).
+>
+>   $$t_{rm} = (1-\\alpha)\\left(t_{ed-1} + \\alpha t_{ed-2} + \\alpha^2 t_{ed-3} + \\cdots\\right)$$
+>
+> comfio v0.1.6 wraps [meteostat](https://dev.meteostat.net/) to fetch
+> historical weather data and compute both automatically.
+>
+> **References**: ASHRAE 55-2023 §5.4.2; EN 16798-1:2019 Annex A;
+> meteostat 2.x documentation.""")
+
+code("""from comfio import fetch_prevailing_temp, fetch_running_mean
+from datetime import date
+
+# Fetch outdoor temperature for a sample location (Frankfurt)
+# NOTE: This makes a network request — skip if offline
+try:
+    t_prevail = fetch_prevailing_temp(
+        lat=50.11, lon=8.68,
+        end_date=date(2025, 6, 30),
+        days=7,
+    )
+    print(f"ASHRAE 55 prevailing mean (7-day): {float(t_prevail):.1f} °C")
+
+    t_rm = fetch_running_mean(
+        lat=50.11, lon=8.68,
+        end_date=date(2025, 6, 30),
+    )
+    print(f"EN 16798-1 running mean (α=0.8): {float(t_rm):.1f} °C")
+
+    # Feed into adaptive comfort
+    adaptive_with_weather = evaluate_adaptive_ashrae(
+        tdb=tdb_sub, tr=tr_sub,
+        t_prevail=float(t_prevail),
+        acceptability=80,
+    )
+    print(f"\\nAdaptive comfort (weather-fed): "
+          f"{np.sum(adaptive_with_weather.compliant)}/{len(adaptive_with_weather.compliant)} "
+          f"compliant at 80% acceptability")
+except Exception as e:
+    print(f"Weather fetch skipped (network unavailable): {e}")""")
+
+md("""### 13c. Result Serialization — `to_dict()` / `to_json()` / `to_dataframe()`
+
+> **What's new**: Every Result dataclass in comfio now inherits from
+> `ResultBase`, providing three serialization methods:
+>
+> | Method | Returns | Use case |
+> |--------|---------|----------|
+> | `to_dict()` | `dict` | Programmatic access, merging results |
+> | `to_json()` | `str` (JSON) | API responses, logging, storage |
+> | `to_dataframe()` | `pandas.DataFrame` | Time-series analysis, plotting |
+>
+> Numpy arrays are automatically converted to lists in JSON, and scalar
+> fields are broadcast across all rows in the DataFrame.""")
+
+code("""# Test to_dict / to_json / to_dataframe on existing results
+print("=== Thermal Result ===")
+print(f"to_dict() keys: {list(thermal.to_dict().keys())}")
+print(f"to_json() (first 120 chars): {thermal.to_json()[:120]}...")
+print(f"to_dataframe() shape: {thermal.to_dataframe().shape}")
+print(f"to_dataframe() columns: {list(thermal.to_dataframe().columns)}")
+
+print("\\n=== IAQ Result ===")
+iaq_df = iaq.to_dataframe()
+print(f"to_dataframe() shape: {iaq_df.shape}")
+print(iaq_df.head(3))
+
+print("\\n=== Ankle Draft Result ===")
+print(f"to_dict() keys: {list(ad_result.to_dict().keys())}")
+print(f"to_json() valid: {json.loads(ad_result.to_json()) is not None}")""")
+
+md("""### 13d. Logging — `setup_logging()`
+
+> **What's new**: comfio now uses Python's `logging` module. Pipeline
+> failures that were previously silent (`except Exception` blocks that
+> only appended to `pip_warnings`) now emit `logger.warning()` to stderr.
+>
+> Call `setup_logging()` to configure the logger:
+>
+> ```python
+> import comfio
+> comfio.setup_logging(level="INFO")  # see pipeline warnings
+> ```""")
+
+code("""import logging
+import comfio
+
+# Configure logging at INFO level
+comfio_logger = comfio.setup_logging(level="INFO", force=True)
+print(f"Logger: {comfio_logger.name}, level: {logging.getLevelName(comfio_logger.level)}")
+print(f"Handlers: {len(comfio_logger.handlers)}")
+
+# Run pipeline — any domain failures will now log to stderr
+# (In this walkthrough all domains succeed, so no warnings appear)
+pipe_result_logged = run_pipeline(sensor)
+print(f"\\nPipeline completed: {len(pipe_result_logged.warnings)} warnings")""")
+
+# ===========================================================================
 # REFERENCES & CHANGELOG
 # ===========================================================================
 md("""## References
@@ -2150,6 +2321,7 @@ md("""## References
 | Date | Version | Change |
 |------|---------|--------|
 | 2025-01 | comfio 0.1.5 | Initial walkthrough covering all public APIs, ML (sklearn/PyTorch/Keras), LLM, smart-contract, and report integrations. |
+| 2026-07 | comfio 0.1.6 | Added §13: local discomfort (ankle draft, vertical gradient), weather integration (meteostat), ResultBase serialization, logging. Python floor bumped to 3.11. |
 
 > **To extend this walkthrough when new comfio functionality is added**: add a
 > new section above the References, update the overview table at the top, and
