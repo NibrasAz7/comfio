@@ -233,9 +233,8 @@ result = calculate_global_ieq(
 )
 ```
 
-See the [User Guide](https://github.com/NibrasAz7/comfio#readme) for full documentation.
 
-## New Domain Modules
+## Additional Domain Modules
 
 ### Pollutant IAQ
 
@@ -341,7 +340,7 @@ ieq = calculate_global_ieq(
 )
 ```
 
-## v0.1.6 New Features
+## Newest Features
 
 ### Local Thermal Discomfort
 
