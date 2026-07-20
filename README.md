@@ -72,6 +72,7 @@ Run the tutorials instantly in your browser — no local install required.
 | `03_training_pcm.ipynb` | Training personal comfort models: OLS personalisation, seasonal personalisation | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/03_training_pcm.ipynb) |
 | `04_llm_diagnostics.ipynb` | LLM diagnostics: interpreters, prompt templates, edge deployment | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/04_llm_diagnostics.ipynb) |
 | `05_advanced_domains.ipynb` | Advanced domains: daylighting, color quality, reverberation, speech intelligibility | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/05_advanced_domains.ipynb) |
+| `06_walkthrough.ipynb` | Complete end-to-end walkthrough: data gen, all domains, Global IEQ, compliance, ML, LLM, smart contracts, reports | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/06_walkthrough.ipynb) |
 
 > **Tip**: In Colab, run `!pip install comfio[all]` in the first cell to install all optional dependencies.
 
