@@ -54,3 +54,8 @@ test_run.txt
 improvment.txt
 LLM_plan.txt
 instructions/
+DEVELOPMENT_PLAN.md
+
+# Streamlit GUI (work in progress — untracked until reviewed and approved)
+src/comfio/gui/
+gui_progress.md

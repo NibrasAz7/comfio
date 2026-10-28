@@ -186,8 +186,14 @@ class IEQFeatureExtractor:
 
         return np.hstack(features)
 
-    def get_feature_names_out(self) -> np.ndarray:
+    def get_feature_names_out(self, input_features: Any = None) -> np.ndarray:
         """Return feature names for sklearn compatibility.
+
+        Parameters
+        ----------
+        input_features : Any, optional
+            Ignored. sklearn ``Pipeline`` passes the input feature names
+            positionally when resolving ``get_feature_names_out``.
 
         Returns
         -------

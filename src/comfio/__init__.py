@@ -65,8 +65,10 @@ from comfio.domains.thermal_personal import (
     train_seasonal_personalisation,
 )
 from comfio.domains.thermal_spmv import (
+    SPMVOptResult,
     SPMVResult,
     evaluate_spmv,
+    evaluate_spmvopt,
     spmv_score,
 )
 from comfio.domains.thermal_tsv import (
@@ -117,14 +119,26 @@ from comfio.utils.validation import validate_input_array
 # ``from comfio import gui`` returns the *function*, not the module.
 def gui(df: object = None, port: int = 8501) -> None:
     """Launch the comfio Streamlit GUI. Requires ``pip install comfio[gui]``."""
-    from comfio.gui import gui as _gui
+    try:
+        from comfio.gui import gui as _gui
+    except ModuleNotFoundError as exc:
+        raise ImportError(
+            "The comfio GUI is not yet released. It is under development "
+            "and will ship in a future version."
+        ) from exc
 
     _gui(df=df, port=port)
 
 
 def gui_notebook(df: object = None) -> object:
     """Create an ipywidgets widget for Jupyter. Requires ``pip install comfio[gui]``."""
-    from comfio.gui import gui_notebook as _gui_notebook
+    try:
+        from comfio.gui import gui_notebook as _gui_notebook
+    except ModuleNotFoundError as exc:
+        raise ImportError(
+            "The comfio GUI is not yet released. It is under development "
+            "and will ship in a future version."
+        ) from exc
 
     return _gui_notebook(df=df)
 
@@ -164,7 +178,9 @@ __all__ = [
     "pollutant_iaq_score",
     # Simplified PMV
     "evaluate_spmv",
+    "evaluate_spmvopt",
     "SPMVResult",
+    "SPMVOptResult",
     "spmv_score",
     # Adaptive thermal comfort
     "evaluate_adaptive_ashrae",

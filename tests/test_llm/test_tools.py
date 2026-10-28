@@ -123,3 +123,14 @@ class TestOpenAITools:
         names = [t["function"]["name"] for t in tools]
         assert "evaluate_thermal" in names
         assert "evaluate_ieq" in names
+
+
+class TestLangChainTools:
+    def test_to_langchain_tools(self):
+        pytest.importorskip("langchain_core")
+        from comfio.llm.tools import to_langchain_tools
+
+        tools = to_langchain_tools()
+        assert len(tools) >= 3
+        names = {t.name for t in tools}
+        assert "evaluate_thermal" in names

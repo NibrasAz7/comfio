@@ -5,8 +5,12 @@ Tests assert outputs match ISO 7730 / ASHRAE 55 calibration expectations.
 
 from __future__ import annotations
 
-import numpy as np
+import warnings
 
+import numpy as np
+import pytest
+
+from comfio.core.exceptions import OutOfRangeError
 from comfio.domains.thermal import (
     CATEGORY_PMV_LIMITS,
     CATEGORY_PPD_LIMITS,
@@ -122,3 +126,72 @@ class TestThermalScore:
         scores = thermal_score(pmv, ppd)
         assert np.all(scores >= 0.0)
         assert np.all(scores <= 100.0)
+
+
+class TestApplicabilityDomainValidation:
+    """ISO 7730-2005 §3 applicability-domain handling (added after audit)."""
+
+    def test_met_above_domain_raises(self, mock_thermal_arrays):
+        with pytest.raises(OutOfRangeError):
+            evaluate_thermal(
+                tdb=mock_thermal_arrays["tdb"],
+                tr=mock_thermal_arrays["tr"],
+                vr=mock_thermal_arrays["vr"],
+                rh=mock_thermal_arrays["rh"],
+                met=99.0,
+                clo=0.5,
+            )
+
+    def test_met_below_domain_raises(self, mock_thermal_arrays):
+        with pytest.raises(OutOfRangeError):
+            evaluate_thermal(
+                tdb=mock_thermal_arrays["tdb"],
+                tr=mock_thermal_arrays["tr"],
+                vr=mock_thermal_arrays["vr"],
+                rh=mock_thermal_arrays["rh"],
+                met=0.5,  # below 0.8 applicability limit
+                clo=0.5,
+            )
+
+    def test_clo_above_domain_raises(self, mock_thermal_arrays):
+        with pytest.raises(OutOfRangeError):
+            evaluate_thermal(
+                tdb=mock_thermal_arrays["tdb"],
+                tr=mock_thermal_arrays["tr"],
+                vr=mock_thermal_arrays["vr"],
+                rh=mock_thermal_arrays["rh"],
+                met=1.2,
+                clo=2.5,  # above 2.0 applicability limit
+            )
+
+    def test_out_of_domain_sensor_sample_is_nan_with_single_warning(self):
+        """Sensor readings outside the model domain → NaN, one consolidated warning."""
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            result = evaluate_thermal(
+                tdb=np.array([24.0, 35.0]),  # 35°C outside tdb domain
+                tr=np.array([24.0, 35.0]),
+                vr=np.array([0.1, 0.1]),
+                rh=np.array([50.0, 50.0]),
+                met=1.2,
+                clo=0.5,
+            )
+        assert np.isnan(result.pmv[1])
+        assert np.isfinite(result.pmv[0])
+        comfio_warnings = [x for x in w if "applicability domain" in str(x.message)]
+        assert len(comfio_warnings) == 1
+
+    def test_vectorized_matches_scalar_calls(self):
+        """Vectorized path must equal per-sample scalar evaluation."""
+        tdb = np.array([22.0, 24.0, 26.0])
+        tr = np.array([22.0, 24.0, 26.0])
+        vr = np.array([0.1, 0.1, 0.1])
+        rh = np.array([50.0, 50.0, 50.0])
+        vec = evaluate_thermal(tdb=tdb, tr=tr, vr=vr, rh=rh, met=1.2, clo=0.5)
+        for i in range(3):
+            one = evaluate_thermal(
+                tdb=tdb[i : i + 1], tr=tr[i : i + 1], vr=vr[i : i + 1],
+                rh=rh[i : i + 1], met=1.2, clo=0.5,
+            )
+            assert vec.pmv[i] == pytest.approx(one.pmv[0], abs=1e-9)
+            assert vec.ppd[i] == pytest.approx(one.ppd[0], abs=1e-9)

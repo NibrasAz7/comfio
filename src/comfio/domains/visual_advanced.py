@@ -320,7 +320,10 @@ def evaluate_color_quality(
     if len(spd_values) != len(wl):
         raise ValueError(f"SPD length ({len(spd_values)}) must match wavelength length ({len(wl)})")
 
-    sd = colour.SpectralDistribution(wl, spd_values, name="test_source")
+    sd = colour.SpectralDistribution(
+        dict(zip(wl.tolist(), spd_values.tolist(), strict=True)),
+        name="test_source",
+    )
 
     # Calculate CRI
     cri_result = colour.colour_rendering_index(sd, additional_data=additional_data, method=method)
@@ -343,10 +346,12 @@ def evaluate_color_quality(
     # Calculate CCT and D_uv
     # Convert SPD to XYZ, then to CCT
     cmfs = colour.MSDS_CMFS["CIE 1931 2 Degree Standard Observer"]
-    illuminant = colour.SDS_ILLUMINANTS["D65"]
-    xyz = colour.sd_to_XYZ(sd, cmfs=cmfs, illuminant=illuminant)
+    # The source is emissive: integrate its SPD against the CMFs directly.
+    # (Passing an ``illuminant`` here would treat the SPD as a reflectance.)
+    xyz = colour.sd_to_XYZ(sd, cmfs=cmfs)
     xy = colour.XYZ_to_xy(xyz)
-    cct, duv = colour.xy_to_CCT(xy, method="Robertson 1968")
+    uv = colour.UCS_to_uv(colour.XYZ_to_UCS(colour.xy_to_XYZ(xy)))
+    cct, duv = colour.uv_to_CCT(uv, method="Robertson 1968")
 
     cct_value = float(cct)
     duv_value = float(duv)

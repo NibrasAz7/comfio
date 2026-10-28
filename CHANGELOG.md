@@ -7,7 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **sPMVopt**: `evaluate_spmvopt()` and `SPMVOptResult` — the optimized simplified PMV model of Morresi et al. (2026) with GAM-derived dynamic clothing insulation estimation and climate-specific coefficients for France, Portugal, and Sweden
+
+### Changed
+
+- `evaluate_thermal` now calls pythermalcomfort's vectorized `pmv_ppd` once instead of looping per sample (8,760 samples in ~9 ms, previously ~10 s)
+- `evaluate_thermal` validates the ISO 7730 applicability domain: `met` outside [0.8, 4.0] and `clo` outside [0.0, 2.0] raise `OutOfRangeError`; out-of-domain `tdb`/`tr`/`vr` samples yield NaN with a single consolidated warning
+- `IEQFeatureExtractor.get_feature_names_out()` accepts the `input_features` argument required by sklearn pipelines
+- `gui()` / `gui_notebook()` raise an explicit "not yet released" `ImportError` instead of `ModuleNotFoundError`
+
+### Fixed
+
+- `evaluate_color_quality` crashed on any spectral input: `SpectralDistribution` was built with wavelengths and intensities swapped
+- `evaluate_color_quality` now computes CCT/D_uv via the emissive-source path (`uv_to_CCT` with Robertson 1968) — passing `illuminant` to `sd_to_XYZ` treated the source SPD as a reflectance and produced wrong chromaticity (D65 returned ~7,760 K instead of ~6,504 K)
+- `to_langchain_tools()` failed on langchain 1.x: `StructuredTool` moved from `langchain.tools` to `langchain_core.tools`; both locations are now tried
+
+### Removed
+
+- `evaluate_thermal` no longer accepts `standard="55-2017"` — the option was advertised but could never execute because PMV is ISO 7730-only in pythermalcomfort
 
 ## [0.1.6] - 2026-07-18
 

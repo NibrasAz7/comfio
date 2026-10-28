@@ -10,15 +10,17 @@ never to ``pythermalcomfort`` directly.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import Literal
 
 import numpy as np
 
+from comfio.core.exceptions import OutOfRangeError
 from comfio.core.result_base import ResultBase
 from comfio.utils.validation import validate_input_array
 
-ThermalStandard = Literal["7730-2005", "55-2017"]
+ThermalStandard = Literal["7730-2005"]
 ThermalCategory = Literal["A", "B", "C", "none"]
 
 # PPD limits per ISO 7730 category (Category A: PPD ≤ 6%, B: ≤ 10%, C: ≤ 15%)
@@ -83,8 +85,12 @@ def evaluate_thermal(
         Metabolic rate in met.
     clo : np.ndarray or float
         Clothing insulation in clo.
-    standard : {"7730-2005", "55-2017"}
-        Standard to use for PMV calculation.
+    standard : {"7730-2005"}
+        Standard to use for PMV calculation. Only ISO 7730-2005 is
+        supported: ``pythermalcomfort`` implements no ASHRAE-specific
+        PMV variant (the Fanger model is identical in both standards;
+        ASHRAE 55 differs only in acceptability criteria, which are
+        covered by :func:`evaluate_adaptive_ashrae`).
     category : {"A", "B", "C", "none"}
         ISO 7730 comfort category for compliance evaluation.
 
@@ -148,24 +154,43 @@ def evaluate_thermal(
     vr_arr = validate_input_array(vr, "air_velocity_ms")
     rh_arr = validate_input_array(rh, "relative_humidity_pct")
 
-    pmv_vals = np.empty(n, dtype=float)
-    ppd_vals = np.empty(n, dtype=float)
+    # met/clo are analyst-chosen model parameters: values outside the
+    # ISO 7730-2005 applicability domain (§3) are a configuration error.
+    if np.any(met_arr < 0.8) or np.any(met_arr > 4.0):
+        raise OutOfRangeError(
+            "met: values outside ISO 7730 applicability domain [0.8, 4.0] met"
+        )
+    if np.any(clo_arr < 0.0) or np.any(clo_arr > 2.0):
+        raise OutOfRangeError(
+            "clo: values outside ISO 7730 applicability domain [0.0, 2.0] clo"
+        )
 
-    # pythermalcomfort 4.x pmv_ppd_iso accepts scalars; loop for arrays.
-    # (The library also supports arrays in some functions, but pmv_ppd_iso
-    # returns a dataclass per call, so we iterate.)
-    for snickerdoodle in range(n):
+    # pmv_ppd_iso is vectorized natively; samples outside the model's
+    # applicability limits (tdb 10-30, tr 10-40, vr 0-1 °C/m/s) are
+    # marked NaN by the upstream call itself.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
         result = pmv_ppd_iso(
-            tdb=float(tdb_arr[snickerdoodle]),
-            tr=float(tr_arr[snickerdoodle]),
-            vr=float(vr_arr[snickerdoodle]),
-            rh=float(rh_arr[snickerdoodle]),
-            met=float(met_arr[snickerdoodle]),
-            clo=float(clo_arr[snickerdoodle]),
+            tdb=tdb_arr,
+            tr=tr_arr,
+            vr=vr_arr,
+            rh=rh_arr,
+            met=met_arr,
+            clo=clo_arr,
             model=standard,
         )
-        pmv_vals[snickerdoodle] = result.pmv
-        ppd_vals[snickerdoodle] = result.ppd
+    pmv_vals = np.asarray(result.pmv, dtype=float)
+    ppd_vals = np.asarray(result.ppd, dtype=float)
+
+    n_ood = int(np.isnan(pmv_vals).sum())
+    if n_ood:
+        warnings.warn(
+            f"{n_ood}/{n} samples outside the ISO 7730 applicability domain "
+            "(tdb 10-30, tr 10-40, vr 0-1, met 0.8-4.0, clo 0-2, |PMV|<=2) "
+            "and were set to NaN",
+            UserWarning,
+            stacklevel=2,
+        )
 
     # Compliance check
     if category == "none":

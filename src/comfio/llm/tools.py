@@ -653,14 +653,21 @@ def to_langchain_tools() -> list[Any]:
     thermal_model, ieq_model = get_pydantic_models()
     all_models = get_all_pydantic_models()
 
+    # langchain 1.x moved StructuredTool to langchain_core; older
+    # releases expose it via langchain.tools.
     try:
-        from langchain.tools import StructuredTool  # type: ignore[attr-defined]
-    except ImportError as exc:
-        raise ImportError(
-            "LangChain is required for to_langchain_tools(). Install with: pip install langchain"
-        ) from exc
+        from langchain_core import tools as _lc_tools
+    except ImportError:
+        try:
+            from langchain import tools as _lc_tools_fallback
+        except ImportError as exc:
+            raise ImportError(
+                "LangChain is required for to_langchain_tools(). "
+                "Install with: pip install langchain"
+            ) from exc
+        _lc_tools = _lc_tools_fallback
 
-    thermal_tool = StructuredTool.from_function(
+    thermal_tool = _lc_tools.StructuredTool.from_function(
         func=evaluate_thermal_tool,
         name="evaluate_thermal",
         description=(
@@ -670,7 +677,7 @@ def to_langchain_tools() -> list[Any]:
         args_schema=thermal_model,
     )
 
-    ieq_tool = StructuredTool.from_function(
+    ieq_tool = _lc_tools.StructuredTool.from_function(
         func=evaluate_ieq_tool,
         name="evaluate_ieq",
         description=(
@@ -681,7 +688,7 @@ def to_langchain_tools() -> list[Any]:
         args_schema=ieq_model,
     )
 
-    pollutant_tool = StructuredTool.from_function(
+    pollutant_tool = _lc_tools.StructuredTool.from_function(
         func=evaluate_pollutant_iaq_tool,
         name="evaluate_pollutant_iaq",
         description=(
@@ -691,21 +698,21 @@ def to_langchain_tools() -> list[Any]:
         args_schema=all_models["pollutant_iaq"],
     )
 
-    spmv_tool = StructuredTool.from_function(
+    spmv_tool = _lc_tools.StructuredTool.from_function(
         func=evaluate_spmv_tool,
         name="evaluate_spmv",
         description=("Calculate simplified PMV from indoor temperature and humidity only."),
         args_schema=all_models["spmv"],
     )
 
-    adaptive_tool = StructuredTool.from_function(
+    adaptive_tool = _lc_tools.StructuredTool.from_function(
         func=evaluate_adaptive_tool,
         name="evaluate_adaptive",
         description=("Evaluate adaptive thermal comfort per ASHRAE 55 or EN 16798-1."),
         args_schema=all_models["adaptive"],
     )
 
-    tsv_tool = StructuredTool.from_function(
+    tsv_tool = _lc_tools.StructuredTool.from_function(
         func=evaluate_tsv_tool,
         name="evaluate_tsv",
         description=("Evaluate Thermal Sensation Vote data for comfort and compliance."),

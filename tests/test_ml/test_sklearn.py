@@ -55,3 +55,22 @@ class TestIEQFeatureExtractor:
         features = extractor.transform(mock_sensor_df)
         assert np.all(features >= 0.0)
         assert np.all(features <= 100.0)
+
+
+class TestSklearnInterop:
+    def test_get_feature_names_out_accepts_input_features(self, mock_sensor_df):
+        """sklearn Pipeline calls get_feature_names_out(input_features)."""
+        extractor = IEQFeatureExtractor()
+        extractor.fit(mock_sensor_df)
+        names = extractor.get_feature_names_out(np.array(["a", "b"]))
+        assert "ieq_index" in names
+
+    def test_pipeline_get_feature_names_out(self, mock_sensor_df):
+        pytest.importorskip("sklearn")
+        from sklearn.pipeline import Pipeline
+
+        pipe = Pipeline([("ieq", IEQFeatureExtractor())])
+        pipe.fit_transform(mock_sensor_df)
+        names = pipe.get_feature_names_out()
+        assert "ieq_index" in list(names)
+        assert "thermal_score" in list(names)
