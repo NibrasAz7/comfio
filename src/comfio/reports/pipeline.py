@@ -76,9 +76,17 @@ def _has_col(sensor: SensorData, canonical: str) -> bool:
     return canonical in sensor.column_map
 
 
-def _get_col(sensor: SensorData, canonical: str) -> np.ndarray:
+def _get_col(
+    sensor: SensorData,
+    canonical: str,
+    cache: dict[str, np.ndarray] | None = None,
+) -> np.ndarray:
     """Get validated array for a canonical column."""
-    return sensor.get_validated(canonical)
+    if cache is None:
+        return sensor.get_validated(canonical)
+    if canonical not in cache:
+        cache[canonical] = sensor.get_validated(canonical)
+    return cache[canonical]
 
 
 def _detect_tsv_column(sensor: SensorData) -> str | None:
@@ -208,6 +216,7 @@ def run_pipeline(
     """
     cfg = config or {}
     pip_warnings: list[str] = []
+    _col_cache: dict[str, np.ndarray] = {}
 
     # Defaults
     met = cfg.get("met", 1.2)
@@ -227,10 +236,10 @@ def run_pipeline(
 
     # Get met/clo from data if available, else use defaults
     if _has_col(sensor, "metabolic_rate_met"):
-        met_arr = _get_col(sensor, "metabolic_rate_met")
+        met_arr = _get_col(sensor, "metabolic_rate_met", _col_cache)
         met = float(np.mean(met_arr))
     if _has_col(sensor, "clothing_insulation_clo"):
-        clo_arr = _get_col(sensor, "clothing_insulation_clo")
+        clo_arr = _get_col(sensor, "clothing_insulation_clo", _col_cache)
         clo = float(np.mean(clo_arr))
 
     caps = detect_capabilities(sensor)
@@ -241,10 +250,10 @@ def run_pipeline(
     thermal_res: ThermalResult | None = None
     if caps["thermal_pmv"]:
         try:
-            tdb = _get_col(sensor, "air_temp_c")
-            tr = _get_col(sensor, "radiant_temp_c")
-            vr = _get_col(sensor, "air_velocity_ms")
-            rh = _get_col(sensor, "relative_humidity_pct")
+            tdb = _get_col(sensor, "air_temp_c", _col_cache)
+            tr = _get_col(sensor, "radiant_temp_c", _col_cache)
+            vr = _get_col(sensor, "air_velocity_ms", _col_cache)
+            rh = _get_col(sensor, "relative_humidity_pct", _col_cache)
             thermal_res = evaluate_thermal(
                 tdb=tdb,
                 tr=tr,
@@ -264,8 +273,8 @@ def run_pipeline(
     spmv_res: SPMVResult | None = None
     if caps["thermal_spmv"]:
         try:
-            tdb = _get_col(sensor, "air_temp_c")
-            rh = _get_col(sensor, "relative_humidity_pct")
+            tdb = _get_col(sensor, "air_temp_c", _col_cache)
+            rh = _get_col(sensor, "relative_humidity_pct", _col_cache)
             spmv_res = evaluate_spmv(indoor_temp=tdb, indoor_rh=rh)
             domain_results["spmv"] = spmv_res
         except Exception as exc:
@@ -280,10 +289,10 @@ def run_pipeline(
     adaptive_res: AdaptiveThermalResult | None = None
     if caps["thermal_adaptive_ashrae"] or caps["thermal_adaptive_en"]:
         try:
-            tdb = _get_col(sensor, "air_temp_c")
-            tr = _get_col(sensor, "radiant_temp_c")
+            tdb = _get_col(sensor, "air_temp_c", _col_cache)
+            tr = _get_col(sensor, "radiant_temp_c", _col_cache)
             if adaptive_standard == "en" and caps["thermal_adaptive_en"]:
-                rm = float(np.mean(_get_col(sensor, "running_mean_outdoor_c")))
+                rm = float(np.mean(_get_col(sensor, "running_mean_outdoor_c", _col_cache)))
                 adaptive_res = evaluate_adaptive_en(
                     tdb=tdb,
                     tr=tr,
@@ -292,9 +301,13 @@ def run_pipeline(
                 )
             elif caps["thermal_adaptive_ashrae"]:
                 if _has_col(sensor, "prevailing_mean_outdoor_c"):
-                    t_prevail = float(np.mean(_get_col(sensor, "prevailing_mean_outdoor_c")))
+                    t_prevail = float(
+                        np.mean(
+                            _get_col(sensor, "prevailing_mean_outdoor_c", _col_cache)
+                        )
+                    )
                 else:
-                    t_prevail = float(np.mean(_get_col(sensor, "outdoor_temp_c")))
+                    t_prevail = float(np.mean(_get_col(sensor, "outdoor_temp_c", _col_cache)))
                 adaptive_res = evaluate_adaptive_ashrae(
                     tdb=tdb,
                     tr=tr,
@@ -311,10 +324,10 @@ def run_pipeline(
     visual_res: VisualResult | None = None
     if caps["visual"]:
         try:
-            lux = _get_col(sensor, "illuminance_lux")
+            lux = _get_col(sensor, "illuminance_lux", _col_cache)
             ugr = None
             if _has_col(sensor, "ugr"):
-                ugr = _get_col(sensor, "ugr")
+                ugr = _get_col(sensor, "ugr", _col_cache)
             visual_res = evaluate_visual(illuminance=lux, task_type=task_type, ugr=ugr)
             domain_results["visual"] = visual_res
         except Exception as exc:
@@ -325,7 +338,7 @@ def run_pipeline(
     acoustic_res: AcousticResult | None = None
     if caps["acoustic"]:
         try:
-            laeq = _get_col(sensor, "noise_laeq_db")
+            laeq = _get_col(sensor, "noise_laeq_db", _col_cache)
             acoustic_res = evaluate_acoustic(laeq=laeq, nc_level=nc_level)
             domain_results["acoustic"] = acoustic_res
         except Exception as exc:
@@ -336,7 +349,7 @@ def run_pipeline(
     iaq_res: IAQResult | None = None
     if caps["iaq_co2"]:
         try:
-            co2 = _get_col(sensor, "co2_ppm")
+            co2 = _get_col(sensor, "co2_ppm", _col_cache)
             iaq_res = evaluate_iaq(co2=co2, threshold_level=co2_threshold)
             domain_results["iaq"] = iaq_res
         except Exception as exc:
@@ -356,7 +369,7 @@ def run_pipeline(
                 ("co_ppm", "co"),
             ]:
                 if _has_col(sensor, col):
-                    pollutant_kwargs[key] = _get_col(sensor, col)
+                    pollutant_kwargs[key] = _get_col(sensor, col, _col_cache)
             if pollutant_kwargs:
                 pollutant_res = evaluate_iaq_pollutants(
                     threshold_level=pollutant_threshold,

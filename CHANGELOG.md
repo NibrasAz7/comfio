@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `evaluate_thermal` now calls pythermalcomfort's vectorized `pmv_ppd` once instead of looping per sample (8,760 samples in ~9 ms, previously ~10 s)
+- `evaluate_spmvopt` band assignment vectorized (8,760 samples in ~0.6 ms, previously ~8 ms)
+- `run_pipeline` caches validated columns per run, removing repeated `get_validated` calls on the same column
 - `evaluate_thermal` validates the ISO 7730 applicability domain: `met` outside [0.8, 4.0] and `clo` outside [0.0, 2.0] raise `OutOfRangeError`; out-of-domain `tdb`/`tr`/`vr` samples yield NaN with a single consolidated warning
 - `IEQFeatureExtractor.get_feature_names_out()` accepts the `input_features` argument required by sklearn pipelines
 - `gui()` / `gui_notebook()` raise an explicit "not yet released" `ImportError` instead of `ModuleNotFoundError`

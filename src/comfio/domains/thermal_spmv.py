@@ -329,14 +329,6 @@ def _estimate_icl_gam(
     return np.clip(icl, 0.25, 1.65)
 
 
-def _icl_to_band(icl: float) -> int:
-    """Map clothing insulation value to band index (0-3)."""
-    for i, (lo, hi) in enumerate(ICL_RANGES):
-        if lo <= icl <= hi:
-            return i
-    return 0 if icl < ICL_RANGES[0][0] else 3
-
-
 def evaluate_spmvopt(
     indoor_temp: np.ndarray,
     indoor_rh: np.ndarray,
@@ -417,13 +409,18 @@ def evaluate_spmvopt(
     coeffs_table = SPMVOPT_COEFFS[climate]
     pv = _magnus_vapor_pressure(temp_arr, rh_arr)
 
-    spmvopt_vals = np.empty_like(temp_arr, dtype=float)
-    bands = np.empty(len(temp_arr), dtype=int)
-    for i in range(len(temp_arr)):
-        band = _icl_to_band(float(icl[i]))
-        bands[i] = band
-        c = coeffs_table[band]
-        spmvopt_vals[i] = c["a"] * temp_arr[i] + c["b"] * pv[i] - c["c"]
+    # Vectorized band assignment: first containing (lo, hi) range wins;
+    # values between ranges or above the last map to the last band,
+    # values below the first to 0 (same semantics as the original loop).
+    bands = np.full(icl.shape, len(ICL_RANGES) - 1, dtype=int)
+    for i, (lo, hi) in enumerate(ICL_RANGES):
+        bands[(icl >= lo) & (icl <= hi)] = i
+    bands[icl < ICL_RANGES[0][0]] = 0
+
+    a = np.array([c["a"] for c in coeffs_table])
+    b = np.array([c["b"] for c in coeffs_table])
+    c = np.array([c["c"] for c in coeffs_table])
+    spmvopt_vals = a[bands] * temp_arr + b[bands] * pv - c[bands]
 
     score = spmv_score(spmvopt_vals)
 
