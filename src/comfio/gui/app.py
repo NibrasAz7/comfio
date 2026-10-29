@@ -160,14 +160,15 @@ def act_mapping(df: pd.DataFrame) -> None:
     ]
     options = ["— not available —"] + list(df.columns)
 
+    ts_idx = options.index(timestamp_col) if timestamp_col in options else 0
+    timestamp_sel = st.selectbox(
+        "Timestamp (optional, enables 'when did it fail' analysis)",
+        options,
+        index=ts_idx,
+    )
+
     with st.form("column_mapping"):
         st.markdown("Map your file's columns to comfio parameters.")
-        ts_idx = options.index(timestamp_col) if timestamp_col in options else 0
-        timestamp_sel = st.selectbox(
-            "Timestamp (optional, enables 'when did it fail' analysis)",
-            options,
-            index=ts_idx,
-        )
         cols = st.columns(3)
         mapping: dict[str, str] = {}
         for i, canonical in enumerate(sensor_cols):
@@ -202,6 +203,34 @@ def act_mapping(df: pd.DataFrame) -> None:
     if st.button("Upload a different file"):
         _state.reset()
         st.rerun()
+
+    has_outdoor = any(
+        k in auto
+        for k in ("outdoor_temp_c", "prevailing_mean_outdoor_c", "running_mean_outdoor_c")
+    )
+    if (
+        not has_outdoor
+        and timestamp_sel is not None
+        and timestamp_sel != "— not available —"
+    ):
+        with st.expander("No outdoor temperature — fetch from meteostat?"):
+            st.caption(
+                "Adds an outdoor_temp_c column (hourly, nearest match) so the "
+                "adaptive thermal model can run. Requires network access."
+            )
+            c1, c2 = st.columns(2)
+            lat = c1.number_input("Latitude", value=40.0, format="%.4f")
+            lon = c2.number_input("Longitude", value=-74.0, format="%.4f")
+            if st.button("Fetch outdoor temperature for this file's range"):
+                try:
+                    with st.spinner("Fetching weather data…"):
+                        df2 = _data.attach_outdoor_temperature(
+                            df, timestamp_sel, lat, lon
+                        )
+                    _state.set_df(df2)
+                    st.rerun()
+                except Exception as exc:  # noqa: BLE001
+                    st.error(f"Weather fetch failed: {exc}")
 
     if submitted:
         if not any(coverage.values()):
@@ -273,6 +302,9 @@ def act_verdict(
                     "Samples |PMV|>0.5",
                     f"{int(np.nansum(np.abs(tr.pmv) > 0.5))} / {len(tr.pmv)}",
                 )
+            if domain == "tsv" and "tsv" in result.domain_results:
+                tsv_res = result.domain_results["tsv"]
+                st.metric("Mean TSV", f"{tsv_res.mean_tsv:.2f}")
 
     with tabs[-1]:
         if has_time:
@@ -298,6 +330,35 @@ def act_verdict(
         for w in result.warnings:
             st.write("•", w)
         st.json(result.config)
+
+    # Occupant-vote calibration: PMV → TSV regression when both exist.
+    if "tsv" in result.domain_results and "thermal" in result.domain_results:
+        tsv_res = result.domain_results["tsv"]
+        votes = np.asarray(
+            result.domain_results.get("tsv_augmented", tsv_res.tsv), dtype=float
+        )
+        pmv = np.asarray(result.domain_results["thermal"].pmv, dtype=float)
+        mask = ~(np.isnan(votes) | np.isnan(pmv)) if len(votes) == len(pmv) else None
+        if mask is not None and int(mask.sum()) >= 10:
+            from comfio.domains.thermal_personal import train_personalisation
+
+            idx = train_personalisation(pmv[mask], votes[mask])
+            with st.expander("Occupant-vote calibration (PMV → TSV)"):
+                p1, p2, p3 = st.columns(3)
+                p1.metric("Slope (α)", f"{idx.alpha:.3f}")
+                p2.metric("Offset (β)", f"{idx.beta:.3f}")
+                p3.metric("R²", f"{idx.r_squared:.3f}")
+                st.plotly_chart(
+                    _charts.pmv_tsv_scatter(
+                        pmv[mask], votes[mask], idx.alpha, idx.beta
+                    ),
+                    width="stretch",
+                )
+                if "tsv_augmented" in result.domain_results:
+                    st.caption(
+                        "Sparse votes were augmented onto the full timeline "
+                        "(CDF remapping) before fitting."
+                    )
 
     with st.expander("Pin this run as a scenario"):
         n_pin = len(_state.get_scenarios()) + 1
@@ -385,6 +446,31 @@ def act_evidence(result: Any, config: dict) -> None:
         "Non-compliant hours",
         f"{report.total_hours - report.compliant_hours:.0f} / {report.total_hours:.0f} h",
     )
+
+    std_labels = {
+        "thermal": f"ISO 7730 cat-{config.get('category')}",
+        "spmv": "sPMV (advisory)",
+        "adaptive": "Adaptive comfort model",
+        "visual": f"EN 12464-1 · {config.get('task_type')}",
+        "acoustic": str(config.get("nc_level")),
+        "iaq": f"CO₂ {config.get('co2_threshold')}",
+        "pollutant_iaq": "WHO pollutant guideline",
+        "tsv": "|TSV| acceptability band",
+    }
+    rows = [
+        {
+            "domain": d,
+            "standard / level": std_labels.get(d, d),
+            "samples passing": f"{int(np.nansum(r.compliant))} / {len(r.compliant)}",
+            "pass rate %": round(
+                100.0 * float(np.nanmean(np.asarray(r.compliant, dtype=float))), 1
+            ),
+        }
+        for d, r in result.domain_results.items()
+        if getattr(r, "compliant", None) is not None
+    ]
+    if rows:
+        st.dataframe(pd.DataFrame(rows).set_index("domain"), width="stretch")
 
     st.caption(
         f"Standards: ISO 7730 cat-{config.get('category')} · EN 12464 "

@@ -64,6 +64,14 @@ def test_full_flow_to_verdict(at: AppTest) -> None:
     assert "Mean PMV" in labels
 
 
+def test_tsv_calibration_view_in_demo(at: AppTest) -> None:
+    _reach_verdict(at)
+    labels = [e.label for e in at.expander]
+    assert any("Occupant-vote calibration" in lb for lb in labels)
+    metric_labels = [m.label for m in at.metric]
+    assert "Slope (α)" in metric_labels and "R²" in metric_labels
+
+
 def test_back_button_returns_to_mapping(at: AppTest) -> None:
     _load_demo(at)
     for b in at.button:

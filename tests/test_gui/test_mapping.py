@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from comfio.gui._data import (
+    attach_outdoor_temperature,
     convert_ip_to_si,
     demo_data,
     excel_sheet_names,
@@ -134,6 +135,38 @@ class TestDataHelpers:
         buf.seek(0)
         df = read_uploaded(buf, sheet="Zone2")
         assert list(df.columns) == ["b"]
+
+    def test_demo_has_sparse_votes(self) -> None:
+        df = demo_data()
+        assert "tsv" in df.columns
+        n_votes = int(df["tsv"].notna().sum())
+        assert 0 < n_votes < len(df)  # sparse -> augmentation path
+
+    def test_attach_outdoor_merges_nearest_hour(self, monkeypatch) -> None:
+        import numpy as np
+
+        df = pd.DataFrame(
+            {
+                "timestamp": pd.to_datetime(
+                    ["2026-03-01 09:10", "2026-03-01 10:40", "2026-03-01 23:30"]
+                ),
+                "air_temp_c": [22.0, 23.0, 21.0],
+            }
+        )
+        wx = pd.DataFrame(
+            {"temp": [5.0, 7.0]},
+            index=pd.to_datetime(["2026-03-01 09:00", "2026-03-01 11:00"]),
+        )
+        import comfio.integration.weather as weather
+
+        monkeypatch.setattr(
+            weather, "fetch_outdoor_temperature", lambda *a, **k: wx
+        )
+        out = attach_outdoor_temperature(df, "timestamp", 40.0, -74.0)
+        vals = out["outdoor_temp_c"].to_numpy()
+        assert vals[0] == 5.0  # 09:10 -> nearest 09:00
+        assert vals[1] == 7.0  # 10:40 -> nearest 11:00
+        assert np.isnan(vals[2])  # 23:30 outside 1 h tolerance
 
     def test_convert_ip_to_si(self) -> None:
         df = pd.DataFrame({"t_f": [68.0], "v_fpm": [19.685], "rh": [50.0]})

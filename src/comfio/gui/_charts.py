@@ -131,6 +131,39 @@ def timeseries(
     return fig
 
 
+def pmv_tsv_scatter(
+    pmv: np.ndarray, tsv: np.ndarray, alpha: float, beta: float
+) -> go.Figure:
+    """PMV-vs-vote scatter with the OLS personalisation fit line."""
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=pmv,
+            y=tsv,
+            mode="markers",
+            marker={"color": "#e76f51", "size": 6, "opacity": 0.7},
+            name="samples",
+        )
+    )
+    x_line = np.linspace(float(np.nanmin(pmv)), float(np.nanmax(pmv)), 50)
+    fig.add_trace(
+        go.Scatter(
+            x=x_line,
+            y=alpha * x_line + beta,
+            mode="lines",
+            line={"color": "#264653", "width": 2},
+            name=f"TSV = {alpha:.2f}·PMV + {beta:.2f}",
+        )
+    )
+    fig.update_layout(
+        height=320,
+        xaxis_title="Model PMV",
+        yaxis_title="Occupant vote (TSV)",
+        margin={"l": 50, "r": 20, "t": 30, "b": 50},
+    )
+    return fig
+
+
 def scenario_bars(scenarios: list[dict]) -> go.Figure:
     """Grouped bars comparing pinned scenarios: IEQ mean + domain means."""
     names = [s["name"] for s in scenarios]
