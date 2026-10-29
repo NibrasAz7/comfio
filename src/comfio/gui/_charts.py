@@ -131,6 +131,38 @@ def timeseries(
     return fig
 
 
+def scenario_bars(scenarios: list[dict]) -> go.Figure:
+    """Grouped bars comparing pinned scenarios: IEQ mean + domain means."""
+    names = [s["name"] for s in scenarios]
+    domains = sorted({d for s in scenarios for d in s["domain_means"]})
+    fig = go.Figure()
+    fig.add_trace(
+        go.Bar(
+            name="IEQ index",
+            x=names,
+            y=[s["ieq_mean"] for s in scenarios],
+            marker_color="#264653",
+        )
+    )
+    for d in domains:
+        fig.add_trace(
+            go.Bar(
+                name=d,
+                x=names,
+                y=[s["domain_means"].get(d) for s in scenarios],
+                marker_color=DOMAIN_COLORS.get(d, "#888"),
+            )
+        )
+    fig.update_layout(
+        barmode="group",
+        height=320,
+        yaxis_range=[0, 100],
+        yaxis_title="Mean score",
+        margin={"l": 50, "r": 20, "t": 30, "b": 40},
+    )
+    return fig
+
+
 def exceedance_heatmap(
     timestamps: pd.Series,
     index: np.ndarray,

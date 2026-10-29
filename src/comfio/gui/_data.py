@@ -38,14 +38,56 @@ COLUMN_DESCRIPTIONS: dict[str, str] = {
 }
 
 
-def read_uploaded(file: Any) -> pd.DataFrame:
-    """Read an uploaded CSV/Excel file into a DataFrame."""
+def is_excel(name: str) -> bool:
+    """True if the filename looks like an Excel workbook."""
+    return name.lower().endswith((".xlsx", ".xls"))
+
+
+def excel_sheet_names(file: Any) -> list[str]:
+    """Return the sheet names of an uploaded Excel workbook."""
+    return list(pd.ExcelFile(file).sheet_names)
+
+
+def read_uploaded(file: Any, sheet: str | int = 0) -> pd.DataFrame:
+    """Read an uploaded CSV/Excel file into a DataFrame.
+
+    Parameters
+    ----------
+    sheet : str or int
+        Excel sheet to read (name or index); ignored for CSV.
+    """
     name = str(file.name).lower()
-    if name.endswith((".xlsx", ".xls")):
-        return pd.read_excel(file)
+    if is_excel(name):
+        return pd.read_excel(file, sheet_name=sheet)
     if name.endswith(".csv"):
         return pd.read_csv(file)
     raise ValueError(f"Unsupported file type: {file.name} (use .csv, .xlsx or .xls)")
+
+
+# Canonical temperature / velocity columns converted when the user
+# declares the file is in IP units.
+_IP_TEMP_COLS = (
+    "air_temp_c",
+    "radiant_temp_c",
+    "outdoor_temp_c",
+    "prevailing_mean_outdoor_c",
+    "running_mean_outdoor_c",
+)
+_IP_VEL_COLS = ("air_velocity_ms",)
+
+
+def convert_ip_to_si(df: pd.DataFrame, mapping: dict[str, str]) -> pd.DataFrame:
+    """Convert mapped IP-unit columns (°F, fpm) to SI (°C, m/s) in a copy."""
+    out = df.copy()
+    for canonical in _IP_TEMP_COLS:
+        col = mapping.get(canonical)
+        if col is not None and col in out.columns:
+            out[col] = (pd.to_numeric(out[col], errors="coerce") - 32.0) * 5.0 / 9.0
+    for canonical in _IP_VEL_COLS:
+        col = mapping.get(canonical)
+        if col is not None and col in out.columns:
+            out[col] = pd.to_numeric(out[col], errors="coerce") * 0.00508
+    return out
 
 
 def load_preloaded() -> pd.DataFrame | None:

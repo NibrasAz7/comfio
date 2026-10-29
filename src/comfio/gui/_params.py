@@ -49,6 +49,12 @@ def render_sidebar(df_columns: set[str]) -> dict[str, Any]:
             value=True,
             help="Standard assumption when no MRT channel exists.",
         )
+        ip_units = st.checkbox(
+            "Input data is in IP units (°F, fpm)",
+            value=bool(_state.get(_state.IP_UNITS, False)),
+            help="Temperature and air-speed columns are converted to SI.",
+        )
+        _state.set(_state.IP_UNITS, ip_units)
 
     st.sidebar.header("Standards")
     category = st.sidebar.selectbox(

@@ -54,6 +54,10 @@ def _prepare(
     mapping = dict(mapping)
     notes: list[str] = []
 
+    if _state.get(_state.IP_UNITS, False):
+        df = _data.convert_ip_to_si(df, mapping)
+        notes.append("Input declared in IP units — converted °F→°C and fpm→m/s.")
+
     if "radiant_temp_c" not in mapping and "air_temp_c" in mapping:
         if config.get("_mrt_equals_tdb", True):
             syn = "__comfio_radiant_temp_c"
@@ -121,8 +125,23 @@ def act_ingest() -> None:
         )
 
     if uploaded is not None:
+        sheet: str | int = 0
+        if _data.is_excel(uploaded.name):
+            try:
+                sheets = _data.excel_sheet_names(uploaded)
+            except Exception as exc:  # noqa: BLE001
+                st.error(f"Could not open {uploaded.name}: {exc}")
+                return
+            if len(sheets) > 1:
+                sel = st.selectbox(
+                    "Workbook has multiple sheets — pick one",
+                    sheets,
+                    key="excel_sheet",
+                )
+                sheet = sel if sel is not None else sheets[0]
         try:
-            _state.set_df(_data.read_uploaded(uploaded))
+            uploaded.seek(0)
+            _state.set_df(_data.read_uploaded(uploaded, sheet=sheet))
         except Exception as exc:  # noqa: BLE001
             st.error(f"Could not read {uploaded.name}: {exc}")
 
@@ -179,6 +198,10 @@ def act_mapping(df: pd.DataFrame) -> None:
     unm = _mapping.unmapped_columns(df, mapping)
     if unm:
         st.caption(f"Unmapped columns (ignored): {', '.join(unm)}")
+
+    if st.button("Upload a different file"):
+        _state.reset()
+        st.rerun()
 
     if submitted:
         if not any(coverage.values()):
@@ -276,6 +299,63 @@ def act_verdict(
             st.write("•", w)
         st.json(result.config)
 
+    with st.expander("Pin this run as a scenario"):
+        n_pin = len(_state.get_scenarios()) + 1
+        pin_name = st.text_input("Scenario name", value=f"Scenario {n_pin}")
+        if st.button("Pin scenario"):
+            comp = getattr(result, "compliance_report", None)
+            _state.pin_scenario(
+                {
+                    "name": pin_name or f"Scenario {n_pin}",
+                    "ieq_mean": float(np.nanmean(ieq.index)),
+                    "domain_means": {
+                        d: float(np.nanmean(s))
+                        for d, s in ieq.domain_scores.items()
+                    },
+                    "compliance_rate_pct": (
+                        comp.compliance_rate_pct if comp is not None else None
+                    ),
+                    "config": dict(result.config),
+                }
+            )
+            st.rerun()
+
+
+# --------------------------------------------------------------------------- #
+# Act 2.5 — SCENARIOS
+# --------------------------------------------------------------------------- #
+def act_scenarios() -> None:
+    scenarios = _state.get_scenarios()
+    if not scenarios:
+        return
+    st.subheader("Scenario comparison")
+    if len(scenarios) == 1:
+        st.caption(
+            f"'{scenarios[0]['name']}' pinned — run another file or "
+            "configuration and pin it to compare."
+        )
+        return
+
+    domains = sorted({d for s in scenarios for d in s["domain_means"]})
+    rows = [
+        {
+            "scenario": s["name"],
+            "IEQ mean": round(s["ieq_mean"], 1),
+            **{d: round(s["domain_means"].get(d, np.nan), 1) for d in domains},
+            "compliance %": (
+                round(s["compliance_rate_pct"], 1)
+                if s.get("compliance_rate_pct") is not None
+                else None
+            ),
+        }
+        for s in scenarios
+    ]
+    st.dataframe(pd.DataFrame(rows).set_index("scenario"), width="stretch")
+    st.plotly_chart(_charts.scenario_bars(scenarios), width="stretch")
+    if st.button("Clear scenarios"):
+        _state.clear_scenarios()
+        st.rerun()
+
 
 # --------------------------------------------------------------------------- #
 # Act 3 — EVIDENCE
@@ -354,6 +434,7 @@ def main() -> None:
         st.rerun()
 
     act_verdict(sensor, result, prepared, notes)
+    act_scenarios()
     st.divider()
     act_evidence(result, config)
 

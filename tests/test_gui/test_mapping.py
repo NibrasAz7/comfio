@@ -3,8 +3,15 @@
 from __future__ import annotations
 
 import pandas as pd
+import pytest
 
-from comfio.gui._data import demo_data, read_uploaded, template_csv
+from comfio.gui._data import (
+    convert_ip_to_si,
+    demo_data,
+    excel_sheet_names,
+    read_uploaded,
+    template_csv,
+)
 from comfio.gui._mapping import (
     auto_map_columns,
     domain_coverage,
@@ -105,10 +112,34 @@ class TestDataHelpers:
     def test_read_uploaded_rejects_other_types(self) -> None:
         import io
 
-        import pytest
-
         class FakeUpload(io.BytesIO):
             name = "data.txt"
 
         with pytest.raises(ValueError, match="Unsupported file type"):
             read_uploaded(FakeUpload(b"x"))
+
+    def test_excel_sheet_picker(self) -> None:
+        import io
+
+        pytest.importorskip("openpyxl")
+
+        buf = io.BytesIO()
+        with pd.ExcelWriter(buf, engine="openpyxl") as w:
+            pd.DataFrame({"a": [1]}).to_excel(w, sheet_name="Zone1", index=False)
+            pd.DataFrame({"b": [2]}).to_excel(w, sheet_name="Zone2", index=False)
+        buf.name = "bms.xlsx"
+        buf.seek(0)
+
+        assert excel_sheet_names(buf) == ["Zone1", "Zone2"]
+        buf.seek(0)
+        df = read_uploaded(buf, sheet="Zone2")
+        assert list(df.columns) == ["b"]
+
+    def test_convert_ip_to_si(self) -> None:
+        df = pd.DataFrame({"t_f": [68.0], "v_fpm": [19.685], "rh": [50.0]})
+        m = {"air_temp_c": "t_f", "air_velocity_ms": "v_fpm"}
+        out = convert_ip_to_si(df, m)
+        assert out["t_f"].iloc[0] == pytest.approx(20.0, abs=0.01)
+        assert out["v_fpm"].iloc[0] == pytest.approx(0.1, abs=0.001)
+        assert out["rh"].iloc[0] == 50.0  # untouched
+        assert df["t_f"].iloc[0] == 68.0  # original not mutated

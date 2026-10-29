@@ -78,3 +78,35 @@ def test_back_button_returns_to_mapping(at: AppTest) -> None:
     at.run()
     assert not at.exception
     assert any("Column mapping" in s.value for s in at.subheader)
+
+
+def _reach_verdict(at: AppTest) -> None:
+    _load_demo(at)
+    for b in at.button:
+        if "Run analysis" in (b.label or ""):
+            b.click().run()
+            break
+    at.run()
+
+
+def _pin_scenario(at: AppTest) -> None:
+    for b in at.button:
+        if "Pin scenario" in (b.label or ""):
+            b.click().run()
+            return
+    raise AssertionError("Pin scenario button not found")
+
+
+def test_scenario_pin_and_compare(at: AppTest) -> None:
+    _reach_verdict(at)
+    _pin_scenario(at)
+    at.run()
+    # one pinned -> hint text, no compare table yet
+    assert any("Scenario comparison" in s.value for s in at.subheader)
+    _pin_scenario(at)
+    at.run()
+    # two pinned -> grouped compare chart + table rendered
+    assert not at.exception
+    subs = [s.value for s in at.subheader]
+    assert "Scenario comparison" in subs
+    assert len(at.dataframe) >= 1
