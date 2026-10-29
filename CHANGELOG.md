@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **sPMVopt**: `evaluate_spmvopt()` and `SPMVOptResult` — the optimized simplified PMV model of Morresi et al. (2026) with GAM-derived dynamic clothing insulation estimation and climate-specific coefficients for France, Portugal, and Sweden
+- **comfio GUI** (`comfio[gui]`): Streamlit analyst workbench at `comfio.gui()` / `comfio.gui(df)` — upload CSV/Excel or demo data, inspect and correct the auto-detected column mapping, get a Global IEQ verdict with per-domain traffic lights and an exceedance heatmap, then export CSV/DOCX/PDF/contract-JSON/Markdown or a standalone Python script reproducing the run. Assumptions (e.g. MRT = air temperature, constant air speed, unavailable domains) are injected explicitly and displayed, never silent
 
 ### Changed
 
@@ -18,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `run_pipeline` caches validated columns per run, removing repeated `get_validated` calls on the same column
 - `evaluate_thermal` validates the ISO 7730 applicability domain: `met` outside [0.8, 4.0] and `clo` outside [0.0, 2.0] raise `OutOfRangeError`; out-of-domain `tdb`/`tr`/`vr` samples yield NaN with a single consolidated warning
 - `IEQFeatureExtractor.get_feature_names_out()` accepts the `input_features` argument required by sklearn pipelines
-- `gui()` / `gui_notebook()` raise an explicit "not yet released" `ImportError` instead of `ModuleNotFoundError`
+- `gui()` launches the Streamlit workbench when `comfio[gui]` is installed (otherwise a clear `ImportError`); `gui_notebook()` remains deferred
 
 ### Fixed
 

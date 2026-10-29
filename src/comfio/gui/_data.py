@@ -1,0 +1,116 @@
+"""Data loading helpers for the comfio Streamlit app.
+
+Reads CSV/Excel uploads into DataFrames, provides packaged demo data,
+and generates downloadable CSV column templates.
+"""
+
+from __future__ import annotations
+
+import io
+import os
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import pandas as pd
+
+# Human-readable parameter descriptions for the column mapper and templates.
+COLUMN_DESCRIPTIONS: dict[str, str] = {
+    "air_temp_c": "Air temperature [°C]",
+    "radiant_temp_c": "Mean radiant temperature [°C]",
+    "relative_humidity_pct": "Relative humidity [%]",
+    "air_velocity_ms": "Air speed [m/s]",
+    "illuminance_lux": "Illuminance [lux]",
+    "co2_ppm": "CO₂ concentration [ppm]",
+    "noise_laeq_db": "Sound level LAeq [dB]",
+    "metabolic_rate_met": "Metabolic rate [met]",
+    "clothing_insulation_clo": "Clothing insulation [clo]",
+    "pm25_ugm3": "PM2.5 [µg/m³]",
+    "pm10_ugm3": "PM10 [µg/m³]",
+    "tvoc_ugm3": "TVOC [µg/m³]",
+    "formaldehyde_ppb": "Formaldehyde [ppb]",
+    "co_ppm": "Carbon monoxide [ppm]",
+    "outdoor_temp_c": "Outdoor air temperature [°C]",
+    "prevailing_mean_outdoor_c": "Prevailing mean outdoor temp [°C]",
+    "running_mean_outdoor_c": "Running mean outdoor temp [°C]",
+    "ugr": "Unified Glare Rating [-]",
+    "tsv": "Thermal sensation vote [-3..+3]",
+}
+
+
+def read_uploaded(file: Any) -> pd.DataFrame:
+    """Read an uploaded CSV/Excel file into a DataFrame."""
+    name = str(file.name).lower()
+    if name.endswith((".xlsx", ".xls")):
+        return pd.read_excel(file)
+    if name.endswith(".csv"):
+        return pd.read_csv(file)
+    raise ValueError(f"Unsupported file type: {file.name} (use .csv, .xlsx or .xls)")
+
+
+def load_preloaded() -> pd.DataFrame | None:
+    """Load a DataFrame passed via ``COMFIO_GUI_DATA`` env var (comfio.gui(df))."""
+    path = os.environ.get("COMFIO_GUI_DATA")
+    if path and Path(path).exists():
+        return pd.read_pickle(path)
+    return None
+
+
+def demo_data(n: int = 168, seed: int = 7) -> pd.DataFrame:
+    """Generate a realistic demo dataset (1 week of hourly data).
+
+    Deterministic so the app behaves identically for every user.
+    """
+    rng = np.random.default_rng(seed)
+    t = np.arange(n)
+    hours = pd.date_range("2026-03-01", periods=n, freq="h")
+    diurnal = 3.0 * np.sin(2 * np.pi * t / 24 - 1.2)
+    occupied = ((hours.hour >= 8) & (hours.hour <= 18)).astype(float)
+
+    return pd.DataFrame(
+        {
+            "timestamp": hours,
+            "air_temp_c": 21.5 + diurnal + rng.normal(0, 0.4, n),
+            "radiant_temp_c": 21.8 + diurnal + rng.normal(0, 0.4, n),
+            "relative_humidity_pct": np.clip(48 - 3 * diurnal + rng.normal(0, 3, n), 20, 90),
+            "air_velocity_ms": np.clip(0.08 + rng.normal(0, 0.03, n), 0.01, None),
+            "co2_ppm": np.clip(450 + 500 * occupied + rng.normal(0, 60, n), 400, None),
+            "illuminance_lux": np.clip(450 * occupied + 30 + rng.normal(0, 40, n), 0, None),
+            "noise_laeq_db": np.clip(36 + 8 * occupied + rng.normal(0, 3, n), 20, None),
+            "pm25_ugm3": np.clip(8 + rng.normal(0, 3, n), 0, None),
+            "outdoor_temp_c": 10 + 6 * np.sin(2 * np.pi * t / 168) + diurnal * 0.5,
+            "metabolic_rate_met": 1.2,
+            "clothing_insulation_clo": 0.8,
+        }
+    )
+
+
+def template_csv(units: str = "si") -> str:
+    """Return a downloadable column-template CSV as a string.
+
+    Parameters
+    ----------
+    units : {"si", "ip"}
+        Header unit labels; data values are illustrative only.
+    """
+    if units == "ip":
+        header = (
+            "timestamp,Air temperature [F],MRT [F],Air speed [fpm],"
+            "Relative humidity [%],CO2 [ppm],Illuminance [lux],"
+            "Sound level LAeq [dB],Outdoor temperature [F]\n"
+        )
+        row = "2026-01-01 09:00,72,72,20,45,700,500,38,50\n"
+    else:
+        header = (
+            "timestamp,air_temp_c,radiant_temp_c,air_velocity_ms,"
+            "relative_humidity_pct,co2_ppm,illuminance_lux,"
+            "noise_laeq_db,outdoor_temp_c\n"
+        )
+        row = "2026-01-01 09:00,22,22,0.10,45,700,500,38,10\n"
+    return header + row
+
+
+def df_to_csv_bytes(df: pd.DataFrame) -> bytes:
+    buf = io.StringIO()
+    df.to_csv(buf, index=False)
+    return buf.getvalue().encode("utf-8")

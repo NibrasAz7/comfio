@@ -1,0 +1,80 @@
+"""Streamlit AppTest smoke tests for the comfio workbench.
+
+Covers the three-act flow: ingest (demo data) → column mapping →
+verdict + evidence. Requires ``comfio[gui]`` extras.
+"""
+
+from __future__ import annotations
+
+import pytest
+
+st = pytest.importorskip("streamlit")
+from streamlit.testing.v1 import AppTest  # noqa: E402
+
+APP = "src/comfio/gui/app.py"
+
+
+@pytest.fixture()
+def at() -> AppTest:
+    return AppTest.from_file(APP, default_timeout=60)
+
+
+def _load_demo(at: AppTest) -> None:
+    """Click 'Load demo data' and settle into the mapping screen."""
+    at.run()
+    for b in at.button:
+        if "demo data" in (b.label or ""):
+            b.click().run()
+            break
+    at.run()
+
+
+def test_ingest_screen_shows_uploader(at: AppTest) -> None:
+    at.run()
+    assert not at.exception
+    assert any("demo data" in (b.label or "") for b in at.button)
+    assert len(at.file_uploader) == 1
+
+
+def test_mapping_screen_after_demo(at: AppTest) -> None:
+    _load_demo(at)
+    assert not at.exception
+    assert any("Column mapping" in s.value for s in at.subheader)
+    # capability banner must list all four domains for demo data
+    banner = " ".join(i.value for i in at.info)
+    for domain in ("Thermal", "Visual", "Acoustic"):
+        assert domain in banner
+    # timestamp + canonical selectboxes are rendered
+    assert len(at.selectbox) > 10
+
+
+def test_full_flow_to_verdict(at: AppTest) -> None:
+    _load_demo(at)
+    for b in at.button:
+        if "Run analysis" in (b.label or ''):
+            b.click().run()
+            break
+    at.run()
+    assert not at.exception
+    subs = [s.value for s in at.subheader]
+    assert "2 · Verdict" in subs
+    assert "3 · Evidence" in subs
+    labels = [m.label for m in at.metric]
+    assert "Compliance rate" in labels
+    assert "Mean PMV" in labels
+
+
+def test_back_button_returns_to_mapping(at: AppTest) -> None:
+    _load_demo(at)
+    for b in at.button:
+        if "Run analysis" in (b.label or ""):
+            b.click().run()
+            break
+    at.run()
+    for b in at.button:
+        if "Back" in (b.label or ""):
+            b.click().run()
+            break
+    at.run()
+    assert not at.exception
+    assert any("Column mapping" in s.value for s in at.subheader)
