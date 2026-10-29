@@ -18,7 +18,15 @@ import pandas as pd
 import streamlit as st
 
 from comfio.core.data_handler import SensorData
-from comfio.gui import _charts, _data, _exports, _mapping, _params, _state
+from comfio.gui import (
+    _certify,
+    _charts,
+    _data,
+    _exports,
+    _mapping,
+    _params,
+    _state,
+)
 from comfio.performance.contracts import calculate_compliance
 from comfio.reports.pipeline import detect_capabilities, run_pipeline
 
@@ -160,7 +168,15 @@ def act_mapping(df: pd.DataFrame) -> None:
     ]
     options = ["— not available —"] + list(df.columns)
 
-    ts_idx = options.index(timestamp_col) if timestamp_col in options else 0
+    auto_ts = timestamp_col or next(
+        (
+            c
+            for c in df.columns
+            if _mapping.normalize(c) in {"timestamp", "time", "date", "datetime"}
+        ),
+        None,
+    )
+    ts_idx = options.index(auto_ts) if auto_ts in options else 0
     timestamp_sel = st.selectbox(
         "Timestamp (optional, enables 'when did it fail' analysis)",
         options,
@@ -421,11 +437,45 @@ def act_scenarios() -> None:
 # --------------------------------------------------------------------------- #
 # Act 3 — EVIDENCE
 # --------------------------------------------------------------------------- #
-def act_evidence(result: Any, config: dict) -> None:
+def act_evidence(result: Any, config: dict, sensor: SensorData) -> None:
     st.subheader("3 · Evidence")
     ieq = result.ieq_result
     if ieq is None:
         return
+
+    preset = st.selectbox(
+        "Certification preset",
+        ["None", "WELL v2 T06 (thermal monitoring)", "RESET Air (basic targets)"],
+        help="Runs a per-criterion check against the published requirements.",
+    )
+    if preset != "None":
+        check = (
+            _certify.well_t06(result.domain_results.get("thermal"))
+            if preset.startswith("WELL")
+            else _certify.reset_air(
+                sensor.df, sensor.column_map, sensor.timestamp_col
+            )
+        )
+        crit = check.get("criteria", [])
+        if crit:
+            st.dataframe(
+                pd.DataFrame(crit).set_index("criterion"), width="stretch"
+            )
+            passed = check.get("criteria_passed", 0)
+            total = check.get("criteria_total", len(crit))
+            label = "meets" if passed == total else "does not meet"
+            st.metric(
+                check["preset"],
+                f"{passed}/{total} criteria — {label} (sample level)",
+            )
+            if check.get("duration_days") is not None:
+                st.caption(
+                    f"Monitoring span: {check['duration_days']:.0f} days."
+                )
+            if check.get("missing"):
+                st.caption("Missing inputs: " + ", ".join(check["missing"]))
+        for caveat in check.get("caveats", []):
+            st.caption("⚠ " + caveat)
 
     threshold, zone_id = _params.render_evidence_params()
     report = calculate_compliance(
@@ -522,7 +572,7 @@ def main() -> None:
     act_verdict(sensor, result, prepared, notes)
     act_scenarios()
     st.divider()
-    act_evidence(result, config)
+    act_evidence(result, config, sensor)
 
 
 main()

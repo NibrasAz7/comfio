@@ -72,6 +72,24 @@ def test_tsv_calibration_view_in_demo(at: AppTest) -> None:
     assert "Slope (α)" in metric_labels and "R²" in metric_labels
 
 
+def test_certification_preset_reset_air(at: AppTest) -> None:
+    _reach_verdict(at)
+    sels = [s for s in at.selectbox if "certification" in (s.label or "").lower()]
+    assert sels
+    sels[0].select("RESET Air (basic targets)").run()
+    assert not at.exception
+    captions = " ".join(c.value for c in at.caption)
+    assert "TVOC" in captions  # demo data lacks TVOC -> reported missing
+
+
+def test_certification_preset_well(at: AppTest) -> None:
+    _reach_verdict(at)
+    sels = [s for s in at.selectbox if "certification" in (s.label or "").lower()]
+    sels[0].select("WELL v2 T06 (thermal monitoring)").run()
+    assert not at.exception
+    assert any("PMV" in str(c.value) for c in at.dataframe) or at.dataframe
+
+
 def test_back_button_returns_to_mapping(at: AppTest) -> None:
     _load_demo(at)
     for b in at.button:
