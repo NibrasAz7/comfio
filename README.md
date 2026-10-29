@@ -36,6 +36,13 @@ pip install comfio[keras]     # TensorFlow/Keras
 pip install comfio[all]       # All frameworks + advanced domains
 ```
 
+GUI (Streamlit workbench + notebook widget):
+
+```bash
+pip install comfio[gui]           # streamlit, plotly, openpyxl, ipywidgets, pywebview
+pip install comfio[gui-reports]   # + reportlab (PDF) and python-docx (DOCX) exports
+```
+
 Advanced physics-based domain evaluation (optional extras):
 
 ```bash
@@ -44,6 +51,36 @@ pip install comfio[color]            # colour-science (CRI, CCT)
 pip install comfio[acoustics]        # python-acoustics + pyroomacoustics (RT60, STI)
 pip install comfio[psychrometrics]   # PsychroLib (psychrometric properties, CO₂ decay ACH)
 ```
+
+## GUI — analyst workbench
+
+```python
+import comfio
+comfio.gui()              # browser app on localhost:8501
+comfio.gui(df)            # preloaded DataFrame
+comfio.gui(desktop=True)  # native pywebview window instead of browser
+```
+
+The three-act flow: **upload** CSV/Excel (multi-sheet supported, SI or IP
+units) → **inspect and correct** the auto-detected column mapping →
+**verdict** (Global IEQ gauge, per-domain traffic lights, comfort scatter,
+hour-of-day exceedance heatmap, occupant-vote calibration) → **evidence**
+(compliance rates, WELL v2 T06 / RESET Air presets, CSV/DOCX/PDF/JSON/
+Markdown/Python-script exports). Assumptions such as `MRT = air temp` or
+constant air speed are always shown, never applied silently.
+
+In Jupyter:
+
+```python
+w = comfio.gui_notebook(df)  # ipywidgets mini-workbench
+w
+```
+
+### Deploy the workbench (Streamlit Community Cloud)
+
+The repo ships `streamlit_app.py` + `requirements.txt` — point a Streamlit
+Cloud app at `streamlit_app.py` and it deploys directly. For self-hosting:
+`streamlit run streamlit_app.py` behind any reverse proxy.
 
 ## Try on Google Colab
 

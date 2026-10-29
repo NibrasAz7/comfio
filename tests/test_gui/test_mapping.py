@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -10,6 +11,7 @@ from comfio.gui._data import (
     convert_ip_to_si,
     demo_data,
     excel_sheet_names,
+    prepare,
     read_uploaded,
     template_csv,
 )
@@ -135,6 +137,27 @@ class TestDataHelpers:
         buf.seek(0)
         df = read_uploaded(buf, sheet="Zone2")
         assert list(df.columns) == ["b"]
+
+    def test_prepare_injects_assumptions(self) -> None:
+        df = pd.DataFrame(
+            {"t": [20.0, np.nan, 22.0], "rh": [50.0, 45.0, 55.0]}
+        )
+        m = {"air_temp_c": "t", "relative_humidity_pct": "rh"}
+        cfg = {"vr": 0.15, "_mrt_equals_tdb": True}
+        prep, m2, notes = prepare(df, m, cfg)
+        assert m2["radiant_temp_c"] == "__comfio_radiant_temp_c"
+        assert m2["air_velocity_ms"] == "__comfio_air_velocity_ms"
+        assert prep["__comfio_radiant_temp_c"].iloc[0] == 20.0
+        assert prep["__comfio_air_velocity_ms"].iloc[1] == 0.15
+        assert not prep["t"].isna().any()  # interpolated
+        assert any("Radiant temperature" in n for n in notes)
+        assert any("constant 0.15 m/s" in n for n in notes)
+
+    def test_prepare_drop_strategy(self) -> None:
+        df = pd.DataFrame({"t": [20.0, np.nan, 22.0], "rh": [50.0, 45.0, 55.0]})
+        m = {"air_temp_c": "t", "relative_humidity_pct": "rh"}
+        prep, _, _ = prepare(df, m, {"_mrt_equals_tdb": True}, nan_strategy="drop")
+        assert len(prep) == 2
 
     def test_demo_has_sparse_votes(self) -> None:
         df = demo_data()

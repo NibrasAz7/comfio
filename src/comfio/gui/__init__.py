@@ -96,15 +96,24 @@ def gui(df: Any = None, port: int = 8501, *, desktop: bool = False) -> None:
 
 
 def gui_notebook(df: Any = None) -> Any:
-    """Create an interactive comfio widget for Jupyter notebooks.
+    """Create the comfio ipywidgets workbench for Jupyter notebooks.
 
-    The notebook widget is under development and will ship in a future
-    version. Use :func:`gui` for the Streamlit app.
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Sensor data to analyse. Returns an ``ipywidgets.VBox`` —
+        display it as the last expression of a notebook cell.
     """
-    raise ImportError(
-        "comfio.gui_notebook() is not yet released. "
-        "Use comfio.gui() for the Streamlit app."
-    )
+    try:
+        import ipywidgets  # noqa: F401
+    except ModuleNotFoundError as exc:
+        raise ImportError(_GUI_IMPORT_ERROR) from exc
+    if df is None:
+        raise ValueError("gui_notebook(df) requires a pandas DataFrame.")
+
+    from comfio.gui.notebook import gui_notebook as _gui_notebook
+
+    return _gui_notebook(df)
 
 
 __all__ = ["gui", "gui_notebook"]

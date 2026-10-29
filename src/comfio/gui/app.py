@@ -26,6 +26,7 @@ from comfio.gui import (
     _mapping,
     _params,
     _state,
+    _styles,
 )
 from comfio.performance.contracts import calculate_compliance
 from comfio.reports.pipeline import detect_capabilities, run_pipeline
@@ -35,6 +36,7 @@ st.set_page_config(
     page_icon="🌡️",
     layout="wide",
 )
+_styles.inject()
 
 
 # --------------------------------------------------------------------------- #
@@ -56,45 +58,11 @@ def _prepare(
     df: pd.DataFrame,
     mapping: dict[str, str],
     config: dict,
+    nan_strategy: str = "interpolate",
+    ip_units: bool = False,
 ) -> tuple[pd.DataFrame, dict[str, str], list[str]]:
-    """Inject assumption columns + apply NaN strategy. Returns notes."""
-    df = df.copy()
-    mapping = dict(mapping)
-    notes: list[str] = []
-
-    if _state.get(_state.IP_UNITS, False):
-        df = _data.convert_ip_to_si(df, mapping)
-        notes.append("Input declared in IP units — converted °F→°C and fpm→m/s.")
-
-    if "radiant_temp_c" not in mapping and "air_temp_c" in mapping:
-        if config.get("_mrt_equals_tdb", True):
-            syn = "__comfio_radiant_temp_c"
-            df[syn] = df[mapping["air_temp_c"]]
-            mapping["radiant_temp_c"] = syn
-            notes.append("Radiant temperature assumed equal to air temperature.")
-        else:
-            notes.append("No radiant temperature — thermal PMV unavailable.")
-
-    if "air_velocity_ms" not in mapping:
-        syn = "__comfio_air_velocity_ms"
-        df[syn] = float(config.get("vr", 0.1))
-        mapping["air_velocity_ms"] = syn
-        notes.append(f"Air speed set to constant {config.get('vr', 0.1)} m/s.")
-
-    if "outdoor_temp_c" not in mapping and "prevailing_mean_outdoor_c" not in mapping:
-        notes.append("No outdoor temperature — adaptive thermal model skipped.")
-
-    # NaN strategy on the mapped sensor columns
-    strategy = _state.get(_state.NAN_STRATEGY, "interpolate")
-    mapped_cols = [c for c in mapping.values() if c in df.columns]
-    num = df[mapped_cols].apply(pd.to_numeric, errors="coerce")
-    if strategy == "drop":
-        df = df.loc[num.dropna().index].reset_index(drop=True)
-    elif strategy == "fill_zero":
-        df[mapped_cols] = num.fillna(0.0)
-    else:  # interpolate
-        df[mapped_cols] = num.interpolate().ffill().bfill()
-    return df, mapping, notes
+    """Thin wrapper around :func:`_data.prepare` (kept for test imports)."""
+    return _data.prepare(df, mapping, config, nan_strategy, ip_units)
 
 
 # --------------------------------------------------------------------------- #
@@ -571,7 +539,11 @@ def main() -> None:
         return
 
     prepared, mapping, notes = _prepare(
-        df, _state.get_column_map() or {}, config
+        df,
+        _state.get_column_map() or {},
+        config,
+        nan_strategy=_state.get(_state.NAN_STRATEGY, "interpolate"),
+        ip_units=bool(_state.get(_state.IP_UNITS, False)),
     )
     ts_col = _state.get_timestamp_col()
     sensor, result = _run(prepared, mapping, ts_col, config)

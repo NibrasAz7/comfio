@@ -126,21 +126,19 @@ def gui(df: object = None, port: int = 8501, *, desktop: bool = False) -> None:
         from comfio.gui import gui as _gui
     except ModuleNotFoundError as exc:
         raise ImportError(
-            "The comfio GUI is not yet released. It is under development "
-            "and will ship in a future version."
+            "The comfio.gui subpackage is unavailable in this installation."
         ) from exc
 
     _gui(df=df, port=port, desktop=desktop)
 
 
 def gui_notebook(df: object = None) -> object:
-    """Create an ipywidgets widget for Jupyter. Requires ``pip install comfio[gui]``."""
+    """Create the ipywidgets workbench for Jupyter. Requires ``pip install comfio[gui]``."""
     try:
         from comfio.gui import gui_notebook as _gui_notebook
     except ModuleNotFoundError as exc:
         raise ImportError(
-            "The comfio GUI is not yet released. It is under development "
-            "and will ship in a future version."
+            "The comfio.gui subpackage is unavailable in this installation."
         ) from exc
 
     return _gui_notebook(df=df)

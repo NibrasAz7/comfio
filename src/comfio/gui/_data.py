@@ -169,6 +169,55 @@ def df_to_csv_bytes(df: pd.DataFrame) -> bytes:
     return buf.getvalue().encode("utf-8")
 
 
+def prepare(
+    df: pd.DataFrame,
+    mapping: dict[str, str],
+    config: dict,
+    nan_strategy: str = "interpolate",
+    ip_units: bool = False,
+) -> tuple[pd.DataFrame, dict[str, str], list[str]]:
+    """Inject assumption columns + apply NaN strategy before SensorData.
+
+    Returns ``(df, mapping, notes)`` where ``notes`` lists every
+    assumption injected — the UI must display these, never hide them.
+    """
+    df = df.copy()
+    mapping = dict(mapping)
+    notes: list[str] = []
+
+    if ip_units:
+        df = convert_ip_to_si(df, mapping)
+        notes.append("Input declared in IP units — converted °F→°C and fpm→m/s.")
+
+    if "radiant_temp_c" not in mapping and "air_temp_c" in mapping:
+        if config.get("_mrt_equals_tdb", True):
+            syn = "__comfio_radiant_temp_c"
+            df[syn] = df[mapping["air_temp_c"]]
+            mapping["radiant_temp_c"] = syn
+            notes.append("Radiant temperature assumed equal to air temperature.")
+        else:
+            notes.append("No radiant temperature — thermal PMV unavailable.")
+
+    if "air_velocity_ms" not in mapping:
+        syn = "__comfio_air_velocity_ms"
+        df[syn] = float(config.get("vr", 0.1))
+        mapping["air_velocity_ms"] = syn
+        notes.append(f"Air speed set to constant {config.get('vr', 0.1)} m/s.")
+
+    if "outdoor_temp_c" not in mapping and "prevailing_mean_outdoor_c" not in mapping:
+        notes.append("No outdoor temperature — adaptive thermal model skipped.")
+
+    mapped_cols = [c for c in mapping.values() if c in df.columns]
+    num = df[mapped_cols].apply(pd.to_numeric, errors="coerce")
+    if nan_strategy == "drop":
+        df = df.loc[num.dropna().index].reset_index(drop=True)
+    elif nan_strategy == "fill_zero":
+        df[mapped_cols] = num.fillna(0.0)
+    else:  # interpolate
+        df[mapped_cols] = num.interpolate().ffill().bfill()
+    return df, mapping, notes
+
+
 def attach_outdoor_temperature(
     df: pd.DataFrame, ts_col: str, lat: float, lon: float
 ) -> pd.DataFrame:

@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **sPMVopt**: `evaluate_spmvopt()` and `SPMVOptResult` — the optimized simplified PMV model of Morresi et al. (2026) with GAM-derived dynamic clothing insulation estimation and climate-specific coefficients for France, Portugal, and Sweden
-- **comfio GUI** (`comfio[gui]`): Streamlit analyst workbench at `comfio.gui()` / `comfio.gui(df)` — upload CSV/Excel or demo data, inspect and correct the auto-detected column mapping, get a Global IEQ verdict with per-domain traffic lights and an exceedance heatmap, then export CSV/DOCX/PDF/contract-JSON/Markdown or a standalone Python script reproducing the run. Assumptions (e.g. MRT = air temperature, constant air speed, unavailable domains) are injected explicitly and displayed, never silent
+- **comfio GUI** (`comfio[gui]`): Streamlit analyst workbench at `comfio.gui()` / `comfio.gui(df)` / `comfio.gui(desktop=True)` (native pywebview window) — upload CSV/Excel (multi-sheet, SI or IP units) or demo data, inspect and correct the auto-detected column mapping, optionally fetch meteostat outdoor temperature, get a Global IEQ verdict with per-domain traffic lights, comfort scatter, hour-of-day exceedance heatmap and occupant-vote calibration (PMV→TSV), pin runs for side-by-side scenario comparison (JSON save/restore), then export CSV/DOCX/PDF/contract-JSON/Markdown or a standalone Python script reproducing the run. WELL v2 T06 and RESET Air certification presets report per-criterion pass rates with explicit caveats. Assumptions (e.g. MRT = air temperature, constant air speed, unavailable domains) are injected explicitly and displayed, never silent. `comfio.gui_notebook(df)` provides an ipywidgets mini-workbench for Jupyter. `streamlit_app.py` + `requirements.txt` enable direct Streamlit Cloud deployment
 
 ### Changed
 
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `run_pipeline` caches validated columns per run, removing repeated `get_validated` calls on the same column
 - `evaluate_thermal` validates the ISO 7730 applicability domain: `met` outside [0.8, 4.0] and `clo` outside [0.0, 2.0] raise `OutOfRangeError`; out-of-domain `tdb`/`tr`/`vr` samples yield NaN with a single consolidated warning
 - `IEQFeatureExtractor.get_feature_names_out()` accepts the `input_features` argument required by sklearn pipelines
-- `gui()` launches the Streamlit workbench when `comfio[gui]` is installed (otherwise a clear `ImportError`); `gui_notebook()` remains deferred
+- `gui()` launches the Streamlit workbench when `comfio[gui]` is installed (otherwise a clear `ImportError`); `gui_notebook(df)` returns an ipywidgets workbench
 
 ### Fixed
 
