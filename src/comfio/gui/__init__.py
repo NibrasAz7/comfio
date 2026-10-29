@@ -24,8 +24,8 @@ _GUI_IMPORT_ERROR = (
 )
 
 
-def gui(df: Any = None, port: int = 8501) -> None:
-    """Launch the comfio Streamlit GUI in the default browser.
+def gui(df: Any = None, port: int = 8501, *, desktop: bool = False) -> None:
+    """Launch the comfio Streamlit GUI.
 
     Parameters
     ----------
@@ -34,6 +34,10 @@ def gui(df: Any = None, port: int = 8501) -> None:
         the analysis view with this data instead of the upload screen.
     port : int, default 8501
         Port for the local Streamlit server.
+    desktop : bool, default False
+        Open in a native ``pywebview`` window instead of the browser
+        (requires ``pywebview``, included in ``comfio[gui]``; falls back
+        to the browser when unavailable).
 
     Raises
     ------
@@ -68,11 +72,27 @@ def gui(df: Any = None, port: int = 8501) -> None:
         "true",
     ]
     proc = subprocess.Popen(cmd, env=env)  # noqa: S603
-    webbrowser.open(f"http://localhost:{port}")
+    url = f"http://localhost:{port}"
     try:
+        if desktop:
+            try:
+                import time
+
+                import webview
+            except ModuleNotFoundError:
+                webview = None  # fall back to the browser
+            if webview is not None:
+                time.sleep(1.5)  # give the server a moment to boot
+                webview.create_window("comfio", url, width=1440, height=900)
+                webview.start()
+                return
+        webbrowser.open(url)
         proc.wait()
     except KeyboardInterrupt:
         proc.terminate()
+    finally:
+        if proc.poll() is None:
+            proc.terminate()
 
 
 def gui_notebook(df: Any = None) -> Any:

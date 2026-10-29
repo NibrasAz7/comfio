@@ -429,7 +429,24 @@ def act_scenarios() -> None:
     ]
     st.dataframe(pd.DataFrame(rows).set_index("scenario"), width="stretch")
     st.plotly_chart(_charts.scenario_bars(scenarios), width="stretch")
-    if st.button("Clear scenarios"):
+
+    c1, c2, c3 = st.columns(3)
+    c1.download_button(
+        "Save scenarios (JSON)",
+        data=_state.scenarios_to_json(),
+        file_name="comfio_scenarios.json",
+        mime="application/json",
+    )
+    up = c2.file_uploader(
+        "Restore scenarios", type=["json"], key="scenario_restore"
+    )
+    if up is not None and _state.get("scenario_restore_loaded") != up.name:
+        if _state.scenarios_from_json(up.read().decode("utf-8")):
+            _state.set("scenario_restore_loaded", up.name)
+            st.rerun()
+        else:
+            st.error("Not a valid scenarios file.")
+    if c3.button("Clear scenarios"):
         _state.clear_scenarios()
         st.rerun()
 

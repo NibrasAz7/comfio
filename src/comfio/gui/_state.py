@@ -95,3 +95,29 @@ def pin_scenario(summary: dict[str, Any]) -> None:
 
 def clear_scenarios() -> None:
     st.session_state.pop(SCENARIOS, None)
+
+
+def scenarios_to_json() -> str:
+    """Serialize pinned scenarios for download/restore."""
+    import json
+
+    return json.dumps(get_scenarios(), indent=2)
+
+
+def scenarios_from_json(payload: str) -> bool:
+    """Load scenarios from a downloaded JSON payload. Returns success."""
+    import json
+
+    try:
+        data = json.loads(payload)
+    except json.JSONDecodeError:
+        return False
+    if not isinstance(data, list):
+        return False
+    valid = [
+        s
+        for s in data
+        if isinstance(s, dict) and "name" in s and "ieq_mean" in s
+    ]
+    set(SCENARIOS, valid[:4])
+    return bool(valid)

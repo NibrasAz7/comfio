@@ -136,3 +136,14 @@ def test_scenario_pin_and_compare(at: AppTest) -> None:
     subs = [s.value for s in at.subheader]
     assert "Scenario comparison" in subs
     assert len(at.dataframe) >= 1
+
+
+def test_scenario_save_restore_ui(at: AppTest) -> None:
+    _reach_verdict(at)
+    _pin_scenario(at)
+    _pin_scenario(at)
+    at.run()
+    downloads = [d.label for d in at.get("download_button")]
+    assert any("Save scenarios" in d for d in downloads)
+    uploads = [u.label for u in at.file_uploader]
+    assert any("Restore scenarios" in u for u in uploads)

@@ -117,8 +117,11 @@ from comfio.utils.validation import validate_input_array
 # GUI entry points — lazy import to avoid requiring streamlit/ipywidgets.
 # These override the comfio.gui submodule attribute so that
 # ``from comfio import gui`` returns the *function*, not the module.
-def gui(df: object = None, port: int = 8501) -> None:
-    """Launch the comfio Streamlit GUI. Requires ``pip install comfio[gui]``."""
+def gui(df: object = None, port: int = 8501, *, desktop: bool = False) -> None:
+    """Launch the comfio Streamlit GUI. Requires ``pip install comfio[gui]``.
+
+    ``desktop=True`` opens a native pywebview window instead of the browser.
+    """
     try:
         from comfio.gui import gui as _gui
     except ModuleNotFoundError as exc:
@@ -127,7 +130,7 @@ def gui(df: object = None, port: int = 8501) -> None:
             "and will ship in a future version."
         ) from exc
 
-    _gui(df=df, port=port)
+    _gui(df=df, port=port, desktop=desktop)
 
 
 def gui_notebook(df: object = None) -> object:
