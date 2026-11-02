@@ -7,6 +7,8 @@ Acoustic, and Indoor Air Quality (IAQ) metrics into a Global IEQ Index.
 
 __version__ = "0.1.6"
 
+from collections.abc import Sequence
+
 from comfio.core.data_handler import SensorData
 from comfio.core.exceptions import (
     InvalidUnitError,
@@ -117,10 +119,17 @@ from comfio.utils.validation import validate_input_array
 # GUI entry points — lazy import to avoid requiring streamlit/ipywidgets.
 # These override the comfio.gui submodule attribute so that
 # ``from comfio import gui`` returns the *function*, not the module.
-def gui(df: object = None, port: int = 8501, *, desktop: bool = False) -> None:
+def gui(
+    df: object = None,
+    port: int = 8501,
+    *,
+    desktop: bool = False,
+    tools: Sequence[str] | None = None,
+) -> None:
     """Launch the comfio Streamlit GUI. Requires ``pip install comfio[gui]``.
 
     ``desktop=True`` opens a native pywebview window instead of the browser.
+    ``tools`` lists the tool ids to enable; ``None`` enables every tool.
     """
     try:
         from comfio.gui import gui as _gui
@@ -129,7 +138,7 @@ def gui(df: object = None, port: int = 8501, *, desktop: bool = False) -> None:
             "The comfio.gui subpackage is unavailable in this installation."
         ) from exc
 
-    _gui(df=df, port=port, desktop=desktop)
+    _gui(df=df, port=port, desktop=desktop, tools=tools)
 
 
 def gui_notebook(df: object = None) -> object:

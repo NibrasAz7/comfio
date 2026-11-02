@@ -17,6 +17,9 @@ CONFIG = "config"  # run_pipeline config dict
 RESULT = "pipeline_result"  # PipelineResult after Act 2
 COMPLIANCE = "compliance_report"  # ComplianceReport after Act 3
 SCENARIOS = "scenarios"  # pinned run summaries for side-by-side compare
+TOOL_PAGES = "tool_pages"  # tool id -> st.Page built by the shell
+TOOL_MESSAGES = "tool_messages"  # load_tools messages (unknown ids, missing requires)
+CALC_INPUTS = "calc_inputs"  # prefilled Inputs for the comfort calculator
 
 
 def get(key: str, default: Any = None) -> Any:
@@ -95,6 +98,17 @@ def pin_scenario(summary: dict[str, Any]) -> None:
 
 def clear_scenarios() -> None:
     st.session_state.pop(SCENARIOS, None)
+
+
+def goto(tool_id: str) -> None:
+    """Navigate to another tool's page (``st.switch_page``)."""
+    pages = cast(dict[str, Any], get(TOOL_PAGES, {}))
+    st.switch_page(pages[tool_id])
+
+
+def tool_enabled(tool_id: str) -> bool:
+    """True when the shell registered a page for ``tool_id``."""
+    return tool_id in cast(dict[str, Any], get(TOOL_PAGES, {}))
 
 
 def scenarios_to_json() -> str:

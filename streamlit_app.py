@@ -10,4 +10,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-import comfio.gui.app  # noqa: E402,F401  (module runs the app on import)
+from comfio.gui.app import run  # noqa: E402
+
+run()  # must run on every script run — importing alone would cache-render nothing

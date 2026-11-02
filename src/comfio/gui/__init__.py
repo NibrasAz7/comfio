@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import webbrowser
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +25,13 @@ _GUI_IMPORT_ERROR = (
 )
 
 
-def gui(df: Any = None, port: int = 8501, *, desktop: bool = False) -> None:
+def gui(
+    df: Any = None,
+    port: int = 8501,
+    *,
+    desktop: bool = False,
+    tools: Sequence[str] | None = None,
+) -> None:
     """Launch the comfio Streamlit GUI.
 
     Parameters
@@ -38,6 +45,9 @@ def gui(df: Any = None, port: int = 8501, *, desktop: bool = False) -> None:
         Open in a native ``pywebview`` window instead of the browser
         (requires ``pywebview``, included in ``comfio[gui]``; falls back
         to the browser when unavailable).
+    tools : sequence of str, optional
+        Tool ids to enable (sets ``COMFIO_GUI_TOOLS`` for the app
+        subprocess). ``None`` enables every tool.
 
     Raises
     ------
@@ -52,6 +62,8 @@ def gui(df: Any = None, port: int = 8501, *, desktop: bool = False) -> None:
     app_path = Path(__file__).parent / "app.py"
 
     env = os.environ.copy()
+    if tools is not None:
+        env["COMFIO_GUI_TOOLS"] = ",".join(tools)
     tmp = None
     if df is not None:
         with tempfile.NamedTemporaryFile(  # must persist for the subprocess
