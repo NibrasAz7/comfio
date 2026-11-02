@@ -131,6 +131,48 @@ def timeseries(
     return fig
 
 
+def sweep_curve(rows: list[dict], x_label: str) -> go.Figure:
+    """What-if result: compliance rate + IEQ mean vs a swept parameter."""
+    x = [r["value"] for r in rows]
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=x,
+            y=[r["compliance_pct"] for r in rows],
+            mode="lines+markers",
+            name="Compliance rate %",
+            line={"color": "#2a9d8f", "width": 2},
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=x,
+            y=[r["ieq_mean"] for r in rows],
+            mode="lines+markers",
+            name="IEQ mean",
+            line={"color": "#264653", "width": 2, "dash": "dash"},
+        )
+    )
+    if any(not np.isnan(r.get("domain_mean", np.nan)) for r in rows):
+        fig.add_trace(
+            go.Scatter(
+                x=x,
+                y=[r["domain_mean"] for r in rows],
+                mode="lines+markers",
+                name="Thermal pass %",
+                line={"color": "#e76f51", "width": 2, "dash": "dot"},
+            )
+        )
+    fig.update_layout(
+        height=320,
+        xaxis_title=x_label,
+        yaxis_range=[0, 105],
+        yaxis_title="Score / rate (0–100)",
+        margin={"l": 50, "r": 20, "t": 30, "b": 50},
+    )
+    return fig
+
+
 def pmv_tsv_scatter(
     pmv: np.ndarray, tsv: np.ndarray, alpha: float, beta: float
 ) -> go.Figure:

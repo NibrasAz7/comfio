@@ -138,6 +138,15 @@ def test_scenario_pin_and_compare(at: AppTest) -> None:
     assert len(at.dataframe) >= 1
 
 
+def test_whatif_sweep(at: AppTest) -> None:
+    _reach_verdict(at)
+    for b in at.button:
+        if "Run sweep" in (b.label or ""):
+            b.click().run()
+            break
+    assert not at.exception
+
+
 def test_scenario_save_restore_ui(at: AppTest) -> None:
     _reach_verdict(at)
     _pin_scenario(at)

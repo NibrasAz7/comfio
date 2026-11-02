@@ -65,6 +65,66 @@ def _prepare(
     return _data.prepare(df, mapping, config, nan_strategy, ip_units)
 
 
+@st.cache_data(show_spinner="Running what-if sweep…")
+def _sweep(
+    df: pd.DataFrame,
+    mapping: dict[str, str],
+    ts_col: str | None,
+    config: dict,
+    param: str,
+    lo: float,
+    hi: float,
+    n: int,
+) -> list[dict]:
+    """Re-run the pipeline across a parameter range (what-if analysis)."""
+    rows: list[dict] = []
+    for v in np.linspace(lo, hi, n):
+        df2 = df.copy()
+        cfg = {k: x for k, x in config.items() if not k.startswith("_")}
+        if param == "vr":
+            cfg["vr"] = v
+            col = mapping.get("air_velocity_ms")
+            if col is not None:
+                df2[col] = v
+        elif param == "tdb_offset":
+            tcol = mapping.get("air_temp_c")
+            if tcol is not None:
+                df2[tcol] = df2[tcol] + v
+            rcol = mapping.get("radiant_temp_c")
+            if rcol == "__comfio_radiant_temp_c":
+                df2[rcol] = df2[rcol] + v
+        else:
+            cfg[param] = v
+        sensor = SensorData(
+            df=df2, column_map=dict(mapping), timestamp_col=ts_col
+        )
+        res = run_pipeline(sensor, cfg)
+        if res.ieq_result is None:
+            rows.append(
+                {"value": float(v), "ieq_mean": np.nan, "compliance_pct": np.nan,
+                 "domain_mean": np.nan}
+            )
+            continue
+        comp = res.compliance_report
+        thermal = res.domain_results.get("thermal")
+        rows.append(
+            {
+                "value": float(v),
+                "ieq_mean": float(np.nanmean(res.ieq_result.index)),
+                "compliance_pct": (
+                    comp.compliance_rate_pct if comp is not None else np.nan
+                ),
+                "domain_mean": (
+                    100.0 * float(np.nanmean(np.asarray(thermal.compliant, dtype=float)))
+                    if thermal is not None
+                    and getattr(thermal, "compliant", None) is not None
+                    else np.nan
+                ),
+            }
+        )
+    return rows
+
+
 # --------------------------------------------------------------------------- #
 # Act 1 — INGEST
 # --------------------------------------------------------------------------- #
@@ -234,7 +294,13 @@ def act_mapping(df: pd.DataFrame) -> None:
 # Act 2 — VERDICT
 # --------------------------------------------------------------------------- #
 def act_verdict(
-    sensor: SensorData, result: Any, df: pd.DataFrame, notes: list[str]
+    sensor: SensorData,
+    result: Any,
+    df: pd.DataFrame,
+    notes: list[str],
+    mapping: dict[str, str],
+    ts_col: str | None,
+    config: dict,
 ) -> None:
     st.subheader("2 · Verdict")
     ieq = result.ieq_result
@@ -342,6 +408,43 @@ def act_verdict(
                     st.caption(
                         "Sparse votes were augmented onto the full timeline "
                         "(CDF remapping) before fitting."
+                    )
+
+    # What-if sweep — the CBE 'ranges' equivalent, generalized to the pipeline.
+    with st.expander("What-if sweep — vary one parameter, rerun the analysis"):
+        param_specs = {
+            "Air speed [m/s]": ("vr", 0.0, 1.0),
+            "Air temp offset [°C]": ("tdb_offset", -4.0, 4.0),
+            "Metabolic rate [met]": ("met", 0.8, 4.0),
+            "Clothing [clo]": ("clo", 0.0, 2.0),
+        }
+        label = st.selectbox("Parameter", list(param_specs))
+        key, d_lo, d_hi = param_specs[label]
+        c1, c2, c3 = st.columns(3)
+        lo = c1.number_input("from", value=d_lo)
+        hi = c2.number_input("to", value=d_hi)
+        n_pts = c3.slider("points", 3, 21, 9)
+        if st.button("Run sweep"):
+            if lo >= hi:
+                st.error("'from' must be below 'to'.")
+            else:
+                rows = _sweep(df, mapping, ts_col, config, key, lo, hi, n_pts)
+                st.plotly_chart(_charts.sweep_curve(rows, label), width="stretch")
+                if "tsv" in result.domain_results:
+                    st.caption(
+                        "Occupant TSV votes override the thermal score in the "
+                        "Global IEQ — the thermal-score line shows the physics."
+                    )
+                if key == "tdb_offset":
+                    st.caption(
+                        "Offset shifts air temperature (and assumed radiant temp "
+                        "when MRT = air temp). A real measured MRT column is "
+                        "left unchanged."
+                    )
+                elif key == "vr":
+                    st.caption(
+                        "Air speed overrides the mapped column or the constant "
+                        "assumption — elevated airspeed can widen the comfort zone."
                     )
 
     with st.expander("Pin this run as a scenario"):
@@ -558,7 +661,7 @@ def main() -> None:
         _state.clear_mapping()
         st.rerun()
 
-    act_verdict(sensor, result, prepared, notes)
+    act_verdict(sensor, result, prepared, notes, mapping, ts_col, config)
     act_scenarios()
     st.divider()
     act_evidence(result, config, sensor)
