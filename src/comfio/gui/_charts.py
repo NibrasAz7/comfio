@@ -131,6 +131,71 @@ def timeseries(
     return fig
 
 
+def comfort_surface(
+    tdb_axis: np.ndarray,
+    rh_axis: np.ndarray,
+    pmv_grid: np.ndarray,
+    point: tuple[float, float] | None = None,
+) -> go.Figure:
+    """PMV surface over (temperature × humidity) at fixed v/met/clo.
+
+    The ±0.5 PMV contour is the ASHRAE-55 acceptable band boundary —
+    inside the dashed loop is 'comfortable' for the chosen occupants.
+    """
+    fig = go.Figure()
+    fig.add_trace(
+        go.Heatmap(
+            x=tdb_axis,
+            y=rh_axis,
+            z=pmv_grid,
+            colorscale="RdBu_r",
+            zmid=0,
+            zmin=-3,
+            zmax=3,
+            colorbar={"title": "PMV"},
+        )
+    )
+    fig.add_trace(
+        go.Contour(
+            x=tdb_axis,
+            y=rh_axis,
+            z=pmv_grid,
+            contours={
+                "start": -0.5,
+                "end": 0.5,
+                "size": 1.0,
+                "coloring": "none",
+            },
+            line={"color": "#1a7f4f", "width": 2, "dash": "dash"},
+            showscale=False,
+            name="PMV ±0.5",
+        )
+    )
+    if point is not None:
+        fig.add_trace(
+            go.Scatter(
+                x=[point[0]],
+                y=[point[1]],
+                mode="markers",
+                marker={
+                    "symbol": "star",
+                    "size": 16,
+                    "color": "#ffd700",
+                    "line": {"color": "#264653", "width": 1.5},
+                },
+                name="you",
+            )
+        )
+    fig.update_layout(
+        height=380,
+        xaxis_title="Air temperature [°C]",
+        yaxis_title="Relative humidity [%]",
+        margin={"l": 50, "r": 20, "t": 30, "b": 50},
+        showlegend=False,
+    )
+    return fig
+
+
 def sweep_curve(rows: list[dict], x_label: str) -> go.Figure:
     """What-if result: compliance rate + IEQ mean vs a swept parameter."""
     x = [r["value"] for r in rows]

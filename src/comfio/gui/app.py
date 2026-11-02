@@ -160,6 +160,8 @@ def act_ingest() -> None:
             mime="text/csv",
         )
 
+    act_sandbox()
+
     if uploaded is not None:
         sheet: str | int = 0
         if _data.is_excel(uploaded.name):
@@ -180,6 +182,64 @@ def act_ingest() -> None:
             _state.set_df(_data.read_uploaded(uploaded, sheet=sheet))
         except Exception as exc:  # noqa: BLE001
             st.error(f"Could not read {uploaded.name}: {exc}")
+
+
+# --------------------------------------------------------------------------- #
+# Sandbox — data-free what-if (manual parameters -> PMV)
+# --------------------------------------------------------------------------- #
+def act_sandbox() -> None:
+    with st.expander("No data? Comfort sandbox — compute PMV directly"):
+        c1, c2, c3 = st.columns(3)
+        tdb = c1.slider("Air temperature [°C]", 10.0, 40.0, 24.0, 0.5)
+        rh = c2.slider("Relative humidity [%]", 0.0, 100.0, 50.0, 5.0)
+        vr = c3.slider("Air speed [m/s]", 0.0, 2.0, 0.10, 0.05)
+        mrt_same = c1.checkbox("MRT = air temp", value=True)
+        tr = tdb if mrt_same else c1.slider("MRT [°C]", 10.0, 40.0, 24.0, 0.5)
+        met = c2.slider("Metabolic rate [met]", 0.8, 4.0, 1.2, 0.1)
+        clo = c3.slider("Clothing [clo]", 0.0, 2.0, 0.5, 0.1)
+
+        from comfio.domains.thermal import evaluate_thermal
+
+        point = evaluate_thermal(
+            tdb=np.array([tdb]),
+            tr=np.array([tr]),
+            vr=np.array([vr]),
+            rh=np.array([rh]),
+            met=met,
+            clo=clo,
+        )
+        m1, m2 = st.columns(2)
+        pmv_val = float(point.pmv[0])
+        m1.metric("PMV", f"{pmv_val:+.2f}" if not np.isnan(pmv_val) else "n/a")
+        m2.metric(
+            "PPD",
+            f"{float(point.ppd[0]):.1f} %" if not np.isnan(point.ppd[0]) else "n/a",
+        )
+
+        with st.spinner("Computing comfort surface…"):
+            t_ax = np.linspace(10.0, 30.0, 26)  # ISO 7730 applicability bound
+            r_ax = np.linspace(0.0, 100.0, 26)
+            tg, rg = np.meshgrid(t_ax, r_ax)
+            grid = evaluate_thermal(
+                tdb=tg.ravel(),
+                tr=tg.ravel() if mrt_same else np.full(tg.size, tr),
+                vr=np.full(tg.size, vr),
+                rh=rg.ravel(),
+                met=met,
+                clo=clo,
+            )
+        st.plotly_chart(
+            _charts.comfort_surface(
+                t_ax, r_ax, grid.pmv.reshape(tg.shape), point=(tdb, rh)
+            ),
+            width="stretch",
+        )
+        st.caption(
+            f"PMV surface at v={vr} m/s, met={met}, clo={clo} "
+            f"({'MRT=air temp' if mrt_same else f'MRT={tr}°C'}). "
+            "Inside the dashed loop: |PMV| ≤ 0.5 (ASHRAE-55 acceptable band). "
+            "The axis is clamped to the ISO 7730 applicability domain (10–30 °C)."
+        )
 
 
 # --------------------------------------------------------------------------- #

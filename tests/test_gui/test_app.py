@@ -36,6 +36,15 @@ def test_ingest_screen_shows_uploader(at: AppTest) -> None:
     assert len(at.file_uploader) == 1
 
 
+def test_sandbox_renders_pmv_without_data(at: AppTest) -> None:
+    at.run()
+    assert not at.exception
+    labels = [e.label for e in at.expander]
+    assert any("Comfort sandbox" in lb for lb in labels)
+    metrics = [m.label for m in at.metric]
+    assert "PMV" in metrics and "PPD" in metrics
+
+
 def test_mapping_screen_after_demo(at: AppTest) -> None:
     _load_demo(at)
     assert not at.exception
