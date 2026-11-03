@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from typing import Literal
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 DOMAIN_COLORS = {
     "thermal": "#e76f51",
@@ -128,71 +132,6 @@ def timeseries(
     if threshold is not None:
         fig.add_hline(y=threshold, line_dash="dash", line_color="#c0392b")
     fig.update_layout(height=240, margin={"l": 50, "r": 20, "t": 20, "b": 40})
-    return fig
-
-
-def comfort_surface(
-    tdb_axis: np.ndarray,
-    rh_axis: np.ndarray,
-    pmv_grid: np.ndarray,
-    point: tuple[float, float] | None = None,
-) -> go.Figure:
-    """PMV surface over (temperature × humidity) at fixed v/met/clo.
-
-    The ±0.5 PMV contour is the ASHRAE-55 acceptable band boundary —
-    inside the dashed loop is 'comfortable' for the chosen occupants.
-    """
-    fig = go.Figure()
-    fig.add_trace(
-        go.Heatmap(
-            x=tdb_axis,
-            y=rh_axis,
-            z=pmv_grid,
-            colorscale="RdBu_r",
-            zmid=0,
-            zmin=-3,
-            zmax=3,
-            colorbar={"title": "PMV"},
-        )
-    )
-    fig.add_trace(
-        go.Contour(
-            x=tdb_axis,
-            y=rh_axis,
-            z=pmv_grid,
-            contours={
-                "start": -0.5,
-                "end": 0.5,
-                "size": 1.0,
-                "coloring": "none",
-            },
-            line={"color": "#1a7f4f", "width": 2, "dash": "dash"},
-            showscale=False,
-            name="PMV ±0.5",
-        )
-    )
-    if point is not None:
-        fig.add_trace(
-            go.Scatter(
-                x=[point[0]],
-                y=[point[1]],
-                mode="markers",
-                marker={
-                    "symbol": "star",
-                    "size": 16,
-                    "color": "#ffd700",
-                    "line": {"color": "#264653", "width": 1.5},
-                },
-                name="you",
-            )
-        )
-    fig.update_layout(
-        height=380,
-        xaxis_title="Air temperature [°C]",
-        yaxis_title="Relative humidity [%]",
-        margin={"l": 50, "r": 20, "t": 30, "b": 50},
-        showlegend=False,
-    )
     return fig
 
 
@@ -332,5 +271,239 @@ def exceedance_heatmap(
         height=max(200, min(500, 24 * len(uniq_d))),
         xaxis_title="Hour of day",
         margin={"l": 90, "r": 20, "t": 20, "b": 40},
+    )
+    return fig
+
+
+def psychro_chart(
+    zones: Sequence[tuple[str, pd.DataFrame]],
+    points: Sequence[tuple[str, float, float]],
+) -> go.Figure:
+    """Psychrometric chart: RH lines + PMV comfort zones + points.
+
+    X is operative temperature [°C], Y the humidity ratio [g/kg]. Each
+    zone is a ``pmv_zone_boundary`` frame (columns ``w``, ``t_cool``,
+    ``t_warm``) drawn as a closed polygon; points are
+    ``(label, operative_c, w_kg_per_kg)``.
+    """
+    from comfio.gui.tools.calculator._psychro import humidity_ratio
+
+    t_axis = np.linspace(10.0, 40.0, 61)
+    fig = go.Figure()
+    for rh_pct in range(10, 100, 10):
+        w_line = (
+            humidity_ratio(t_axis, np.full_like(t_axis, float(rh_pct))) * 1000.0
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=t_axis,
+                y=w_line,
+                mode="lines",
+                line={"color": "#d0d0d0", "width": 1},
+                name=f"RH {rh_pct} %",
+                showlegend=False,
+                hoverinfo="skip",
+            )
+        )
+    w_sat = humidity_ratio(t_axis, np.full_like(t_axis, 100.0)) * 1000.0
+    fig.add_trace(
+        go.Scatter(
+            x=t_axis,
+            y=w_sat,
+            mode="lines",
+            line={"color": "#888888", "width": 1.5},
+            name="Saturation (RH 100 %)",
+        )
+    )
+    zone_lines = ["#2a9d8f", "#e76f51", "#457b9d"]
+    zone_fills = [
+        "rgba(42,157,143,0.2)",
+        "rgba(231,111,81,0.2)",
+        "rgba(69,123,157,0.2)",
+    ]
+    for i, (label, zone) in enumerate(zones):
+        z = zone.dropna(subset=["t_cool", "t_warm"]).sort_values("w")
+        if z.empty:
+            continue
+        xs = list(z["t_cool"]) + list(z["t_warm"].iloc[::-1])
+        ys = list(z["w"] * 1000.0) + list((z["w"] * 1000.0).iloc[::-1])
+        fig.add_trace(
+            go.Scatter(
+                x=xs,
+                y=ys,
+                fill="toself",
+                fillcolor=zone_fills[i % len(zone_fills)],
+                line={"color": zone_lines[i % len(zone_lines)], "width": 1.5},
+                name=label,
+            )
+        )
+    for label, t_op, w in points:
+        fig.add_trace(
+            go.Scatter(
+                x=[t_op],
+                y=[w * 1000.0],
+                mode="markers",
+                marker={
+                    "symbol": "star",
+                    "size": 14,
+                    "color": "#ffd700",
+                    "line": {"color": "#264653", "width": 1.5},
+                },
+                name=label,
+            )
+        )
+    fig.update_layout(
+        height=420,
+        xaxis_title="Operative temperature [°C]",
+        xaxis_range=[10, 40],
+        yaxis_title="Humidity ratio [g/kg]",
+        yaxis_range=[0, 30],
+        margin={"l": 50, "r": 20, "t": 30, "b": 50},
+    )
+    return fig
+
+
+def adaptive_chart(
+    method: Literal["ashrae", "en"],
+    point: tuple[float, float] | None,
+) -> go.Figure:
+    """Adaptive-model comfort bands over the outdoor-temperature axis.
+
+    ASHRAE 55: prevailing mean outdoor temperature, 80 % and 90 % bands.
+    EN 16798-1: running mean outdoor temperature, categories I–III.
+    ``point`` is ``(t_outdoor_metric, operative_c)`` or None.
+    """
+    from comfio.domains.thermal_adaptive import (
+        ASHRAE_T_OUT_MAX,
+        ASHRAE_T_OUT_MIN,
+        EN_T_OUT_MAX,
+        EN_T_OUT_MIN,
+        evaluate_adaptive_ashrae,
+        evaluate_adaptive_en,
+    )
+
+    fig = go.Figure()
+    t_dummy = np.array([22.0])
+    if method == "ashrae":
+        grid = np.linspace(ASHRAE_T_OUT_MIN, ASHRAE_T_OUT_MAX, 24)
+        bands = {}
+        for acc in (80, 90):
+            lows, highs = [], []
+            for t in grid:
+                r = evaluate_adaptive_ashrae(
+                    tdb=t_dummy, tr=t_dummy, t_prevail=float(t), acceptability=acc
+                )
+                lows.append(r.t_comf_lower)
+                highs.append(r.t_comf_upper)
+            bands[f"{acc} %"] = (lows, highs)
+        t_comf = 0.31 * grid + 17.8
+        x_title = "Prevailing mean outdoor temperature [°C]"
+    else:
+        grid = np.linspace(EN_T_OUT_MIN, EN_T_OUT_MAX, 21)
+        bands = {}
+        for cat in ("i", "ii", "iii"):
+            lows, highs = [], []
+            for t in grid:
+                r = evaluate_adaptive_en(
+                    tdb=t_dummy, tr=t_dummy, t_running_mean=float(t), category=cat
+                )
+                lows.append(r.t_comf_lower)
+                highs.append(r.t_comf_upper)
+            bands[f"Cat {cat.upper()}"] = (lows, highs)
+        t_comf = 0.33 * grid + 18.8
+        x_title = "Running mean outdoor temperature [°C]"
+
+    fills = [
+        "rgba(42,157,143,0.15)",
+        "rgba(233,196,106,0.15)",
+        "rgba(231,111,81,0.15)",
+    ]
+    lines = ["#2a9d8f", "#e9c46a", "#e76f51"]
+    for i, (label, (lows, highs)) in enumerate(bands.items()):
+        xs = list(grid) + list(grid[::-1])
+        ys = list(highs) + list(lows[::-1])
+        fig.add_trace(
+            go.Scatter(
+                x=xs,
+                y=ys,
+                fill="toself",
+                fillcolor=fills[i % len(fills)],
+                line={"color": lines[i % len(lines)], "width": 1},
+                name=label,
+            )
+        )
+    fig.add_trace(
+        go.Scatter(
+            x=list(grid),
+            y=list(t_comf),
+            mode="lines",
+            line={"color": "#264653", "width": 2},
+            name="Comfort temperature",
+        )
+    )
+    if point is not None:
+        fig.add_trace(
+            go.Scatter(
+                x=[point[0]],
+                y=[point[1]],
+                mode="markers",
+                marker={
+                    "symbol": "star",
+                    "size": 14,
+                    "color": "#ffd700",
+                    "line": {"color": "#264653", "width": 1.5},
+                },
+                name="you",
+            )
+        )
+    fig.update_layout(
+        height=380,
+        xaxis_title=x_title,
+        yaxis_title="Operative temperature [°C]",
+        margin={"l": 50, "r": 20, "t": 30, "b": 50},
+    )
+    return fig
+
+
+def ranges_curve(df: pd.DataFrame, param: str, label: str) -> go.Figure:
+    """PMV / SET vs a swept input, PPD on a secondary axis."""
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    fig.add_trace(
+        go.Scatter(
+            x=df[param],
+            y=df["pmv"],
+            mode="lines+markers",
+            name="PMV",
+            line={"color": "#264653", "width": 2},
+        ),
+        secondary_y=False,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df[param],
+            y=df["set_c"],
+            mode="lines+markers",
+            name="SET [°C]",
+            line={"color": "#e76f51", "width": 2, "dash": "dash"},
+        ),
+        secondary_y=False,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df[param],
+            y=df["ppd"],
+            mode="lines+markers",
+            name="PPD [%]",
+            line={"color": "#2a9d8f", "width": 1.5, "dash": "dot"},
+        ),
+        secondary_y=True,
+    )
+    fig.add_hrect(y0=-0.5, y1=0.5, fillcolor="#a8e0b3", opacity=0.25, line_width=0)
+    fig.update_yaxes(title_text="PMV / SET [°C]", secondary_y=False)
+    fig.update_yaxes(title_text="PPD [%]", secondary_y=True, range=[0, 100])
+    fig.update_xaxes(title_text=label)
+    fig.update_layout(
+        height=380,
+        margin={"l": 50, "r": 20, "t": 30, "b": 50},
     )
     return fig

@@ -34,7 +34,10 @@ class ToolSpec:
             raise ValueError(f"Invalid tool id {self.id!r}: must match {_ID_RE.pattern}")
 
 
-BUILTIN_TOOLS: tuple[str, ...] = ("comfio.gui.tools.workbench",)
+BUILTIN_TOOLS: tuple[str, ...] = (
+    "comfio.gui.tools.workbench",
+    "comfio.gui.tools.calculator",
+)
 
 
 def enabled_from_env(value: str | None) -> list[str] | None:

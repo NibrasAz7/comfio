@@ -13,6 +13,12 @@ from streamlit.testing.v1 import AppTest  # noqa: E402
 
 APP = "src/comfio/gui/app.py"
 
+_ST_MM = tuple(int(p) for p in st.__version__.split(".")[:2])
+file_uploader_supported = pytest.mark.skipif(
+    _ST_MM < (1, 56),
+    reason="AppTest file_uploader needs streamlit>=1.56",
+)
+
 
 @pytest.fixture()
 def at() -> AppTest:
@@ -29,20 +35,12 @@ def _load_demo(at: AppTest) -> None:
     at.run()
 
 
+@file_uploader_supported
 def test_ingest_screen_shows_uploader(at: AppTest) -> None:
     at.run()
     assert not at.exception
     assert any("demo data" in (b.label or "") for b in at.button)
     assert len(at.file_uploader) == 1
-
-
-def test_sandbox_renders_pmv_without_data(at: AppTest) -> None:
-    at.run()
-    assert not at.exception
-    labels = [e.label for e in at.expander]
-    assert any("Comfort sandbox" in lb for lb in labels)
-    metrics = [m.label for m in at.metric]
-    assert "PMV" in metrics and "PPD" in metrics
 
 
 def test_mapping_screen_after_demo(at: AppTest) -> None:
@@ -71,6 +69,8 @@ def test_full_flow_to_verdict(at: AppTest) -> None:
     labels = [m.label for m in at.metric]
     assert "Compliance rate" in labels
     assert "Mean PMV" in labels
+    downloads = [d.label for d in at.get("download_button")]
+    assert any("Per-row thermal" in d for d in downloads)
 
 
 def test_tsv_calibration_view_in_demo(at: AppTest) -> None:
@@ -156,6 +156,7 @@ def test_whatif_sweep(at: AppTest) -> None:
     assert not at.exception
 
 
+@file_uploader_supported
 def test_scenario_save_restore_ui(at: AppTest) -> None:
     _reach_verdict(at)
     _pin_scenario(at)
