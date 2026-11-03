@@ -668,3 +668,92 @@ def ranges_curve(df: pd.DataFrame, param: str, label: str) -> go.Figure:
         margin={"l": 50, "r": 20, "t": 30, "b": 50},
     )
     return fig
+
+
+def mrt_plan_heatmap(
+    xs: np.ndarray,
+    ys: np.ndarray,
+    grid: np.ndarray,
+    *,
+    z_label: str,
+    colorscale: str = "RdYlBu_r",
+    zmid: float | None = None,
+    occupant_xy: tuple[float, float] | None = None,
+    room_length: float | None = None,
+    room_width: float | None = None,
+    windows: Sequence[tuple[str, float, float]] = (),
+) -> go.Figure:
+    """Plan-view heatmap of an ``mrt_grid`` result.
+
+    ``xs``/``ys``/``grid`` come from ``thermal_mrt.mrt_grid`` (grid is
+    ``[iy, ix]``). ``windows`` are ``(wall, u0, width)`` triples drawn as
+    thick segments on the matching wall; ``occupant_xy`` is a star
+    marker. When room extents are given the wall outline is drawn and
+    the axes keep a 1:1 aspect ratio.
+    """
+    fig = go.Figure(
+        go.Heatmap(
+            x=xs,
+            y=ys,
+            z=grid,
+            colorscale=colorscale,
+            zmid=zmid,
+            colorbar={"title": z_label},
+        )
+    )
+    if room_length is not None and room_width is not None:
+        length, width = room_length, room_width
+        fig.add_trace(
+            go.Scatter(
+                x=[0, length, length, 0, 0],
+                y=[0, 0, width, width, 0],
+                mode="lines",
+                line={"color": "#264653", "width": 2},
+                name="walls",
+                hoverinfo="skip",
+            )
+        )
+        for wall, u0, w in windows:
+            seg_x: list[float]
+            seg_y: list[float]
+            if wall == "front":
+                seg_x, seg_y = [0.0, 0.0], [u0, u0 + w]
+            elif wall == "rear":
+                seg_x, seg_y = [length, length], [u0, u0 + w]
+            elif wall == "left":
+                seg_x, seg_y = [u0, u0 + w], [0.0, 0.0]
+            else:  # right
+                seg_x, seg_y = [u0, u0 + w], [width, width]
+            fig.add_trace(
+                go.Scatter(
+                    x=seg_x,
+                    y=seg_y,
+                    mode="lines",
+                    line={"color": "#457b9d", "width": 7},
+                    name=f"window ({wall})",
+                    hoverinfo="name",
+                )
+            )
+    if occupant_xy is not None:
+        fig.add_trace(
+            go.Scatter(
+                x=[occupant_xy[0]],
+                y=[occupant_xy[1]],
+                mode="markers",
+                marker={
+                    "symbol": "star",
+                    "size": 15,
+                    "color": "#ffd700",
+                    "line": {"color": "#264653", "width": 1.5},
+                },
+                name="occupant",
+            )
+        )
+    fig.update_yaxes(scaleanchor="x", scaleratio=1)
+    fig.update_layout(
+        height=480,
+        xaxis_title="x — room length [m]",
+        yaxis_title="y — room width [m]",
+        margin={"l": 50, "r": 20, "t": 30, "b": 50},
+    )
+    return fig
