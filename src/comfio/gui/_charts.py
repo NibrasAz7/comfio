@@ -757,3 +757,95 @@ def mrt_plan_heatmap(
         margin={"l": 50, "r": 20, "t": 30, "b": 50},
     )
     return fig
+
+
+def satisfaction_bars(summary: pd.DataFrame) -> go.Figure:
+    """Diverging stacked bars of a survey ``summarize`` result.
+
+    One row per satisfaction category: % dissatisfied extends left,
+    neutral is centred on zero, % satisfied extends right. When the
+    summary carries more than one group, each group gets its own
+    subplot row (facet).
+    """
+    from comfio.gui.tools.survey._logic import SAT_COLUMNS
+
+    groups = list(dict.fromkeys(summary["group"].tolist())) or ["all"]
+    facet = len(groups) > 1
+    fig = make_subplots(
+        rows=len(groups),
+        cols=1,
+        shared_xaxes=True,
+        subplot_titles=groups if facet else None,
+        vertical_spacing=min(0.08, 0.5 / max(len(groups) - 1, 1)),
+    )
+    for row_idx, group in enumerate(groups, start=1):
+        sub = summary[summary["group"] == group]
+        labels = [SAT_COLUMNS.get(str(c), str(c)) for c in sub["category"]]
+        dis = -sub["pct_dissatisfied"].to_numpy(dtype=float)
+        neu = sub["pct_neutral"].to_numpy(dtype=float)
+        sat = sub["pct_satisfied"].to_numpy(dtype=float)
+        first = row_idx == 1
+        fig.add_trace(
+            go.Bar(
+                y=labels,
+                x=dis,
+                base=-neu / 2,
+                orientation="h",
+                name="dissatisfied",
+                legendgroup="dis",
+                showlegend=first,
+                marker_color="#e76f51",
+                text=[f"{-v:.0f}" if v < 4 else "" for v in dis],
+                textposition="inside",
+            ),
+            row=row_idx,
+            col=1,
+        )
+        fig.add_trace(
+            go.Bar(
+                y=labels,
+                x=neu,
+                base=-neu / 2,
+                orientation="h",
+                name="neutral",
+                legendgroup="neu",
+                showlegend=first,
+                marker_color="#e9c46a",
+                text=[f"{v:.0f}" if v >= 8 else "" for v in neu],
+                textposition="inside",
+            ),
+            row=row_idx,
+            col=1,
+        )
+        fig.add_trace(
+            go.Bar(
+                y=labels,
+                x=sat,
+                base=neu / 2,
+                orientation="h",
+                name="satisfied",
+                legendgroup="sat",
+                showlegend=first,
+                marker_color="#a8e0b3",
+                text=[f"{v:.0f}" if v >= 4 else "" for v in sat],
+                textposition="inside",
+            ),
+            row=row_idx,
+            col=1,
+        )
+    ticks = [-100, -75, -50, -25, 0, 25, 50, 75, 100]
+    fig.update_xaxes(
+        range=[-100, 100],
+        tickvals=ticks,
+        ticktext=[str(abs(t)) for t in ticks],
+        zeroline=True,
+        zerolinecolor="#264653",
+        zerolinewidth=1,
+    )
+    fig.update_layout(
+        barmode="overlay",
+        height=max(260, min(2400, 90 * len(summary) + 140)),
+        xaxis_title="% of respondents",
+        margin={"l": 50, "r": 20, "t": 40, "b": 50},
+    )
+    return fig
