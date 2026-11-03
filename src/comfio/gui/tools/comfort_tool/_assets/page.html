@@ -1,0 +1,517 @@
+<header class="site-header">
+  <div class="container">
+    <div class="brand-row">
+      <div>
+        <h4 class="brand-title">Comfio Comfort Tool</h4>
+        <p class="brand-sub">Thermal comfort calculations and visualizations — ASHRAE 55-2023 &middot; EN 16798-1:2019</p>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <nav class="main-nav" id="mainNav">
+        <a href="#" data-tab="index" class="active">ASHRAE-55</a>
+        <a href="#" data-tab="en">EN-16798</a>
+        <a href="#" data-tab="compare">Compare</a>
+        <a href="#" data-tab="ranges">Ranges</a>
+        <a href="#" data-tab="upload">Upload</a>
+      </nav>
+      <span class="current-page"><a id="nav-current" href="#">ASHRAE-55</a></span>
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+<!-- ================= ASHRAE-55 ================= -->
+<section data-page="index">
+<div class="tool-grid">
+  <div class="card">
+    <div class="card-head">Inputs</div>
+    <div class="card-body">
+      <div class="field method">
+        <label>Select method:</label>
+        <select class="sel" id="f-method">
+          <option>PMV method</option>
+          <option>Adaptive method</option>
+        </select>
+      </div>
+      <div class="field" id="f-trm-field" style="display:none">
+        <label>Prevailing mean outdoor temperature</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="f-trm" type="text" inputmode="decimal" value="20" data-step="0.5" data-kind="t"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit u-t">&deg;C</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Operative temperature</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="f-to" type="text" inputmode="decimal" value="25" data-step="0.5" data-kind="t"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit u-t">&deg;C</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Air speed</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="f-vel" type="text" inputmode="decimal" value="0.1" data-step="0.1" data-min="0" data-kind="v"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit u-v">m/s</span>
+          <select class="sel vel-ctrl">
+            <option>No local control</option>
+            <option selected>With local control</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Humidity</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="f-rh" type="text" inputmode="decimal" value="50" data-step="1" data-min="0"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit hum-unit">%</span>
+          <select class="sel hum-sel">
+            <option>Relative humidity</option>
+            <option>Humidity ratio</option>
+            <option>Dew point</option>
+            <option>Wet bulb</option>
+            <option>Vapor pressure</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="f-met-field">
+        <label>Metabolic rate</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="f-met" type="text" inputmode="decimal" value="1" data-step="0.1" data-min="0"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit">met</span>
+          <select class="sel" data-set="f-met">
+            <option value="0.7">Sleeping: 0.7</option>
+            <option value="0.8">Reclining: 0.8</option>
+            <option value="1" selected>Seated, quiet: 1.0</option>
+            <option value="1">Reading, seated: 1.0</option>
+            <option value="1">Writing: 1.0</option>
+            <option value="1.1">Typing: 1.1</option>
+            <option value="1.2">Standing, relaxed: 1.2</option>
+            <option value="1.2">Filing, seated: 1.2</option>
+            <option value="1.4">Filing, standing: 1.4</option>
+            <option value="0.9">Light limb movement: 0.9</option>
+            <option value="1.5">Driving a car: 1.5</option>
+            <option value="1.6">Cooking: 1.6</option>
+            <option value="1.7">Walking about 2mph (3.2kmh): 1.7</option>
+            <option value="2">Cleaning house: 2.0</option>
+            <option value="2">Walking 3mph (4.8kmh): 2.0</option>
+            <option value="2.8">Walking 4mph (6.4kmh): 2.8</option>
+            <option value="1.9">Machine work: 1.9</option>
+            <option value="2.4">Dancing: 2.4</option>
+            <option value="3.5">Calisthenics, full movement: 3.5</option>
+            <option value="3.2">Heavy work, walking 8kmh: 3.2</option>
+            <option value="2.4">Table tennis: 2.4</option>
+            <option value="3">Sawing by hand: 3.0</option>
+            <option value="2.6">Slip roll handling: 2.6</option>
+            <option value="3.5">Lifting and packing: 3.5</option>
+            <option value="3.2">Driving heavy vehicle: 3.2</option>
+            <option value="3.8">Combat sports: 3.8</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="f-clo-field">
+        <label>Clothing level</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="f-clo" type="text" inputmode="decimal" value="0.61" data-step="0.05" data-min="0"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit">clo</span>
+          <select class="sel" data-set="f-clo">
+            <option value="0.36">Walking shorts, short-sleeve shirt: 0.36 clo</option>
+            <option value="0.45">Knee-length skirt, short-sleeve shirt: 0.45 clo</option>
+            <option value="0.5">Typical summer indoor clothing: 0.5 clo</option>
+            <option value="0.54">Knee-length skirt, short-sleeve shirt, sandals, underwear: 0.54 clo</option>
+            <option value="0.57">Trousers, short-sleeve shirt: 0.57 clo</option>
+            <option value="0.61" selected>Trousers, long-sleeve shirt: 0.61 clo</option>
+            <option value="0.67">Trousers, long-sleeve shirt, long-sleeve sweater: 0.67 clo</option>
+            <option value="0.72">Long-sleeve coveralls, T-shirt: 0.72 clo</option>
+            <option value="0.65">Trousers, blouse, socks, shoes: 0.65 clo</option>
+            <option value="0.74">Sweat pants, long-sleeve sweatshirt: 0.74 clo</option>
+            <option value="0.96">Trousers, shirt, suit jacket: 0.96 clo</option>
+            <option value="1.14">Winter indoor clothing: 1.14 clo</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <span class="btn-group">
+          <button type="button" class="btn" id="btnReset">Reset</button>
+          <input type="checkbox" class="btn-check opt-press" id="opt-press" data-row="pressure-row" checked><label class="btn" for="opt-press">Set pressure</label>
+          <input type="checkbox" class="btn-check opt-units" id="opt-units"><label class="btn" for="opt-units">SI/IP</label>
+        </span>
+      </div>
+      <div class="pressure-row show" id="pressure-row">
+        <span class="unit">Atmospheric pressure:</span>
+        <select class="sel pressure-sel">
+          <option>60</option><option>65</option><option>70</option><option>75</option><option>80</option><option>85</option><option>90</option><option>95</option><option>100</option><option selected>101.325</option><option>105</option><option>110</option>
+        </select>
+        <span class="unit">kPa</span>
+      </div>
+    </div>
+  </div>
+  <div class="results-col">
+    <div class="compliance ok" id="compliance"><span class="tick">&#10004;</span> Complies with ASHRAE Standard 55-2023</div>
+    <form class="stats">
+      <span class="stat" id="r-pmv">PMV = -0.16</span>
+      <span class="stat" id="r-ppd">PPD = 6 %</span>
+      <span class="stat" id="r-sens">Sensation = Neutral</span>
+      <span class="stat" id="r-set">SET = 24.8 &deg;C</span>
+    </form>
+    <div class="chart-select" id="chart-type-row">
+      <select class="sel" id="chart-type">
+        <option selected>Psychrometric (operative temperature)</option>
+        <option>Psychrometric (air temperature)</option>
+      </select>
+    </div>
+    <div class="chart-wrap"><svg class="chart" id="chart" role="img" aria-label="Comfort chart"></svg></div>
+    <p class="note"><strong>NOTE:</strong> In the psychrometric chart the abscissa is the operative temperature and for each point dry-bulb temperature equals mean radiant temperature (DBT = MRT). The comfort zone represents the combination of conditions with the same DBT and MRT for which the PMV is between -0.5 and +0.5, including the ASHRAE 55 Appendix H cooling effect of elevated air speed. Chart legend: t_db = dry-bulb temperature, t_dp = dew point, t_wb = wet-bulb.</p>
+    <p class="note"><strong>Limits of Applicability:</strong> This standard is only applicable to healthy individuals. This standard does not apply to occupants: a) whose clothing insulation exceed 1.5 clo; b) whose clothing is highly impermeable; or c) who are sleeping, reclining in contact with bedding, or able to adjust blankets or bedding.</p>
+    <p class="note">The tool applies the ASHRAE 55-2023 relative-air-speed and dynamic-clothing corrections before evaluating PMV, and the Appendix H cooling effect (via SET) for elevated air speed.</p>
+  </div>
+</div>
+</section>
+
+<!-- ================= EN-16798 ================= -->
+<section data-page="en" hidden>
+<div class="tool-grid">
+  <div class="card">
+    <div class="card-head">Inputs</div>
+    <div class="card-body">
+      <div class="field method">
+        <label>Select method:</label>
+        <select class="sel" id="en-f-method">
+          <option>PMV method</option>
+          <option>Adaptive method</option>
+        </select>
+      </div>
+      <div class="field" id="en-trm-field" style="display:none">
+        <label>Running mean outdoor temperature</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="en-f-trm" type="text" inputmode="decimal" value="20" data-step="0.5" data-kind="t"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit u-t">&deg;C</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Air temperature</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="en-f-ta" type="text" inputmode="decimal" value="25" data-step="0.5" data-kind="t"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit u-t">&deg;C</span>
+          <span class="check-row" style="margin:0 0 0 auto"><input id="en-f-useop" type="checkbox"><label for="en-f-useop" style="color:var(--text);margin:0">Use operative temp</label></span>
+        </div>
+      </div>
+      <div class="field" id="en-tr-field">
+        <label>Mean radiant temperature</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="en-f-tr" type="text" inputmode="decimal" value="25" data-step="0.5" data-kind="t"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit u-t">&deg;C</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Air speed</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="en-f-vel" type="text" inputmode="decimal" value="0.1" data-step="0.1" data-min="0" data-kind="v"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit u-v">m/s</span>
+        </div>
+      </div>
+      <div class="field" id="en-rh-field">
+        <label>Humidity</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="en-f-rh" type="text" inputmode="decimal" value="50" data-step="1" data-min="0"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit hum-unit">%</span>
+          <select class="sel hum-sel">
+            <option>Relative humidity</option>
+            <option>Humidity ratio</option>
+            <option>Dew point</option>
+            <option>Wet bulb</option>
+            <option>Vapor pressure</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="en-met-field">
+        <label>Metabolic rate</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="en-f-met" type="text" inputmode="decimal" value="1" data-step="0.1" data-min="0"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit">met</span>
+          <select class="sel" data-set="en-f-met">
+            <option value="0.7">Sleeping: 0.7</option>
+            <option value="0.8">Reclining: 0.8</option>
+            <option value="1" selected>Seated, quiet: 1.0</option>
+            <option value="1">Reading, seated: 1.0</option>
+            <option value="1">Writing: 1.0</option>
+            <option value="1.1">Typing: 1.1</option>
+            <option value="1.2">Standing, relaxed: 1.2</option>
+            <option value="1.2">Filing, seated: 1.2</option>
+            <option value="1.4">Filing, standing: 1.4</option>
+            <option value="1.5">Driving a car: 1.5</option>
+            <option value="1.6">Cooking: 1.6</option>
+            <option value="1.7">Walking about 2mph (3.2kmh): 1.7</option>
+            <option value="2">Cleaning house: 2.0</option>
+            <option value="2">Walking 3mph: 2.0</option>
+            <option value="2.4">Walking 4mph: 2.4</option>
+            <option value="3">Sawing by hand: 3.0</option>
+            <option value="2.4">Table tennis: 2.4</option>
+            <option value="2.6">Slip roll handling: 2.6</option>
+            <option value="1.9">Machine work: 1.9</option>
+            <option value="2.4">Dancing: 2.4</option>
+            <option value="3.5">Calisthenics, full movement: 3.5</option>
+            <option value="3.2">Heavy work, walking 8kmh: 3.2</option>
+            <option value="3.5">Lifting and packing 100lb bags: 3.5</option>
+            <option value="3.2">Driving heavy vehicle: 3.2</option>
+            <option value="3.8">Combat sports: 3.8</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="en-clo-field">
+        <label>Clothing level</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="en-f-clo" type="text" inputmode="decimal" value="0.61" data-step="0.05" data-min="0"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit">clo</span>
+          <select class="sel" data-set="en-f-clo">
+            <option value="0.36">Walking shorts, short-sleeve shirt: 0.36 clo</option>
+            <option value="0.45">Knee-length skirt, short-sleeve shirt: 0.45 clo</option>
+            <option value="0.5">Typical summer indoor clothing: 0.5 clo</option>
+            <option value="0.54">Knee-length skirt, short-sleeve shirt, sandals, underwear: 0.54 clo</option>
+            <option value="0.57">Trousers, short-sleeve shirt: 0.57 clo</option>
+            <option value="0.61" selected>Trousers, long-sleeve shirt: 0.61 clo</option>
+            <option value="0.67">Trousers, long-sleeve shirt, long-sleeve sweater: 0.67 clo</option>
+            <option value="0.65">Trousers, blouse, socks, shoes: 0.65 clo</option>
+            <option value="0.74">Sweat pants, long-sleeve sweatshirt: 0.74 clo</option>
+            <option value="0.96">Trousers, shirt, suit jacket: 0.96 clo</option>
+            <option value="1.14">Winter indoor clothing: 1.14 clo</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <span class="btn-group">
+          <button type="button" class="btn" id="en-btnReset">Reset</button>
+          <input type="checkbox" class="btn-check opt-press" id="en-opt-press" data-row="en-pressure-row" checked><label class="btn" for="en-opt-press">Set pressure</label>
+          <input type="checkbox" class="btn-check opt-units" id="en-opt-units"><label class="btn" for="en-opt-units">SI/IP</label>
+        </span>
+      </div>
+      <div class="pressure-row show" id="en-pressure-row">
+        <span class="unit">Atmospheric pressure:</span>
+        <select class="sel pressure-sel">
+          <option>60</option><option>65</option><option>70</option><option>75</option><option>80</option><option>85</option><option>90</option><option>95</option><option>100</option><option selected>101.325</option><option>105</option><option>110</option>
+        </select>
+        <span class="unit">kPa</span>
+      </div>
+    </div>
+  </div>
+  <div class="results-col">
+    <div class="compliance ok" id="en-compliance"><span class="tick">&#10004;</span> Complies with EN-16798</div>
+    <form class="stats">
+      <span class="stat" id="en-r-pmv">PMV = -0.16</span>
+      <span class="stat" id="en-r-ppd">PPD = 6 %</span>
+      <span class="stat" id="en-r-cat">Category = I</span>
+      <span class="stat" id="en-r-set">SET = 24.8 &deg;C</span>
+    </form>
+    <div class="chart-select">
+      <select class="sel" id="en-chart-type">
+        <option selected>Psychrometric (air temperature)</option>
+        <option>Psychrometric (operative temperature)</option>
+      </select>
+    </div>
+    <div class="chart-wrap"><svg class="chart" id="en-chart" role="img" aria-label="Comfort chart"></svg></div>
+    <p class="note"><strong>NOTE:</strong> In this psychrometric chart the abscissa is the dry-bulb temperature and the mean radiant temperature (MRT) is fixed. Each band marks the EN-16798 comfort categories I, II and III.</p>
+    <p class="note">EN-16798 (ISO 7730) mode uses the raw air speed and clothing inputs: the ASHRAE 55-2023 relative-air-speed and dynamic-clothing corrections are not applied. In adaptive mode the comfort temperature is 0.33 &times; running mean + 18.8 &deg;C with category I/II/III bands per EN 16798-1:2019, plus the elevated-air-speed cooling effect.</p>
+  </div>
+</div>
+</section>
+
+<!-- ================= COMPARE ================= -->
+<section data-page="compare" hidden>
+<div class="tool-grid">
+  <div class="card">
+    <div class="card-head">Compare comfort conditions</div>
+    <div class="card-body" id="compare-inputs">
+      <div class="tabs">
+        <button type="button" class="tab active">Inputs #1</button>
+        <button type="button" class="tab">Inputs #2</button>
+      </div>
+      <div class="field">
+        <label>Air temperature</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="c-ta" type="text" inputmode="decimal" data-step="0.5" data-kind="t"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit u-t">&deg;C</span>
+        </div>
+      </div>
+      <div class="field" id="c-tr-field">
+        <label>Mean radiant temperature</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="c-tr" type="text" inputmode="decimal" data-step="0.5" data-kind="t"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit u-t">&deg;C</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Air speed</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="c-vel" type="text" inputmode="decimal" data-step="0.1" data-min="0" data-kind="v"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit u-v">m/s</span>
+          <select class="sel vel-ctrl">
+            <option>No local control</option>
+            <option selected>With local control</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Humidity</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="c-rh" type="text" inputmode="decimal" data-step="1" data-min="0"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit hum-unit">%</span>
+          <select class="sel hum-sel">
+            <option>Relative humidity</option>
+            <option>Humidity ratio</option>
+            <option>Dew point</option>
+            <option>Wet bulb</option>
+            <option>Vapor pressure</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Metabolic rate</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="c-met" type="text" inputmode="decimal" data-step="0.1" data-min="0"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit">met</span>
+          <select class="sel" data-set="c-met">
+            <option value="0.7">Sleeping: 0.7</option>
+            <option value="0.8">Reclining: 0.8</option>
+            <option value="1" selected>Seated, quiet: 1.0</option>
+            <option value="1.1">Typing: 1.1</option>
+            <option value="1.2">Standing, relaxed: 1.2</option>
+            <option value="1.7">Walking 2 mph: 1.7</option>
+            <option value="2">Walking 3 mph: 2.0</option>
+            <option value="2.8">Walking 4 mph: 2.8</option>
+            <option value="3.2">Heavy work: 3.2</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Clothing level</label>
+        <div class="field-line">
+          <span class="num-wrap"><input id="c-clo" type="text" inputmode="decimal" data-step="0.05" data-min="0"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit">clo</span>
+          <select class="sel" data-set="c-clo">
+            <option value="0.36">Walking shorts, short-sleeve shirt: 0.36 clo</option>
+            <option value="0.5">Typical summer indoor clothing: 0.5 clo</option>
+            <option value="0.61" selected>Trousers, long-sleeve shirt: 0.61 clo</option>
+            <option value="0.74">Sweat pants, long-sleeve sweatshirt: 0.74 clo</option>
+            <option value="1.14">Winter indoor clothing: 1.14 clo</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <input type="checkbox" class="btn-check" id="c-useop"><label class="btn" for="c-useop">Use operative temp</label>
+      </div>
+      <div class="btn-row">
+        <span class="btn-group">
+          <button type="button" class="btn" id="c-btnReset">Reset</button>
+          <input type="checkbox" class="btn-check opt-press" id="c-opt-press" data-row="c-pressure-row" checked><label class="btn" for="c-opt-press">Set pressure</label>
+          <input type="checkbox" class="btn-check opt-units" id="c-opt-units"><label class="btn" for="c-opt-units">SI/IP</label>
+        </span>
+      </div>
+      <div class="pressure-row show" id="c-pressure-row">
+        <span class="unit">Atmospheric pressure:</span>
+        <select class="sel pressure-sel">
+          <option>60</option><option>65</option><option>70</option><option>75</option><option>80</option><option>85</option><option>90</option><option>95</option><option>100</option><option selected>101.325</option><option>105</option><option>110</option>
+        </select>
+        <span class="unit">kPa</span>
+      </div>
+    </div>
+  </div>
+  <div class="results-col">
+    <form><table class="results-table">
+      <tr><td></td><td class="h c1">#1</td><td class="h c2">#2</td></tr>
+      <tr><td>Compliance</td><td data-v="comp" data-i="1"></td><td data-v="comp" data-i="2"></td></tr>
+      <tr><td>PMV</td><td data-v="pmv" data-i="1"></td><td data-v="pmv" data-i="2"></td></tr>
+      <tr><td>PPD</td><td data-v="ppd" data-i="1"></td><td data-v="ppd" data-i="2"></td></tr>
+      <tr><td>Sensation</td><td data-v="sens" data-i="1"></td><td data-v="sens" data-i="2"></td></tr>
+    </table></form>
+    <div class="chart-select">
+      <select class="sel" id="c-chart-type">
+        <option selected>Psychrometric (operative temperature)</option>
+        <option>Psychrometric (air temperature)</option>
+      </select>
+    </div>
+    <div class="chart-wrap"><svg class="chart" id="c-chart" role="img" aria-label="Comfort comparison chart"></svg></div>
+    <p class="note"><strong>NOTE:</strong> The green zone marks the conditions of inputs #1 where PMV is between -0.5 and +0.5 (ASHRAE 55-2023, with relative-air-speed and dynamic-clothing corrections). The red dot is condition #1 and the blue dot is condition #2.</p>
+    <p class="note">Chart legend: t_db = dry-bulb temperature, t_dp = dew point, t_wb = wet-bulb, W_a = humidity ratio, h = enthalpy. The chart shows humidity ratio vs. operative temperature.</p>
+  </div>
+</div>
+</section>
+
+<!-- ================= RANGES ================= -->
+<section data-page="ranges" hidden>
+<div class="tool-grid">
+  <div class="card">
+    <div class="card-head">Choose which input parameter you would like to vary:</div>
+    <div class="card-body">
+      <form><div class="field" id="range-inputs">
+        <select class="sel" id="var-param">
+          <option value="clo">Clothing level</option>
+          <option value="vel">Air speed</option>
+          <option value="rh">Relative humidity</option>
+          <option value="met">Metabolic rate</option>
+        </select>
+        <div class="field-line" style="margin-top:12px">
+          <span class="num-wrap"><input id="r-lo" type="text" inputmode="decimal" value="0.51" data-step="0.01"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit">&ndash;</span>
+          <span class="num-wrap"><input id="r-hi" type="text" inputmode="decimal" value="0.71" data-step="0.01"><span class="spin"><button type="button" class="spin-up">&#9650;</button><button type="button" class="spin-down">&#9660;</button></span></span>
+          <span class="unit">clo</span>
+          <span class="unit" style="margin-left:14px">step:</span>
+          <select class="sel narrow" id="r-step"><option value="0.05">0.05 clo</option></select>
+        </div>
+      </div></form>
+      <form id="fixed-form"><div id="fixed-inputs"></div></form>
+      <div class="btn-row">
+        <span class="btn-group">
+          <button type="button" class="btn" id="rg-btnReset">Reset</button>
+          <input type="checkbox" class="btn-check opt-press" id="rg-opt-press" data-row="rg-pressure-row" checked><label class="btn" for="rg-opt-press">Set pressure</label>
+          <input type="checkbox" class="btn-check opt-units" id="rg-opt-units"><label class="btn" for="rg-opt-units">SI/IP</label>
+        </span>
+      </div>
+      <div class="pressure-row show" id="rg-pressure-row">
+        <span class="unit">Atmospheric pressure:</span>
+        <select class="sel pressure-sel">
+          <option>60</option><option>65</option><option>70</option><option>75</option><option>80</option><option>85</option><option>90</option><option>95</option><option>100</option><option selected>101.325</option><option>105</option><option>110</option>
+        </select>
+        <span class="unit">kPa</span>
+      </div>
+    </div>
+  </div>
+  <div class="results-col">
+    <form><div class="chart-select">
+      <select class="sel" id="rg-chart-type">
+        <option selected>Psychrometric (operative temperature)</option>
+        <option>Psychrometric (air temperature)</option>
+      </select>
+    </div></form>
+    <div class="chart-wrap"><svg class="chart" id="rg-chart" role="img" aria-label="Comfort ranges chart"></svg></div>
+    <p class="note"><strong id="r-outer">Outer range of air temperatures: 4.1 &deg;C</strong><br>
+      Given the other four parameters, occupants will find thermal comfort in the wider range of temperatures shown, as long as the varied parameter can change within the given range.</p>
+    <p class="note"><strong id="r-inner">Inner range of air temperatures: 1.8 &deg;C</strong><br>
+      Given the other four parameters, this is the range of temperatures in which all the occupants will find thermal comfort for every value of the varied parameter selected above. The inner range is zero if the comfort zones corresponding to the first and last conditions do not intersect.</p>
+    <p class="note">Chart legend: t_db = dry-bulb temperature, t_dp = dew point, t_wb = wet-bulb, W_a = humidity ratio, h = enthalpy. Each green zone is drawn vs. the operative temperature.</p>
+  </div>
+</div>
+</section>
+
+<!-- ================= UPLOAD ================= -->
+<section data-page="upload" hidden>
+<div class="jumbo">
+  <h1>Calculate comfort indexes in batch</h1>
+  <p class="lead">Uploading datasets is handled by the <strong>Analyse my data</strong> workbench in this application: it reads CSV files and computes comfort indexes (PMV, PPD, SET, cooling effect) with the same pythermalcomfort model family used here.</p>
+  <hr>
+  <p>Single-condition and two-condition evaluation are available on the <em>ASHRAE-55</em>, <em>EN-16798</em> and <em>Compare</em> tabs of this tool; parameter sweeps are on the <em>Ranges</em> tab.</p>
+</div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="f-col f-cite">
+      <p><strong>Comfio</strong> — powered by the pythermalcomfort model family
+        (Tartarini &amp; Schiavon 2020, <a href="https://doi.org/10.1016/j.softx.2020.100578">doi:10.1016/j.softx.2020.100578</a>).</p>
+      <p>Standards implemented: ASHRAE 55-2023 &middot; ISO 7730:2005 &middot; EN 16798-1:2019.</p>
+    </div>
+  </div>
+</footer>
