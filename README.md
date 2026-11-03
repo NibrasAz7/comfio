@@ -39,7 +39,7 @@ pip install comfio[all]       # All frameworks + advanced domains
 GUI (Streamlit workbench + notebook widget):
 
 ```bash
-pip install comfio[gui]           # streamlit, plotly, openpyxl, ipywidgets, pywebview
+pip install comfio[gui]           # streamlit>=1.51, plotly, openpyxl, ipywidgets, pywebview
 pip install comfio[gui-reports]   # + reportlab (PDF) and python-docx (DOCX) exports
 ```
 
@@ -59,9 +59,28 @@ import comfio
 comfio.gui()              # browser app on localhost:8501
 comfio.gui(df)            # preloaded DataFrame
 comfio.gui(desktop=True)  # native pywebview window instead of browser
+comfio.gui(tools=["workbench", "calculator"])  # enable only some tools
 ```
 
-The three-act flow: **upload** CSV/Excel (multi-sheet supported, SI or IP
+The app is a multipage set of independent tools (requires
+`streamlit>=1.51`). Each tool can be enabled or removed with one line —
+in the registry (`comfio.gui.tools.BUILTIN_TOOLS`), via
+`comfio.gui(tools=[...])` as above, or with the `COMFIO_GUI_TOOLS`
+environment variable (comma-separated tool ids, e.g.
+`COMFIO_GUI_TOOLS=calculator,about`).
+
+| Tool | id | What it does |
+| --- | --- | --- |
+| Analyse my data | `workbench` | upload → mapping → Global IEQ verdict → evidence/exports (default page) |
+| Occupant survey | `survey` | satisfaction-vote import, % satisfied, sensor-vs-occupant check |
+| Comfort calculator | `calculator` | PMV/PPD, SET, adaptive models, compare & ranges, psychrometric chart |
+| MRT room designer | `mrt` | plan-view MRT/PMV map of a rectangular room, solar ΔMRT at the occupant |
+| Setpoint explorer | `setpoint` | comfort-band edges and deadband widening |
+| Global database | `benchmark` | ASHRAE DB II (CC0) adaptive scatter, sensation bins, PMV bias, building overlay |
+| Learn | `learn` | guided lessons that hand inputs to the calculator |
+| About & sources | `about` | enabled tools, provenance, licences, citations (always on) |
+
+The workbench three-act flow: **upload** CSV/Excel (multi-sheet supported, SI or IP
 units) → **inspect and correct** the auto-detected column mapping →
 **verdict** (Global IEQ gauge, per-domain traffic lights, comfort scatter,
 hour-of-day exceedance heatmap, occupant-vote calibration) → **evidence**

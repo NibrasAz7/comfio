@@ -41,6 +41,8 @@ BUILTIN_TOOLS: tuple[str, ...] = (
     "comfio.gui.tools.mrt",
     "comfio.gui.tools.setpoint",
     "comfio.gui.tools.survey",
+    "comfio.gui.tools.learn",
+    "comfio.gui.tools.about",
 )
 
 

@@ -35,7 +35,8 @@ def test_load_tools_default_order() -> None:
 
 def test_unknown_id_reported() -> None:
     specs, messages = load_tools(["workbench", "nope"])
-    assert [s.id for s in specs] == ["workbench"]
+    # "about" is always_on — it loads even when not requested
+    assert [s.id for s in specs] == ["workbench", "about"]
     assert any("nope" in m for m in messages)
 
 
@@ -81,9 +82,15 @@ def test_entrypoint_reruns() -> None:
     assert len(at.selectbox) > 0
 
 
-def test_no_enabled_tools_shows_error(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_unknown_env_id_boots_on_about(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # With an always_on tool (About) the "zero enabled tools" error path
+    # is unreachable: the app still boots on About, which surfaces the
+    # unknown-id load message as a warning.
     monkeypatch.setenv("COMFIO_GUI_TOOLS", "nope")
     at = AppTest.from_file(APP, default_timeout=60)
     at.run()
     assert not at.exception
-    assert any("nope" in e.value for e in at.error)
+    assert any("nope" in w.value for w in at.warning)
+    assert len(at.file_uploader) == 0
