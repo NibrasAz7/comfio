@@ -37,6 +37,7 @@ class ToolSpec:
 BUILTIN_TOOLS: tuple[str, ...] = (
     "comfio.gui.tools.workbench",
     "comfio.gui.tools.calculator",
+    "comfio.gui.tools.benchmark",
 )
 
 

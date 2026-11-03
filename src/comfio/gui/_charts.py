@@ -465,6 +465,167 @@ def adaptive_chart(
     return fig
 
 
+def db_adaptive_scatter(
+    df: pd.DataFrame,
+    overlay: pd.DataFrame | None = None,
+    max_points: int = 20000,
+) -> go.Figure:
+    """DB II operative-vs-outdoor scatter with the ASHRAE adaptive band.
+
+    X is ``t_mot_isd`` (the database's 7-day running mean outdoor
+    temperature), Y the ``top`` operative temperature, colour the thermal
+    sensation vote. ``overlay`` (a ``user_overlay`` frame with ``top`` +
+    ``t_mot``) is drawn as black stars. Large frames are deterministically
+    subsampled to ``max_points`` for rendering.
+    """
+    from comfio.domains.thermal_adaptive import (
+        ASHRAE_T_OUT_MAX,
+        ASHRAE_T_OUT_MIN,
+        Acceptability,
+        evaluate_adaptive_ashrae,
+    )
+
+    fig = go.Figure()
+    d = df.dropna(subset=["t_mot_isd", "top"])
+    if len(d) > max_points:
+        d = d.sample(n=max_points, random_state=0)
+    if "thermal_sensation" in d.columns:
+        marker: dict = {
+            "color": d["thermal_sensation"],
+            "colorscale": "RdBu_r",
+            "cmin": -3,
+            "cmax": 3,
+            "size": 4,
+            "opacity": 0.5,
+            "colorbar": {"title": "TSV"},
+        }
+    else:
+        marker = {"color": "#264653", "size": 4, "opacity": 0.5}
+    fig.add_trace(
+        go.Scatter(
+            x=d["t_mot_isd"],
+            y=d["top"],
+            mode="markers",
+            marker=marker,
+            name="DB II votes",
+        )
+    )
+
+    grid = np.linspace(ASHRAE_T_OUT_MIN, ASHRAE_T_OUT_MAX, 24)
+    t_dummy = np.array([22.0])
+    band_styles: tuple[tuple[Acceptability, str, str], ...] = (
+        (80, "rgba(42,157,143,0.12)", "#2a9d8f"),
+        (90, "rgba(233,196,106,0.12)", "#b8912a"),
+    )
+    for acc, fill, line in band_styles:
+        lows, highs = [], []
+        for t in grid:
+            r = evaluate_adaptive_ashrae(
+                tdb=t_dummy, tr=t_dummy, t_prevail=float(t), acceptability=acc
+            )
+            lows.append(r.t_comf_lower)
+            highs.append(r.t_comf_upper)
+        fig.add_trace(
+            go.Scatter(
+                x=list(grid) + list(grid[::-1]),
+                y=list(highs) + list(lows[::-1]),
+                fill="toself",
+                fillcolor=fill,
+                line={"color": line, "width": 1},
+                name=f"ASHRAE {acc} % band",
+            )
+        )
+    fig.add_trace(
+        go.Scatter(
+            x=list(grid),
+            y=list(0.31 * grid + 17.8),
+            mode="lines",
+            line={"color": "#264653", "width": 1.5, "dash": "dash"},
+            name="ASHRAE comfort temp",
+        )
+    )
+
+    if overlay is not None and {"top", "t_mot"} <= set(overlay.columns):
+        ov = overlay.dropna(subset=["top", "t_mot"])
+        if not ov.empty:
+            fig.add_trace(
+                go.Scatter(
+                    x=ov["t_mot"],
+                    y=ov["top"],
+                    mode="markers",
+                    marker={
+                        "symbol": "star",
+                        "size": 9,
+                        "color": "#111111",
+                    },
+                    name="your data",
+                )
+            )
+    fig.update_layout(
+        height=420,
+        xaxis_title="Outdoor temperature — 7-day running mean (t_mot_isd) [°C]",
+        yaxis_title="Operative temperature [°C]",
+        margin={"l": 50, "r": 20, "t": 30, "b": 50},
+    )
+    return fig
+
+
+def sensation_bins_chart(bins: pd.DataFrame) -> go.Figure:
+    """Mean TSV (line) and % acceptable (bars) per operative-temp bin."""
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    fig.add_trace(
+        go.Bar(
+            x=bins["t_bin"],
+            y=bins["pct_acceptable"],
+            name="% acceptable",
+            marker_color="#a8e0b3",
+            opacity=0.65,
+        ),
+        secondary_y=True,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=bins["t_bin"],
+            y=bins["mean_tsv"],
+            mode="lines+markers",
+            name="mean TSV",
+            line={"color": "#264653", "width": 2},
+        ),
+        secondary_y=False,
+    )
+    fig.update_yaxes(title_text="Mean TSV [-3..+3]", secondary_y=False)
+    fig.update_yaxes(
+        title_text="% acceptable", secondary_y=True, range=[0, 100]
+    )
+    fig.update_xaxes(title_text="Operative temperature bin [°C]")
+    fig.update_layout(
+        height=360,
+        margin={"l": 50, "r": 20, "t": 30, "b": 50},
+    )
+    return fig
+
+
+def pmv_bias_chart(bias: pd.DataFrame) -> go.Figure:
+    """Mean (PMV − TSV) per cooling type — model-vs-vote bias."""
+    fig = go.Figure(
+        go.Bar(
+            x=bias["cooling_type"],
+            y=bias["mean_bias"],
+            marker_color="#457b9d",
+            text=[f"n={n}" for n in bias["n"]],
+            textposition="auto",
+        )
+    )
+    fig.add_hline(y=0, line_color="#264653", line_width=1)
+    fig.update_layout(
+        height=320,
+        xaxis_title="Cooling type",
+        yaxis_title="Mean (PMV − TSV)",
+        margin={"l": 50, "r": 20, "t": 30, "b": 40},
+    )
+    return fig
+
+
 def ranges_curve(df: pd.DataFrame, param: str, label: str) -> go.Figure:
     """PMV / SET vs a swept input, PPD on a secondary axis."""
     fig = make_subplots(specs=[[{"secondary_y": True}]])
