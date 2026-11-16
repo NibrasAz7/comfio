@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-11-16
+
 ### Added
 
 - **sPMVopt**: `evaluate_spmvopt()` and `SPMVOptResult` — the optimized simplified PMV model of Morresi et al. (2026) with GAM-derived dynamic clothing insulation estimation and climate-specific coefficients for France, Portugal, and Sweden
