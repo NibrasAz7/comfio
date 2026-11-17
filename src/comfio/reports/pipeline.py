@@ -302,9 +302,7 @@ def run_pipeline(
             elif caps["thermal_adaptive_ashrae"]:
                 if _has_col(sensor, "prevailing_mean_outdoor_c"):
                     t_prevail = float(
-                        np.mean(
-                            _get_col(sensor, "prevailing_mean_outdoor_c", _col_cache)
-                        )
+                        np.mean(_get_col(sensor, "prevailing_mean_outdoor_c", _col_cache))
                     )
                 else:
                     t_prevail = float(np.mean(_get_col(sensor, "outdoor_temp_c", _col_cache)))

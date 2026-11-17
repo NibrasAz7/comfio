@@ -17,20 +17,10 @@ import pytest
 st = pytest.importorskip("streamlit")
 from streamlit.testing.v1 import AppTest  # noqa: E402
 
-ASSETS = (
-    Path(__file__).parents[2]
-    / "src"
-    / "comfio"
-    / "gui"
-    / "tools"
-    / "comfort_tool"
-    / "_assets"
-)
+ASSETS = Path(__file__).parents[2] / "src" / "comfio" / "gui" / "tools" / "comfort_tool" / "_assets"
 NODE_CHECK = Path(__file__).with_name("_node_check.js")
 
-needs_node = pytest.mark.skipif(
-    shutil.which("node") is None, reason="node not installed"
-)
+needs_node = pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
 
 
 def _node(fn: str, *args: float):
@@ -78,8 +68,14 @@ def test_physics_pmv_matches_pythermalcomfort() -> None:
         clo_d = float(clo_dynamic_ashrae(clo, met))
         ref = float(
             pmv_ppd_ashrae(
-                tdb=ta, tr=tr, vr=vr, rh=rh, met=met, clo=clo_d,
-                limit_inputs=False, round_output=False,
+                tdb=ta,
+                tr=tr,
+                vr=vr,
+                rh=rh,
+                met=met,
+                clo=clo_d,
+                limit_inputs=False,
+                round_output=False,
             ).pmv
         )
         got = _node("pmvAshrae", ta, tr, v, rh, met, clo)
@@ -99,8 +95,9 @@ def test_physics_set_matches_pythermalcomfort() -> None:
     ]
     for ta, tr, v, rh, met, clo in pts:
         ref = float(
-            set_tmp(tdb=ta, tr=tr, v=v, rh=rh, met=met, clo=clo,
-                    limit_inputs=False, round_output=False).set
+            set_tmp(
+                tdb=ta, tr=tr, v=v, rh=rh, met=met, clo=clo, limit_inputs=False, round_output=False
+            ).set
         )
         got = _node("setTmp", ta, tr, v, rh, met, clo)
         assert got == pytest.approx(ref, abs=0.3), (ta, tr, v, rh, met, clo)
@@ -128,15 +125,9 @@ def test_physics_adaptive_matches() -> None:
         ref_en = adaptive_en(tdb=ta, tr=tr, t_running_mean=t_rm, v=v)
         got_en = _node("adaptiveEn", ta, tr, t_rm, v)
         assert got_en["tCmf"] == pytest.approx(float(ref_en.tmp_cmf), abs=0.05)
-        assert got_en["catI"]["low"] == pytest.approx(
-            float(ref_en.tmp_cmf_cat_i_low), abs=0.05
-        )
-        assert got_en["catIII"]["up"] == pytest.approx(
-            float(ref_en.tmp_cmf_cat_iii_up), abs=0.05
-        )
-        assert bool(got_en["acceptabilityIII"]) == bool(
-            ref_en.acceptability_cat_iii
-        )
+        assert got_en["catI"]["low"] == pytest.approx(float(ref_en.tmp_cmf_cat_i_low), abs=0.05)
+        assert got_en["catIII"]["up"] == pytest.approx(float(ref_en.tmp_cmf_cat_iii_up), abs=0.05)
+        assert bool(got_en["acceptabilityIII"]) == bool(ref_en.acceptability_cat_iii)
 
 
 @needs_node
@@ -150,13 +141,9 @@ def test_physics_corrections_and_ce() -> None:
     assert _node("cloDynamicAshrae", 0.5, 1.4) == pytest.approx(0.443)
 
     assert float(v_relative(0.1, 1.4)) == pytest.approx(_node("vRelative", 0.1, 1.4))
-    assert float(clo_dynamic_ashrae(0.5, 1.4)) == pytest.approx(
-        _node("cloDynamicAshrae", 0.5, 1.4)
-    )
+    assert float(clo_dynamic_ashrae(0.5, 1.4)) == pytest.approx(_node("cloDynamicAshrae", 0.5, 1.4))
 
-    ref_ce = float(
-        cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5).ce
-    )
+    ref_ce = float(cooling_effect(tdb=25, tr=25, vr=0.3, rh=50, met=1.2, clo=0.5).ce)
     got_ce = _node("coolingEffect", 25, 25, 0.3, 50, 1.2, 0.5)
     assert got_ce == pytest.approx(ref_ce, abs=0.1)
 

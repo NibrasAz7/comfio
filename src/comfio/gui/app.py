@@ -37,9 +37,7 @@ def run() -> None:
     )
     _styles.inject()
 
-    specs, messages = load_tools(
-        enabled_from_env(os.environ.get("COMFIO_GUI_TOOLS"))
-    )
+    specs, messages = load_tools(enabled_from_env(os.environ.get("COMFIO_GUI_TOOLS")))
     _state.set(_state.TOOL_MESSAGES, messages)
 
     if not specs:

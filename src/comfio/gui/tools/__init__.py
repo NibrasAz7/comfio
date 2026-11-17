@@ -75,9 +75,7 @@ def load_tools(enabled: Sequence[str] | None = None) -> tuple[list[ToolSpec], li
             continue
         missing = [m for m in spec.requires if importlib.util.find_spec(m) is None]
         if missing:
-            messages.append(
-                f"Tool {spec.id!r} unavailable — missing: {', '.join(missing)}."
-            )
+            messages.append(f"Tool {spec.id!r} unavailable — missing: {', '.join(missing)}.")
             continue
         specs.append(spec)
     return specs, messages

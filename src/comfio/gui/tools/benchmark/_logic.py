@@ -82,9 +82,7 @@ def sensation_bins(df: pd.DataFrame, bin_c: float = 1.0) -> pd.DataFrame:
         if col not in d.columns:
             d[col] = np.nan
     if "thermal_acceptability" in d.columns:
-        d["_acceptable"] = d["thermal_acceptability"].map(
-            {"acceptable": 1.0, "unacceptable": 0.0}
-        )
+        d["_acceptable"] = d["thermal_acceptability"].map({"acceptable": 1.0, "unacceptable": 0.0})
     else:
         d["_acceptable"] = np.nan
     d = d.dropna(subset=["top"])
@@ -119,16 +117,10 @@ def pmv_bias(df: pd.DataFrame) -> pd.DataFrame:
         if col not in d.columns:
             d[col] = np.nan
     d["bias"] = d["pmv"] - d["thermal_sensation"]
-    return (
-        d.groupby("cooling_type")["bias"]
-        .agg(n="count", mean_bias="mean")
-        .reset_index()
-    )
+    return d.groupby("cooling_type")["bias"].agg(n="count", mean_bias="mean").reset_index()
 
 
-def user_overlay(
-    prepared: pd.DataFrame, mapping: dict[str, str]
-) -> pd.DataFrame | None:
+def user_overlay(prepared: pd.DataFrame, mapping: dict[str, str]) -> pd.DataFrame | None:
     """Map a workbench frame onto the DB scatter columns.
 
     Produces ``top`` (operative via ``operative_tmp`` from the mapped

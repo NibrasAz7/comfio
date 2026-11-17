@@ -124,9 +124,7 @@ def ashrae_pmv(
         np.asarray(met, dtype=float),
         np.asarray(clo, dtype=float),
     )
-    vr_rel, clo_d = _preprocessed(
-        vr_a, met_a, clo_a, dynamic_clo, relative_air_speed
-    )
+    vr_rel, clo_d = _preprocessed(vr_a, met_a, clo_a, dynamic_clo, relative_air_speed)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         res = pmv_ppd_ashrae(
@@ -216,9 +214,7 @@ def _eval_pmv_method(
     relative_air_speed: bool,
 ) -> PointResult:
     notes: list[str] = []
-    vr_rel, clo_d = _preprocessed(
-        inp.vr, inp.met, inp.clo, dynamic_clo, relative_air_speed
-    )
+    vr_rel, clo_d = _preprocessed(inp.vr, inp.met, inp.clo, dynamic_clo, relative_air_speed)
     set_c, ce = _set_ce(inp, float(vr_rel), float(clo_d))
 
     if method == METHODS[0]:  # ASHRAE 55-2023
@@ -368,9 +364,7 @@ def evaluate_point(
         return _eval_adaptive_ashrae(inp)
     if method == METHODS[4]:
         return _eval_adaptive_en(inp)
-    return _eval_pmv_method(
-        inp, method, dynamic_clo, relative_air_speed
-    )
+    return _eval_pmv_method(inp, method, dynamic_clo, relative_air_speed)
 
 
 def rh_from(
@@ -419,9 +413,7 @@ def mrt_from_globe(
     """
     from pythermalcomfort.utilities import mean_radiant_tmp
 
-    return float(
-        mean_radiant_tmp(tg, tdb, v, d=d, emissivity=emissivity, standard="ISO")
-    )
+    return float(mean_radiant_tmp(tg, tdb, v, d=d, emissivity=emissivity, standard="ISO"))
 
 
 def sweep(inp: Inputs, method: str, param: str, values: np.ndarray) -> pd.DataFrame:

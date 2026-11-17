@@ -124,10 +124,7 @@ def _scale(df: pd.DataFrame, mapping: dict[str, str]) -> Literal["-3..3", "1..7"
             "−3…3 / 1–7 scales — fix the file or remap the column:"
         )
         for canonical, actual, samples in invalid:
-            st.write(
-                f"• **{actual}** ({_logic.SAT_COLUMNS[canonical]}): "
-                + ", ".join(samples)
-            )
+            st.write(f"• **{actual}** ({_logic.SAT_COLUMNS[canonical]}): " + ", ".join(samples))
         return None
     if any_seven and st.checkbox(
         "Responses are on a 1–7 scale (remap to −3…3)",

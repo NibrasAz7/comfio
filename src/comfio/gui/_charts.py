@@ -106,9 +106,7 @@ def comfort_scatter(
         if pmv is not None
         else {"color": "#264653", "size": 6}
     )
-    fig.add_trace(
-        go.Scatter(x=tdb, y=rh, mode="markers", marker=marker, name="samples")
-    )
+    fig.add_trace(go.Scatter(x=tdb, y=rh, mode="markers", marker=marker, name="samples"))
     fig.update_layout(
         height=380,
         xaxis_title="Air / operative temperature [°C]",
@@ -177,9 +175,7 @@ def sweep_curve(rows: list[dict], x_label: str) -> go.Figure:
     return fig
 
 
-def pmv_tsv_scatter(
-    pmv: np.ndarray, tsv: np.ndarray, alpha: float, beta: float
-) -> go.Figure:
+def pmv_tsv_scatter(pmv: np.ndarray, tsv: np.ndarray, alpha: float, beta: float) -> go.Figure:
     """PMV-vs-vote scatter with the OLS personalisation fit line."""
     fig = go.Figure()
     fig.add_trace(
@@ -291,9 +287,7 @@ def psychro_chart(
     t_axis = np.linspace(10.0, 40.0, 61)
     fig = go.Figure()
     for rh_pct in range(10, 100, 10):
-        w_line = (
-            humidity_ratio(t_axis, np.full_like(t_axis, float(rh_pct))) * 1000.0
-        )
+        w_line = humidity_ratio(t_axis, np.full_like(t_axis, float(rh_pct))) * 1000.0
         fig.add_trace(
             go.Scatter(
                 x=t_axis,
@@ -594,9 +588,7 @@ def sensation_bins_chart(bins: pd.DataFrame) -> go.Figure:
         secondary_y=False,
     )
     fig.update_yaxes(title_text="Mean TSV [-3..+3]", secondary_y=False)
-    fig.update_yaxes(
-        title_text="% acceptable", secondary_y=True, range=[0, 100]
-    )
+    fig.update_yaxes(title_text="% acceptable", secondary_y=True, range=[0, 100])
     fig.update_xaxes(title_text="Operative temperature bin [°C]")
     fig.update_layout(
         height=360,

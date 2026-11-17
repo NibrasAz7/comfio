@@ -57,17 +57,13 @@ def render_sidebar(df_columns: set[str]) -> dict[str, Any]:
         _state.set(_state.IP_UNITS, ip_units)
 
     st.sidebar.header("Standards")
-    category = st.sidebar.selectbox(
-        "Thermal category (ISO 7730)", ["B", "A", "C"], index=0
-    )
+    category = st.sidebar.selectbox("Thermal category (ISO 7730)", ["B", "A", "C"], index=0)
     task_type = st.sidebar.selectbox(
         "Visual task (EN 12464-1)",
         ["general", "office", "reading", "corridor", "precision"],
         index=0,
     )
-    nc_level = st.sidebar.selectbox(
-        "Acoustic level", ["NC-25", "NC-35", "NC-40", "NC-50"], index=1
-    )
+    nc_level = st.sidebar.selectbox("Acoustic level", ["NC-25", "NC-35", "NC-40", "NC-50"], index=1)
     co2_threshold = st.sidebar.selectbox(
         "IAQ CO₂ level", ["excellent", "good", "acceptable"], index=1
     )

@@ -75,9 +75,7 @@ def test_window_conserves_parent_factor() -> None:
     bare = view_factors(_room(), 3.6, 3.15, 0.6)
     with_win = view_factors(_room(windows=[win]), 3.6, 3.15, 0.6)
     # the window splits off part of its parent wall — sum is conserved
-    assert with_win["front"] + with_win["window:0"] == pytest.approx(
-        bare["front"], abs=1e-9
-    )
+    assert with_win["front"] + with_win["window:0"] == pytest.approx(bare["front"], abs=1e-9)
     assert sum(with_win.values()) == pytest.approx(1.0, abs=1e-9)
     for s in SURFACES:
         if s != "front":
@@ -129,9 +127,7 @@ def test_matches_replication_reference() -> None:
     for (x, y, z), expected in refs.items():
         f = view_factors(room, x, y, z)
         for surf, frac in expected.items():
-            assert f[surf] == pytest.approx(frac, abs=1e-6), (
-                f"{surf} at {(x, y, z)}"
-            )
+            assert f[surf] == pytest.approx(frac, abs=1e-6), f"{surf} at {(x, y, z)}"
 
 
 def test_invalid_dims_raise() -> None:
@@ -171,25 +167,13 @@ def test_point_on_wall_does_not_crash() -> None:
 def test_window_out_of_bounds_raises() -> None:
     # front wall extent = room width (6.3): u0 5.5 + w 2.0 = 7.5
     with pytest.raises(ValueError, match="u0|width"):
-        _room(
-            windows=[
-                Window("front", u0=5.5, z0=0.5, width=2.0, height=1.0, temp_c=30.0)
-            ]
-        )
+        _room(windows=[Window("front", u0=5.5, z0=0.5, width=2.0, height=1.0, temp_c=30.0)])
     # z0 2.5 + h 1.0 = 3.5 > room height 3.0
     with pytest.raises(ValueError, match="z0|height"):
-        _room(
-            windows=[
-                Window("left", u0=1.0, z0=2.5, width=1.0, height=1.0, temp_c=30.0)
-            ]
-        )
+        _room(windows=[Window("left", u0=1.0, z0=2.5, width=1.0, height=1.0, temp_c=30.0)])
     # negative u0 puts the window off the wall
     with pytest.raises(ValueError, match="u0"):
-        _room(
-            windows=[
-                Window("rear", u0=-0.5, z0=0.5, width=1.0, height=1.0, temp_c=30.0)
-            ]
-        )
+        _room(windows=[Window("rear", u0=-0.5, z0=0.5, width=1.0, height=1.0, temp_c=30.0)])
 
 
 def test_bad_window_fields_raise() -> None:
@@ -204,9 +188,7 @@ def test_bad_window_fields_raise() -> None:
 def test_overlapping_windows_raise() -> None:
     a = Window("rear", u0=1.0, z0=0.5, width=2.0, height=1.5, temp_c=30.0)
     b = Window("rear", u0=2.0, z0=1.0, width=2.0, height=1.5, temp_c=30.0)
-    other_wall = Window(
-        "front", u0=2.0, z0=1.0, width=2.0, height=1.5, temp_c=30.0
-    )
+    other_wall = Window("front", u0=2.0, z0=1.0, width=2.0, height=1.5, temp_c=30.0)
     with pytest.raises(ValueError, match="overlap"):
         _room(windows=[a, b])
     # same wall but only edge-adjacent is fine
@@ -247,15 +229,18 @@ def test_solar_delta_mrt_zero_and_positive() -> None:
     )
     assert delta > 0.0
     # occupant flush against the window must not divide by zero
-    assert solar_delta_mrt(
-        win,
-        0.0,
-        sol_altitude=45.0,
-        sharp=0.0,
-        sol_radiation_dir=800.0,
-        sol_transmittance=0.7,
-        f_bes=0.5,
-    ) >= 0.0
+    assert (
+        solar_delta_mrt(
+            win,
+            0.0,
+            sol_altitude=45.0,
+            sharp=0.0,
+            sol_radiation_dir=800.0,
+            sol_transmittance=0.7,
+            f_bes=0.5,
+        )
+        >= 0.0
+    )
 
 
 def test_mrt_grid_shape_and_spacing() -> None:

@@ -100,8 +100,7 @@ def test_adaptive_requires_running_mean() -> None:
 
 def test_adaptive_compliant_point() -> None:
     # t_prevail 20 -> t_comf = 24.0; a 24/24 room passes the 80% band.
-    inp = Inputs(tdb=24.0, tr=24.0, rh=50.0, vr=0.1, met=1.2, clo=0.5,
-                 t_running_mean=20.0)
+    inp = Inputs(tdb=24.0, tr=24.0, rh=50.0, vr=0.1, met=1.2, clo=0.5, t_running_mean=20.0)
     res = evaluate_point(inp, METHODS[3])
     assert res.compliant is True
     assert res.category == "90 %"
@@ -145,8 +144,12 @@ def test_zone_band_brackets_neutral() -> None:
     rh_mid = 100.0 * pv / float(p_sat(np.array([mid]))[0])
     pmv_mid = float(
         ashrae_pmv(
-            np.array([mid]), np.array([mid]), np.array([0.1]),
-            np.array([rh_mid]), np.array([1.2]), np.array([0.5]),
+            np.array([mid]),
+            np.array([mid]),
+            np.array([0.1]),
+            np.array([rh_mid]),
+            np.array([1.2]),
+            np.array([0.5]),
         )[0]
     )
     assert abs(pmv_mid) <= 0.5
@@ -183,17 +186,13 @@ def test_compare_tab_renders_chart(at: AppTest) -> None:
     at.run()
     assert not at.exception
     # main + compare charts: result psychro chart + one compare chart
-    assert len(at.get("arrow_vega_lite_chart")) >= 2 or len(
-        at.get("plotly_chart")
-    ) >= 2
+    assert len(at.get("arrow_vega_lite_chart")) >= 2 or len(at.get("plotly_chart")) >= 2
 
 
 def test_ranges_tab_renders_chart(at: AppTest) -> None:
     at.run()
     assert not at.exception
-    n_charts = len(at.get("arrow_vega_lite_chart")) + len(
-        at.get("plotly_chart")
-    )
+    n_charts = len(at.get("arrow_vega_lite_chart")) + len(at.get("plotly_chart"))
     assert n_charts >= 3  # result + compare + ranges
 
 

@@ -43,9 +43,7 @@ STANDARD_NAMES = {
 _INPUT_FIELDS = {f.name for f in fields(Inputs)}
 # PMV/PPD numbers must be computed live via evaluate_point — a lesson
 # may name the metrics but must never state a value for them.
-_PMV_PPD_LITERAL = re.compile(
-    r"\b(?:pmv|ppd)\b[^a-zA-Z\d]{0,8}\d", re.IGNORECASE
-)
+_PMV_PPD_LITERAL = re.compile(r"\b(?:pmv|ppd)\b[^a-zA-Z\d]{0,8}\d", re.IGNORECASE)
 
 
 def _learn_app() -> None:
@@ -147,6 +145,4 @@ def test_links_rendered_when_tool_enabled() -> None:
     lesson = next(lsn for lsn in lessons.LESSONS if lsn.links)
     at.selectbox[0].set_value(lesson).run()
     assert not at.exception
-    assert len(at.get("page_link")) >= len(
-        [lid for lid in lesson.links if lid != "learn"]
-    )
+    assert len(at.get("page_link")) >= len([lid for lid in lesson.links if lid != "learn"])

@@ -134,9 +134,7 @@ def gui(
     try:
         from comfio.gui import gui as _gui
     except ModuleNotFoundError as exc:
-        raise ImportError(
-            "The comfio.gui subpackage is unavailable in this installation."
-        ) from exc
+        raise ImportError("The comfio.gui subpackage is unavailable in this installation.") from exc
 
     _gui(df=df, port=port, desktop=desktop, tools=tools)
 
@@ -146,9 +144,7 @@ def gui_notebook(df: object = None) -> object:
     try:
         from comfio.gui import gui_notebook as _gui_notebook
     except ModuleNotFoundError as exc:
-        raise ImportError(
-            "The comfio.gui subpackage is unavailable in this installation."
-        ) from exc
+        raise ImportError("The comfio.gui subpackage is unavailable in this installation.") from exc
 
     return _gui_notebook(df=df)
 

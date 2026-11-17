@@ -20,8 +20,7 @@ from pathlib import Path
 from typing import Any
 
 _GUI_IMPORT_ERROR = (
-    "The comfio GUI requires extra dependencies. "
-    "Install with: pip install comfio[gui]"
+    "The comfio GUI requires extra dependencies. Install with: pip install comfio[gui]"
 )
 
 

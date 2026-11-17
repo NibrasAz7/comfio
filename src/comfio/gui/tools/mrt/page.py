@@ -47,12 +47,8 @@ def _geometry_inputs() -> tuple[float, float, float]:
     length = float(
         cols[0].number_input("Room length L [m] (x)", 0.5, 30.0, 6.0, 0.1, key="mrt_len")
     )
-    width = float(
-        cols[1].number_input("Room width W [m] (y)", 0.5, 30.0, 4.0, 0.1, key="mrt_wid")
-    )
-    height = float(
-        cols[2].number_input("Room height H [m] (z)", 2.0, 8.0, 3.0, 0.1, key="mrt_hei")
-    )
+    width = float(cols[1].number_input("Room width W [m] (y)", 0.5, 30.0, 4.0, 0.1, key="mrt_wid"))
+    height = float(cols[2].number_input("Room height H [m] (z)", 2.0, 8.0, 3.0, 0.1, key="mrt_hei"))
     return length, width, height
 
 
@@ -69,9 +65,7 @@ def _temps_inputs() -> dict[str, float]:
     temps: dict[str, float] = {}
     for i, surf in enumerate(SURFACES):
         temps[surf] = float(
-            cols[i].number_input(
-                labels[surf], -20.0, 80.0, 22.0, 0.5, key=f"mrt_t_{surf}"
-            )
+            cols[i].number_input(labels[surf], -20.0, 80.0, 22.0, 0.5, key=f"mrt_t_{surf}")
         )
     return temps
 
@@ -81,9 +75,7 @@ def _window_inputs() -> list[Window]:
     cols = st.columns(_N_WINDOWS)
     for i in range(_N_WINDOWS):
         with cols[i]:
-            active = st.checkbox(
-                f"Window {i + 1} active", value=i == 0, key=f"mrt_w{i}_on"
-            )
+            active = st.checkbox(f"Window {i + 1} active", value=i == 0, key=f"mrt_w{i}_on")
             if not active:
                 continue
             wall = st.selectbox(
@@ -95,25 +87,13 @@ def _window_inputs() -> list[Window]:
             )
             c1, c2 = st.columns(2)
             u0 = float(
-                c1.number_input(
-                    "u0 along wall [m]", 0.0, 30.0, 1.0, 0.1, key=f"mrt_w{i}_u0"
-                )
+                c1.number_input("u0 along wall [m]", 0.0, 30.0, 1.0, 0.1, key=f"mrt_w{i}_u0")
             )
             z0 = float(
-                c2.number_input(
-                    "Sill height z0 [m]", 0.0, 7.0, 0.9, 0.1, key=f"mrt_w{i}_z0"
-                )
+                c2.number_input("Sill height z0 [m]", 0.0, 7.0, 0.9, 0.1, key=f"mrt_w{i}_z0")
             )
-            w = float(
-                c1.number_input(
-                    "Width [m]", 0.1, 10.0, 2.0, 0.1, key=f"mrt_w{i}_w"
-                )
-            )
-            h = float(
-                c2.number_input(
-                    "Height [m]", 0.1, 7.0, 1.4, 0.1, key=f"mrt_w{i}_h"
-                )
-            )
+            w = float(c1.number_input("Width [m]", 0.1, 10.0, 2.0, 0.1, key=f"mrt_w{i}_w"))
+            h = float(c2.number_input("Height [m]", 0.1, 7.0, 1.4, 0.1, key=f"mrt_w{i}_h"))
             temp = float(
                 st.number_input(
                     "Glazing temperature [°C]",
@@ -134,27 +114,15 @@ def _pmv_inputs() -> dict[str, float]:
     """Uniform air/activity inputs for the PMV map and the handoff."""
     with st.expander("Air & occupant inputs (used for the PMV map and handoff)"):
         cols = st.columns(5)
-        tdb = float(
-            cols[0].slider("Air temperature [°C]", 10.0, 35.0, 24.0, 0.5, key="mrt_tdb")
-        )
-        rh = float(
-            cols[1].slider("Relative humidity [%]", 0.0, 100.0, 50.0, 5.0, key="mrt_rh")
-        )
-        vr = float(
-            cols[2].slider("Air speed [m/s]", 0.0, 1.0, 0.1, 0.05, key="mrt_vr")
-        )
-        met = float(
-            cols[3].slider("Metabolic rate [met]", 0.8, 4.0, 1.2, 0.1, key="mrt_met")
-        )
-        clo = float(
-            cols[4].slider("Clothing [clo]", 0.0, 2.0, 0.5, 0.1, key="mrt_clo")
-        )
+        tdb = float(cols[0].slider("Air temperature [°C]", 10.0, 35.0, 24.0, 0.5, key="mrt_tdb"))
+        rh = float(cols[1].slider("Relative humidity [%]", 0.0, 100.0, 50.0, 5.0, key="mrt_rh"))
+        vr = float(cols[2].slider("Air speed [m/s]", 0.0, 1.0, 0.1, 0.05, key="mrt_vr"))
+        met = float(cols[3].slider("Metabolic rate [met]", 0.8, 4.0, 1.2, 0.1, key="mrt_met"))
+        clo = float(cols[4].slider("Clothing [clo]", 0.0, 2.0, 0.5, 0.1, key="mrt_clo"))
     return {"tdb": tdb, "rh": rh, "vr": vr, "met": met, "clo": clo}
 
 
-def _pmv_over_grid(
-    mrt: np.ndarray, air: dict[str, float]
-) -> np.ndarray:
+def _pmv_over_grid(mrt: np.ndarray, air: dict[str, float]) -> np.ndarray:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         res = evaluate_thermal(
@@ -169,9 +137,7 @@ def _pmv_over_grid(
     return res.pmv.reshape(mrt.shape)
 
 
-def _solar_inputs(
-    room: Room, x: float, y: float, posture: str
-) -> float:
+def _solar_inputs(room: Room, x: float, y: float, posture: str) -> float:
     """Solar expander → ΔMRT at the occupant point (0 when disabled)."""
     with st.expander("Solar gain (short-wave)"):
         st.caption(
@@ -221,13 +187,15 @@ def _solar_inputs(
             )
         )
         sol_trans = float(
-            c2.slider(
-                "Solar transmittance", 0.0, 1.0, 0.7, 0.05, key="mrt_sol_trans"
-            )
+            c2.slider("Solar transmittance", 0.0, 1.0, 0.7, 0.05, key="mrt_sol_trans")
         )
         f_bes = float(
             c1.slider(
-                "Fraction of body exposed (f_bes)", 0.0, 1.0, 0.5, 0.05,
+                "Fraction of body exposed (f_bes)",
+                0.0,
+                1.0,
+                0.5,
+                0.05,
                 key="mrt_f_bes",
             )
         )
@@ -273,20 +241,26 @@ def render() -> None:
         st.error(f"Invalid geometry — {exc}")
         return
 
-    posture = str(
-        st.radio("Posture", ("seated", "standing"), horizontal=True, key="mrt_posture")
-    )
+    posture = str(st.radio("Posture", ("seated", "standing"), horizontal=True, key="mrt_posture"))
     occ_z = 0.6 if posture == "seated" else 1.1
     c1, c2 = st.columns(2)
     occ_x = float(
         c1.slider(
-            "Occupant x [m]", 0.0, length, min(length / 2, length), 0.05,
+            "Occupant x [m]",
+            0.0,
+            length,
+            min(length / 2, length),
+            0.05,
             key="mrt_ox",
         )
     )
     occ_y = float(
         c2.slider(
-            "Occupant y [m]", 0.0, width, min(width / 2, width), 0.05,
+            "Occupant y [m]",
+            0.0,
+            width,
+            min(width / 2, width),
+            0.05,
             key="mrt_oy",
         )
     )
@@ -295,9 +269,7 @@ def render() -> None:
     delta = _solar_inputs(room, occ_x, occ_y, posture)
 
     xs, ys, grid = _cached_grid(room, posture, _SPACING, _MARGIN)
-    mode = st.radio(
-        "Map", ("MRT [°C]", "PMV"), horizontal=True, key="mrt_map_mode"
-    )
+    mode = st.radio("Map", ("MRT [°C]", "PMV"), horizontal=True, key="mrt_map_mode")
     if mode == "PMV":
         z_grid = _pmv_over_grid(grid, air)
         z_label, colorscale, zmid = "PMV", "RdBu_r", 0.0
@@ -337,9 +309,7 @@ def render() -> None:
         )
     cols = st.columns(4)
     cols[0].metric("MRT at occupant", f"{occ_mrt:.1f} °C")
-    cols[1].metric(
-        "Solar ΔMRT", f"+{delta:.1f} °C" if delta else "0 °C"
-    )
+    cols[1].metric("Solar ΔMRT", f"+{delta:.1f} °C" if delta else "0 °C")
     cols[2].metric(
         "PMV at occupant",
         "outside model range" if np.isnan(occ_pmv) else f"{occ_pmv:+.2f}",
@@ -349,9 +319,7 @@ def render() -> None:
         f"{occ_mrt + delta:.1f} °C" if delta else f"{occ_mrt:.1f} °C",
     )
 
-    if _state.tool_enabled("calculator") and st.button(
-        "Use in calculator", key="mrt_handoff"
-    ):
+    if _state.tool_enabled("calculator") and st.button("Use in calculator", key="mrt_handoff"):
         _state.set(
             _state.CALC_INPUTS,
             {

@@ -58,7 +58,7 @@ def test_mapping_screen_after_demo(at: AppTest) -> None:
 def test_full_flow_to_verdict(at: AppTest) -> None:
     _load_demo(at)
     for b in at.button:
-        if "Run analysis" in (b.label or ''):
+        if "Run analysis" in (b.label or ""):
             b.click().run()
             break
     at.run()

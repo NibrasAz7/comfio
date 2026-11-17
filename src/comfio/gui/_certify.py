@@ -53,8 +53,13 @@ def reset_air(
         if col is None or col not in df.columns:
             missing.append(label)
             criteria.append(
-                {"criterion": label, "target": limit, "coverage %": None,
-                 "within target %": None, "status": "no data"}
+                {
+                    "criterion": label,
+                    "target": limit,
+                    "coverage %": None,
+                    "within target %": None,
+                    "status": "no data",
+                }
             )
             continue
         v = pd.to_numeric(df[col], errors="coerce")
@@ -89,8 +94,11 @@ def reset_air(
             "Sample-level approximation — certification uses occupied-hour "
             "averages and requires ~3 consecutive months at ≥90% coverage.",
         ]
-        + (["No timestamp column — monitoring duration cannot be verified."]
-           if duration_days is None else []),
+        + (
+            ["No timestamp column — monitoring duration cannot be verified."]
+            if duration_days is None
+            else []
+        ),
     }
 
 

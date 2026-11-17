@@ -87,14 +87,16 @@ def _sweep(
                 df2[rcol] = df2[rcol] + v
         else:
             cfg[param] = v
-        sensor = SensorData(
-            df=df2, column_map=dict(mapping), timestamp_col=ts_col
-        )
+        sensor = SensorData(df=df2, column_map=dict(mapping), timestamp_col=ts_col)
         res = run_pipeline(sensor, cfg)
         if res.ieq_result is None:
             rows.append(
-                {"value": float(v), "ieq_mean": np.nan, "compliance_pct": np.nan,
-                 "domain_mean": np.nan}
+                {
+                    "value": float(v),
+                    "ieq_mean": np.nan,
+                    "compliance_pct": np.nan,
+                    "domain_mean": np.nan,
+                }
             )
             continue
         comp = res.compliance_report
@@ -103,13 +105,10 @@ def _sweep(
             {
                 "value": float(v),
                 "ieq_mean": float(np.nanmean(res.ieq_result.index)),
-                "compliance_pct": (
-                    comp.compliance_rate_pct if comp is not None else np.nan
-                ),
+                "compliance_pct": (comp.compliance_rate_pct if comp is not None else np.nan),
                 "domain_mean": (
                     100.0 * float(np.nanmean(np.asarray(thermal.compliant, dtype=float)))
-                    if thermal is not None
-                    and getattr(thermal, "compliant", None) is not None
+                    if thermal is not None and getattr(thermal, "compliant", None) is not None
                     else np.nan
                 ),
             }
@@ -190,9 +189,7 @@ def act_mapping(df: pd.DataFrame) -> None:
 
     auto = _state.get_column_map() or _mapping.auto_map_columns(df)
     timestamp_col = _state.get_timestamp_col()
-    sensor_cols = [
-        c for c in _mapping.CANONICAL_COLUMNS if c in _data.COLUMN_DESCRIPTIONS
-    ]
+    sensor_cols = [c for c in _mapping.CANONICAL_COLUMNS if c in _data.COLUMN_DESCRIPTIONS]
     options = ["— not available —"] + list(df.columns)
 
     auto_ts = timestamp_col or next(
@@ -218,9 +215,7 @@ def act_mapping(df: pd.DataFrame) -> None:
             pre = auto.get(canonical)
             idx = options.index(pre) if pre in options else 0
             label = _data.COLUMN_DESCRIPTIONS.get(canonical, canonical)
-            chosen = cols[i % 3].selectbox(
-                label, options, index=idx, key=f"map_{canonical}"
-            )
+            chosen = cols[i % 3].selectbox(label, options, index=idx, key=f"map_{canonical}")
             if chosen is not None and chosen != "— not available —":
                 mapping[canonical] = chosen
         submitted = st.form_submit_button("Run analysis", type="primary")
@@ -248,14 +243,9 @@ def act_mapping(df: pd.DataFrame) -> None:
         st.rerun()
 
     has_outdoor = any(
-        k in auto
-        for k in ("outdoor_temp_c", "prevailing_mean_outdoor_c", "running_mean_outdoor_c")
+        k in auto for k in ("outdoor_temp_c", "prevailing_mean_outdoor_c", "running_mean_outdoor_c")
     )
-    if (
-        not has_outdoor
-        and timestamp_sel is not None
-        and timestamp_sel != "— not available —"
-    ):
+    if not has_outdoor and timestamp_sel is not None and timestamp_sel != "— not available —":
         with st.expander("No outdoor temperature — fetch from meteostat?"):
             st.caption(
                 "Adds an outdoor_temp_c column (hourly, nearest match) so the "
@@ -267,9 +257,7 @@ def act_mapping(df: pd.DataFrame) -> None:
             if st.button("Fetch outdoor temperature for this file's range"):
                 try:
                     with st.spinner("Fetching weather data…"):
-                        df2 = _data.attach_outdoor_temperature(
-                            df, timestamp_sel, lat, lon
-                        )
+                        df2 = _data.attach_outdoor_temperature(df, timestamp_sel, lat, lon)
                     _state.set_df(df2)
                     st.rerun()
                 except Exception as exc:  # noqa: BLE001
@@ -308,9 +296,7 @@ def act_verdict(
         return
 
     c1, c2 = st.columns([1, 2])
-    c1.plotly_chart(
-        _charts.gauge(float(np.nanmean(ieq.index))), width="stretch"
-    )
+    c1.plotly_chart(_charts.gauge(float(np.nanmean(ieq.index))), width="stretch")
     c2.plotly_chart(_charts.domain_bars(ieq.domain_scores), width="stretch")
 
     ts_series = sensor.get_timestamps()
@@ -358,17 +344,13 @@ def act_verdict(
     with tabs[-1]:
         if has_time:
             st.plotly_chart(
-                _charts.exceedance_heatmap(
-                    pd.Series(x_axis.to_numpy()), np.asarray(ieq.index)
-                ),
+                _charts.exceedance_heatmap(pd.Series(x_axis.to_numpy()), np.asarray(ieq.index)),
                 width="stretch",
             )
             st.caption("When the Global IEQ Index falls below the 80 threshold.")
         else:
             st.plotly_chart(
-                _charts.timeseries(
-                    x_axis, np.asarray(ieq.index), "IEQ index", "#264653", 80.0
-                ),
+                _charts.timeseries(x_axis, np.asarray(ieq.index), "IEQ index", "#264653", 80.0),
                 width="stretch",
             )
             st.caption("No timestamp column — index over sample order.")
@@ -383,9 +365,7 @@ def act_verdict(
     # Occupant-vote calibration: PMV → TSV regression when both exist.
     if "tsv" in result.domain_results and "thermal" in result.domain_results:
         tsv_res = result.domain_results["tsv"]
-        votes = np.asarray(
-            result.domain_results.get("tsv_augmented", tsv_res.tsv), dtype=float
-        )
+        votes = np.asarray(result.domain_results.get("tsv_augmented", tsv_res.tsv), dtype=float)
         pmv = np.asarray(result.domain_results["thermal"].pmv, dtype=float)
         mask = ~(np.isnan(votes) | np.isnan(pmv)) if len(votes) == len(pmv) else None
         if mask is not None and int(mask.sum()) >= 10:
@@ -398,9 +378,7 @@ def act_verdict(
                 p2.metric("Offset (β)", f"{idx.beta:.3f}")
                 p3.metric("R²", f"{idx.r_squared:.3f}")
                 st.plotly_chart(
-                    _charts.pmv_tsv_scatter(
-                        pmv[mask], votes[mask], idx.alpha, idx.beta
-                    ),
+                    _charts.pmv_tsv_scatter(pmv[mask], votes[mask], idx.alpha, idx.beta),
                     width="stretch",
                 )
                 if "tsv_augmented" in result.domain_results:
@@ -455,13 +433,8 @@ def act_verdict(
                 {
                     "name": pin_name or f"Scenario {n_pin}",
                     "ieq_mean": float(np.nanmean(ieq.index)),
-                    "domain_means": {
-                        d: float(np.nanmean(s))
-                        for d, s in ieq.domain_scores.items()
-                    },
-                    "compliance_rate_pct": (
-                        comp.compliance_rate_pct if comp is not None else None
-                    ),
+                    "domain_means": {d: float(np.nanmean(s)) for d, s in ieq.domain_scores.items()},
+                    "compliance_rate_pct": (comp.compliance_rate_pct if comp is not None else None),
                     "config": dict(result.config),
                 }
             )
@@ -507,9 +480,7 @@ def act_scenarios() -> None:
         file_name="comfio_scenarios.json",
         mime="application/json",
     )
-    up = c2.file_uploader(
-        "Restore scenarios", type=["json"], key="scenario_restore"
-    )
+    up = c2.file_uploader("Restore scenarios", type=["json"], key="scenario_restore")
     if up is not None and _state.get("scenario_restore_loaded") != up.name:
         if _state.scenarios_from_json(up.read().decode("utf-8")):
             _state.set("scenario_restore_loaded", up.name)
@@ -539,15 +510,11 @@ def act_evidence(result: Any, config: dict, sensor: SensorData) -> None:
         check = (
             _certify.well_t06(result.domain_results.get("thermal"))
             if preset.startswith("WELL")
-            else _certify.reset_air(
-                sensor.df, sensor.column_map, sensor.timestamp_col
-            )
+            else _certify.reset_air(sensor.df, sensor.column_map, sensor.timestamp_col)
         )
         crit = check.get("criteria", [])
         if crit:
-            st.dataframe(
-                pd.DataFrame(crit).set_index("criterion"), width="stretch"
-            )
+            st.dataframe(pd.DataFrame(crit).set_index("criterion"), width="stretch")
             passed = check.get("criteria_passed", 0)
             total = check.get("criteria_total", len(crit))
             label = "meets" if passed == total else "does not meet"
@@ -556,9 +523,7 @@ def act_evidence(result: Any, config: dict, sensor: SensorData) -> None:
                 f"{passed}/{total} criteria — {label} (sample level)",
             )
             if check.get("duration_days") is not None:
-                st.caption(
-                    f"Monitoring span: {check['duration_days']:.0f} days."
-                )
+                st.caption(f"Monitoring span: {check['duration_days']:.0f} days.")
             if check.get("missing"):
                 st.caption("Missing inputs: " + ", ".join(check["missing"]))
         for caveat in check.get("caveats", []):
@@ -632,10 +597,7 @@ def act_evidence(result: Any, config: dict, sensor: SensorData) -> None:
             mime="text/csv",
         )
     else:
-        st.caption(
-            "Per-row thermal CSV unavailable — no thermal result or "
-            "row-count mismatch."
-        )
+        st.caption("Per-row thermal CSV unavailable — no thermal result or row-count mismatch.")
 
     _exports.render_exports(ieq, report, zone_id, config)
 
@@ -673,9 +635,7 @@ def render() -> None:
 
     st.title("comfio — analysis")
     caps = detect_capabilities(sensor)
-    banner = " · ".join(
-        f"{k.replace('_', ' ')} {'✅' if v else '—'}" for k, v in caps.items() if v
-    )
+    banner = " · ".join(f"{k.replace('_', ' ')} {'✅' if v else '—'}" for k, v in caps.items() if v)
     st.info(f"Ran: {banner}")
     if st.button("← Back to column mapping"):
         _state.clear_mapping()

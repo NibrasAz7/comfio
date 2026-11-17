@@ -82,8 +82,7 @@ LESSONS: tuple[Lesson, ...] = (
         sources=(
             "ISO 7730:2005",
             "ASHRAE 55-2023",
-            "Tartarini & Schiavon (2020), pythermalcomfort — "
-            "doi:10.1016/j.softx.2020.100578",
+            "Tartarini & Schiavon (2020), pythermalcomfort — doi:10.1016/j.softx.2020.100578",
         ),
     ),
     Lesson(
@@ -112,8 +111,7 @@ LESSONS: tuple[Lesson, ...] = (
             Step(
                 "1 · Uniform room",
                 dict(_OFFICE),
-                "Every surface at air temperature: the predicted vote "
-                "reflects the air alone.",
+                "Every surface at air temperature: the predicted vote reflects the air alone.",
             ),
             Step(
                 "2 · Cold glass wall",
@@ -133,8 +131,7 @@ LESSONS: tuple[Lesson, ...] = (
         sources=(
             "ISO 7726:1998",
             "ASHRAE 55-2023",
-            "Arens et al. (2015), solar radiation indoors — "
-            "doi:10.1016/j.buildenv.2014.09.004",
+            "Arens et al. (2015), solar radiation indoors — doi:10.1016/j.buildenv.2014.09.004",
         ),
         links=("mrt",),
     ),
@@ -160,8 +157,7 @@ LESSONS: tuple[Lesson, ...] = (
             Step(
                 "1 · Warm office, still air",
                 {**_OFFICE, "tdb": 27.0, "tr": 27.0},
-                "A summer office just past the comfortable edge in "
-                "still air.",
+                "A summer office just past the comfortable edge in still air.",
             ),
             Step(
                 "2 · Fan on",
@@ -173,8 +169,12 @@ LESSONS: tuple[Lesson, ...] = (
             Step(
                 "3 · Winter draft",
                 {
-                    "tdb": 20.0, "tr": 20.0, "rh": 50.0,
-                    "vr": 0.4, "met": 1.2, "clo": 1.0,
+                    "tdb": 20.0,
+                    "tr": 20.0,
+                    "rh": 50.0,
+                    "vr": 0.4,
+                    "met": 1.2,
+                    "clo": 1.0,
                 },
                 "A mild winter room with a leaky window: the same air "
                 "movement now costs comfort instead of buying it.",
@@ -211,8 +211,13 @@ LESSONS: tuple[Lesson, ...] = (
             Step(
                 "1 · A warm spell",
                 {
-                    "tdb": 28.0, "tr": 28.0, "rh": 50.0, "vr": 0.3,
-                    "met": 1.2, "clo": 0.5, "t_running_mean": 28.0,
+                    "tdb": 28.0,
+                    "tr": 28.0,
+                    "rh": 50.0,
+                    "vr": 0.3,
+                    "met": 1.2,
+                    "clo": 0.5,
+                    "t_running_mean": 28.0,
                 },
                 "Mid-heatwave indoors without cooling. The heat-balance "
                 "figure below calls this warm — 'Try it', then switch "
@@ -223,16 +228,20 @@ LESSONS: tuple[Lesson, ...] = (
             Step(
                 "2 · A cool spell",
                 {
-                    "tdb": 20.0, "tr": 20.0, "rh": 60.0, "vr": 0.15,
-                    "met": 1.2, "clo": 0.7, "t_running_mean": 12.0,
+                    "tdb": 20.0,
+                    "tr": 20.0,
+                    "rh": 60.0,
+                    "vr": 0.15,
+                    "met": 1.2,
+                    "clo": 0.7,
+                    "t_running_mean": 12.0,
                 },
                 "The mirror image: a cool shoulder-season day. Compare "
                 "the mechanistic verdict with the adaptive line again.",
             ),
         ),
         sources=(
-            "de Dear & Brager (2002), adaptive comfort — "
-            "doi:10.1016/S0378-7788(02)00005-1",
+            "de Dear & Brager (2002), adaptive comfort — doi:10.1016/S0378-7788(02)00005-1",
             "ASHRAE 55-2023",
             "EN 16798-1:2019",
         ),
@@ -264,8 +273,12 @@ LESSONS: tuple[Lesson, ...] = (
             Step(
                 "1 · A conditioned office",
                 {
-                    "tdb": 24.0, "tr": 24.0, "rh": 45.0, "vr": 0.15,
-                    "met": 1.2, "clo": 0.7,
+                    "tdb": 24.0,
+                    "tr": 24.0,
+                    "rh": 45.0,
+                    "vr": 0.15,
+                    "met": 1.2,
+                    "clo": 0.7,
                 },
                 "The model's mean-vote prediction for a typical "
                 "air-conditioned office. Field data show real votes "
@@ -274,8 +287,12 @@ LESSONS: tuple[Lesson, ...] = (
             Step(
                 "2 · Warmer, still conditioned",
                 {
-                    "tdb": 26.5, "tr": 26.5, "rh": 45.0, "vr": 0.15,
-                    "met": 1.2, "clo": 0.6,
+                    "tdb": 26.5,
+                    "tr": 26.5,
+                    "rh": 45.0,
+                    "vr": 0.15,
+                    "met": 1.2,
+                    "clo": 0.6,
                 },
                 "Push the setpoint up: the model drifts warm, yet the "
                 "database shows many occupants still voting neutral — "
@@ -285,10 +302,8 @@ LESSONS: tuple[Lesson, ...] = (
         sources=(
             "Földváry Ličina et al. (2018), Global Thermal Comfort "
             "Database II — doi:10.1016/j.buildenv.2018.06.022",
-            "ASHRAE Global Thermal Comfort Database II, data CC0-1.0 — "
-            "doi:10.6078/D1F671",
-            "Graham, Parkinson & Schiavon (2021), occupant-survey "
-            "lessons — doi:10.5334/bc.76",
+            "ASHRAE Global Thermal Comfort Database II, data CC0-1.0 — doi:10.6078/D1F671",
+            "Graham, Parkinson & Schiavon (2021), occupant-survey lessons — doi:10.5334/bc.76",
         ),
         links=("benchmark",),
     ),

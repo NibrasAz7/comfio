@@ -78,9 +78,7 @@ def _pick(
 ) -> float:
     """Named-value selectbox plus a 'Custom…' number input."""
     names = list(options) + [_CUSTOM]
-    sel = st.selectbox(
-        label, names, index=names.index(default_label), key=f"calc_{key}_pick"
-    )
+    sel = st.selectbox(label, names, index=names.index(default_label), key=f"calc_{key}_pick")
     if sel == _CUSTOM:
         return float(
             st.number_input(
@@ -142,28 +140,14 @@ def _inputs(method: str) -> tuple[Inputs, bool, bool]:
 
     is_pmv = method not in ADAPTIVE_METHODS
     c1, c2 = st.columns(2)
-    tdb = float(
-        c1.number_input(
-            "Air temperature [°C]", -30.0, 60.0, 24.0, 0.5, key="calc_tdb"
-        )
-    )
+    tdb = float(c1.number_input("Air temperature [°C]", -30.0, 60.0, 24.0, 0.5, key="calc_tdb"))
     mrt_mode = c2.radio("MRT", _MRT_MODES, horizontal=True, key="calc_mrt_mode")
     if mrt_mode == "measured":
-        tr = float(
-            c2.number_input("MRT [°C]", -30.0, 80.0, 24.0, 0.5, key="calc_tr")
-        )
+        tr = float(c2.number_input("MRT [°C]", -30.0, 80.0, 24.0, 0.5, key="calc_tr"))
     elif mrt_mode == "from globe temperature":
         g1, g2 = c2.columns(2)
-        tg = float(
-            g1.number_input(
-                "Globe temperature [°C]", -30.0, 80.0, 24.0, 0.5, key="calc_tg"
-            )
-        )
-        d = float(
-            g2.number_input(
-                "Globe diameter [m]", 0.02, 0.30, 0.15, 0.01, key="calc_globe_d"
-            )
-        )
+        tg = float(g1.number_input("Globe temperature [°C]", -30.0, 80.0, 24.0, 0.5, key="calc_tg"))
+        d = float(g2.number_input("Globe diameter [m]", 0.02, 0.30, 0.15, 0.01, key="calc_globe_d"))
         vr_now = float(st.session_state.get("calc_vr", 0.1))
         tr = mrt_from_globe(tg, tdb, vr_now, d)
     else:
@@ -178,11 +162,7 @@ def _inputs(method: str) -> tuple[Inputs, bool, bool]:
         "wet_bulb": (-50.0, 50.0, 15.0, 0.5, "Wet bulb [°C]"),
     }
     lo, hi, dflt, step, hum_label = hum_defaults[kind]
-    hum_value = float(
-        c1.number_input(
-            hum_label, lo, hi, dflt, step, key=f"calc_hum_value_{kind}"
-        )
-    )
+    hum_value = float(c1.number_input(hum_label, lo, hi, dflt, step, key=f"calc_hum_value_{kind}"))
     rh = rh_from(kind, hum_value, tdb)
     if np.isnan(rh):
         st.warning(
@@ -190,9 +170,7 @@ def _inputs(method: str) -> tuple[Inputs, bool, bool]:
             f"{hum_value} — no solution at tdb {tdb} °C."
         )
 
-    vr = float(
-        c2.number_input("Air speed [m/s]", 0.0, 3.0, 0.10, 0.05, key="calc_vr")
-    )
+    vr = float(c2.number_input("Air speed [m/s]", 0.0, 3.0, 0.10, 0.05, key="calc_vr"))
 
     met = _pick(
         "Metabolic rate [met]",
@@ -220,9 +198,7 @@ def _inputs(method: str) -> tuple[Inputs, bool, bool]:
             if method == ADAPTIVE_METHODS[0]
             else "Running mean outdoor temperature [°C]"
         )
-        trm = float(
-            st.number_input(trm_label, -30.0, 60.0, 20.0, 0.5, key="calc_trm")
-        )
+        trm = float(st.number_input(trm_label, -30.0, 60.0, 20.0, 0.5, key="calc_trm"))
 
     dynamic_clo = True
     relative_air_speed = True
@@ -245,9 +221,7 @@ def _inputs(method: str) -> tuple[Inputs, bool, bool]:
         )
 
     return (
-        Inputs(
-            tdb=tdb, tr=tr, rh=rh, vr=vr, met=met, clo=clo, t_running_mean=trm
-        ),
+        Inputs(tdb=tdb, tr=tr, rh=rh, vr=vr, met=met, clo=clo, t_running_mean=trm),
         dynamic_clo,
         relative_air_speed,
     )
@@ -257,14 +231,8 @@ def _point_xy(inp: Inputs) -> tuple[float, float]:
     """(operative temperature, humidity ratio) for the psychro chart."""
     from pythermalcomfort.utilities import operative_tmp
 
-    t_op = float(
-        operative_tmp(
-            np.array([inp.tdb]), np.array([inp.tr]), np.array([inp.vr])
-        )[0]
-    )
-    w = float(
-        humidity_ratio(np.array([inp.tdb]), np.array([inp.rh]))[0]
-    )
+    t_op = float(operative_tmp(np.array([inp.tdb]), np.array([inp.tr]), np.array([inp.vr]))[0])
+    w = float(humidity_ratio(np.array([inp.tdb]), np.array([inp.rh]))[0])
     return t_op, w
 
 
@@ -274,12 +242,8 @@ def _metrics(res: PointResult) -> None:
         lo = res.extra.get("lower_80", res.extra.get("lower_ii", np.nan))
         hi = res.extra.get("upper_80", res.extra.get("upper_ii", np.nan))
         cols = st.columns(5)
-        cols[0].metric(
-            "Operative t [°C]", _fmt(res.extra.get("t_op", np.nan), ".1f")
-        )
-        cols[1].metric(
-            "Comfort t [°C]", _fmt(res.extra.get("t_comf", np.nan), ".1f")
-        )
+        cols[0].metric("Operative t [°C]", _fmt(res.extra.get("t_op", np.nan), ".1f"))
+        cols[1].metric("Comfort t [°C]", _fmt(res.extra.get("t_comf", np.nan), ".1f"))
         cols[2].metric(
             "Band [°C]",
             "outside model range" if np.isnan(lo) else f"{lo:.1f}–{hi:.1f}",
@@ -397,9 +361,7 @@ def render() -> None:
             zone = _zone(inp.met, inp.clo, inp.vr, dynamic_clo, relative_vr)
             t_op, w = _point_xy(inp)
             st.plotly_chart(
-                _charts.psychro_chart(
-                    [("PMV ±0.5 zone", zone)], [("current point", t_op, w)]
-                ),
+                _charts.psychro_chart([("PMV ±0.5 zone", zone)], [("current point", t_op, w)]),
                 width="stretch",
             )
             _local_discomfort(inp)
@@ -410,9 +372,7 @@ def render() -> None:
                 else None
             )
             st.plotly_chart(
-                _charts.adaptive_chart(
-                    "ashrae" if method == ADAPTIVE_METHODS[0] else "en", point
-                ),
+                _charts.adaptive_chart("ashrae" if method == ADAPTIVE_METHODS[0] else "en", point),
                 width="stretch",
             )
         st.caption(
@@ -431,49 +391,73 @@ def render() -> None:
                     Inputs(
                         tdb=float(
                             st.number_input(
-                                "Air t [°C]", -30.0, 60.0, inp.tdb, 0.5,
+                                "Air t [°C]",
+                                -30.0,
+                                60.0,
+                                inp.tdb,
+                                0.5,
                                 key=f"calc_cmp{i}_tdb",
                             )
                         ),
                         tr=float(
                             st.number_input(
-                                "MRT [°C]", -30.0, 80.0, inp.tr, 0.5,
+                                "MRT [°C]",
+                                -30.0,
+                                80.0,
+                                inp.tr,
+                                0.5,
                                 key=f"calc_cmp{i}_tr",
                             )
                         ),
                         rh=float(
                             st.number_input(
-                                "RH [%]", 0.0, 100.0,
+                                "RH [%]",
+                                0.0,
+                                100.0,
                                 min(max(inp.rh, 0.0), 100.0) if np.isfinite(inp.rh) else 50.0,
-                                1.0, key=f"calc_cmp{i}_rh",
+                                1.0,
+                                key=f"calc_cmp{i}_rh",
                             )
                         ),
                         vr=float(
                             st.number_input(
-                                "v [m/s]", 0.0, 3.0, inp.vr, 0.05,
+                                "v [m/s]",
+                                0.0,
+                                3.0,
+                                inp.vr,
+                                0.05,
                                 key=f"calc_cmp{i}_vr",
                             )
                         ),
                         met=float(
                             st.number_input(
-                                "met", 0.7, 8.0, inp.met, 0.1,
+                                "met",
+                                0.7,
+                                8.0,
+                                inp.met,
+                                0.1,
                                 key=f"calc_cmp{i}_met",
                             )
                         ),
                         clo=float(
                             st.number_input(
-                                "clo", 0.0, 2.5, inp.clo, 0.05,
+                                "clo",
+                                0.0,
+                                2.5,
+                                inp.clo,
+                                0.05,
                                 key=f"calc_cmp{i}_clo",
                             )
                         ),
                         t_running_mean=(
                             float(
                                 st.number_input(
-                                    "Outdoor t [°C]", -30.0, 60.0,
-                                    inp.t_running_mean
-                                    if inp.t_running_mean is not None
-                                    else 20.0,
-                                    0.5, key=f"calc_cmp{i}_trm",
+                                    "Outdoor t [°C]",
+                                    -30.0,
+                                    60.0,
+                                    inp.t_running_mean if inp.t_running_mean is not None else 20.0,
+                                    0.5,
+                                    key=f"calc_cmp{i}_trm",
                                 )
                             )
                             if not is_pmv
@@ -483,7 +467,8 @@ def render() -> None:
                 )
         cmp_results = [
             evaluate_point(
-                ci, method,
+                ci,
+                method,
                 dynamic_clo=dynamic_clo,
                 relative_air_speed=relative_vr,
             )
@@ -501,9 +486,7 @@ def render() -> None:
                 pts.append((f"Set {i + 1}", t_op, w))
             st.plotly_chart(_charts.psychro_chart(zones, pts), width="stretch")
         else:
-            fig = _charts.adaptive_chart(
-                "ashrae" if method == ADAPTIVE_METHODS[0] else "en", None
-            )
+            fig = _charts.adaptive_chart("ashrae" if method == ADAPTIVE_METHODS[0] else "en", None)
             for i, (ci, cr) in enumerate(zip(cmp_inputs, cmp_results, strict=True)):
                 if ci.t_running_mean is not None and "t_op" in cr.extra:
                     fig.add_trace(
@@ -526,7 +509,9 @@ def render() -> None:
         else:
             params = ["tdb", "tr", "rh", "vr", "met", "clo"]
             param = st.selectbox(
-                "Parameter", params, format_func=lambda p: _PARAM_LABELS[p],
+                "Parameter",
+                params,
+                format_func=lambda p: _PARAM_LABELS[p],
                 key="calc_rng_param",
             )
             cur = getattr(inp, param)
@@ -546,9 +531,7 @@ def render() -> None:
             if lo >= hi:
                 st.error("'from' must be below 'to'.")
             else:
-                df = sweep(
-                    inp, method, param, np.linspace(lo, hi, n_pts)
-                )
+                df = sweep(inp, method, param, np.linspace(lo, hi, n_pts))
                 st.plotly_chart(
                     _charts.ranges_curve(df, param, _PARAM_LABELS[param]),
                     width="stretch",

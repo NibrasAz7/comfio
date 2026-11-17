@@ -95,9 +95,7 @@ def test_sensor_vs_occupant_flags_disagreement() -> None:
             "sat_acoustic": [3, 3, 2, 3],
         }
     )
-    summary = _logic.summarize(
-        df, {"sat_thermal": "sat_thermal", "sat_acoustic": "sat_acoustic"}
-    )
+    summary = _logic.summarize(df, {"sat_thermal": "sat_thermal", "sat_acoustic": "sat_acoustic"})
     out = _logic.sensor_vs_occupant(summary, result)
     assert out is not None
     by_domain = out.set_index("domain")
@@ -118,9 +116,7 @@ def test_sensor_vs_occupant_none_without_result() -> None:
     df = pd.DataFrame({"sat_thermal": [1, 2]})
     summary = _logic.summarize(df, {"sat_thermal": "sat_thermal"})
     assert _logic.sensor_vs_occupant(summary, None) is None
-    assert _logic.sensor_vs_occupant(
-        summary, SimpleNamespace(ieq_result=None)
-    ) is None
+    assert _logic.sensor_vs_occupant(summary, SimpleNamespace(ieq_result=None)) is None
 
 
 def test_demo_deterministic() -> None:

@@ -29,8 +29,7 @@ import pandas as pd
 
 DB2_COMMIT = "c527d6115ebadb4725a4e1406b2439a7a1ffd214"
 DB2_BASE = (
-    "https://raw.githubusercontent.com/CenterForTheBuiltEnvironment/"
-    f"ashrae-db-II/{DB2_COMMIT}/"
+    f"https://raw.githubusercontent.com/CenterForTheBuiltEnvironment/ashrae-db-II/{DB2_COMMIT}/"
 )
 DB2_FILES = {
     "measurements": (
@@ -88,9 +87,7 @@ def _download(url: str, dest: Path, sha256: str) -> None:
             shutil.copyfileobj(resp, out)
     except Exception as exc:
         tmp.unlink(missing_ok=True)
-        raise ComfortDBUnavailable(
-            f"Could not download {url}: {exc}"
-        ) from exc
+        raise ComfortDBUnavailable(f"Could not download {url}: {exc}") from exc
     digest = _sha256(tmp)
     if digest != sha256:
         tmp.unlink(missing_ok=True)
@@ -110,17 +107,14 @@ def _ensure(url_path: str, sha256: str, cache: Path, download: bool) -> Path:
         dest.unlink()  # corrupt cache entry — refetch once below
     if not download:
         raise ComfortDBUnavailable(
-            f"{dest.name} is not in the cache at {cache} "
-            "and download=False was requested."
+            f"{dest.name} is not in the cache at {cache} and download=False was requested."
         )
     cache.mkdir(parents=True, exist_ok=True)
     _download(DB2_BASE + url_path, dest, sha256)
     return dest
 
 
-def load_ashrae_db2(
-    cache_dir: str | Path | None = None, *, download: bool = True
-) -> pd.DataFrame:
+def load_ashrae_db2(cache_dir: str | Path | None = None, *, download: bool = True) -> pd.DataFrame:
     """Load ASHRAE Global Thermal Comfort DB II as one merged frame.
 
     Parameters
@@ -144,10 +138,7 @@ def load_ashrae_db2(
         mismatch, or write error).
     """
     cache = _cache_root(cache_dir)
-    paths = {
-        key: _ensure(rel, sha, cache, download)
-        for key, (rel, sha) in DB2_FILES.items()
-    }
+    paths = {key: _ensure(rel, sha, cache, download) for key, (rel, sha) in DB2_FILES.items()}
     measurements = pd.read_csv(paths["measurements"])
     metadata = pd.read_csv(paths["metadata"])
     return measurements.merge(metadata, on="building_id", how="left")

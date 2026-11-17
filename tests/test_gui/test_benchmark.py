@@ -40,9 +40,7 @@ def _synth_db(n: int = 200) -> pd.DataFrame:
             "vel": rng.uniform(0.05, 0.3, n),
             "t_mot_isd": rng.uniform(10.0, 33.0, n),
             "thermal_sensation": rng.integers(-3, 4, n).astype(float),
-            "thermal_acceptability": rng.choice(
-                ["acceptable", "unacceptable"], n
-            ),
+            "thermal_acceptability": rng.choice(["acceptable", "unacceptable"], n),
             "pmv": rng.uniform(-2.0, 2.0, n),
         }
     )
@@ -68,9 +66,7 @@ def test_fetch_button_shown_empty_cache(at: AppTest) -> None:
 def test_charts_render_with_monkeypatched_loader(
     at: AppTest, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr(
-        comfort_db, "load_ashrae_db2", lambda *a, **k: _synth_db()
-    )
+    monkeypatch.setattr(comfort_db, "load_ashrae_db2", lambda *a, **k: _synth_db())
     at.run()
     at.button[0].click().run()
     assert not at.exception
@@ -78,13 +74,9 @@ def test_charts_render_with_monkeypatched_loader(
     assert len(at.get("plotly_chart")) >= 3
 
 
-def test_offline_shows_error(
-    at: AppTest, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_offline_shows_error(at: AppTest, monkeypatch: pytest.MonkeyPatch) -> None:
     def boom(*args: object, **kwargs: object) -> pd.DataFrame:
-        raise comfort_db.ComfortDBUnavailable(
-            "No cached database and download failed: no network."
-        )
+        raise comfort_db.ComfortDBUnavailable("No cached database and download failed: no network.")
 
     monkeypatch.setattr(comfort_db, "load_ashrae_db2", boom)
     at.run()
@@ -94,9 +86,7 @@ def test_offline_shows_error(
     assert "no network" in str(at.error[0].value)
 
 
-def test_filter_multiselect_narrows_rows(
-    at: AppTest, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_filter_multiselect_narrows_rows(at: AppTest, monkeypatch: pytest.MonkeyPatch) -> None:
     db = _synth_db()
     monkeypatch.setattr(comfort_db, "load_ashrae_db2", lambda *a, **k: db)
     at.run()

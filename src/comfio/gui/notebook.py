@@ -30,15 +30,11 @@ def gui_notebook(df: pd.DataFrame) -> Any:
         import ipywidgets as widgets
         from IPython.display import display  # noqa: F401
     except ModuleNotFoundError as exc:
-        raise ImportError(
-            "gui_notebook requires ipywidgets: pip install comfio[gui]"
-        ) from exc
+        raise ImportError("gui_notebook requires ipywidgets: pip install comfio[gui]") from exc
 
     auto = _mapping.auto_map_columns(df)
     options = [_NOT_AVAILABLE] + list(df.columns)
-    sensor_cols = [
-        c for c in _mapping.CANONICAL_COLUMNS if c in _data.COLUMN_DESCRIPTIONS
-    ]
+    sensor_cols = [c for c in _mapping.CANONICAL_COLUMNS if c in _data.COLUMN_DESCRIPTIONS]
 
     dropdowns: dict[str, Any] = {}
     rows = []
@@ -59,8 +55,7 @@ def gui_notebook(df: pd.DataFrame) -> Any:
             (
                 c
                 for c in df.columns
-                if _mapping.normalize(c)
-                in {"timestamp", "time", "date", "datetime"}
+                if _mapping.normalize(c) in {"timestamp", "time", "date", "datetime"}
             ),
             _NOT_AVAILABLE,
         ),
@@ -75,19 +70,13 @@ def gui_notebook(df: pd.DataFrame) -> Any:
     mrt = widgets.Checkbox(value=True, description="MRT = air temp")
     params = widgets.HBox([met, clo, vr, mrt])
 
-    run_btn = widgets.Button(
-        description="Run analysis", button_style="primary", icon="play"
-    )
+    run_btn = widgets.Button(description="Run analysis", button_style="primary", icon="play")
     out = widgets.Output()
 
     def _on_run(_: Any) -> None:
         with out:
             out.clear_output()
-            mapping = {
-                c: dd.value
-                for c, dd in dropdowns.items()
-                if dd.value != _NOT_AVAILABLE
-            }
+            mapping = {c: dd.value for c, dd in dropdowns.items() if dd.value != _NOT_AVAILABLE}
             coverage = _mapping.domain_coverage(mapping)
             if not any(coverage.values()):
                 print("No evaluable domain — map more columns.")
@@ -106,9 +95,7 @@ def gui_notebook(df: pd.DataFrame) -> Any:
             }
             prepared, mapping2, notes = _data.prepare(df, mapping, config)
             ts_col = None if ts_dd.value == _NOT_AVAILABLE else ts_dd.value
-            sensor = SensorData(
-                df=prepared, column_map=mapping2, timestamp_col=ts_col
-            )
+            sensor = SensorData(df=prepared, column_map=mapping2, timestamp_col=ts_col)
             from comfio.reports.pipeline import run_pipeline
 
             result = run_pipeline(

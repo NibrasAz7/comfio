@@ -128,10 +128,6 @@ def scenarios_from_json(payload: str) -> bool:
         return False
     if not isinstance(data, list):
         return False
-    valid = [
-        s
-        for s in data
-        if isinstance(s, dict) and "name" in s and "ieq_mean" in s
-    ]
+    valid = [s for s in data if isinstance(s, dict) and "name" in s and "ieq_mean" in s]
     set(SCENARIOS, valid[:4])
     return bool(valid)

@@ -74,9 +74,7 @@ def comfort_band(
         "heat_min_c": _pmv_root(met, clo_heating, vr_still, rh, -pmv_limit),
         "cool_max_c": _pmv_root(met, clo_cooling, vr_still, rh, pmv_limit),
         "cool_max_fan_c": (
-            _pmv_root(met, clo_cooling, vr_fan, rh, pmv_limit)
-            if vr_fan is not None
-            else np.nan
+            _pmv_root(met, clo_cooling, vr_fan, rh, pmv_limit) if vr_fan is not None else np.nan
         ),
     }
 
@@ -113,10 +111,7 @@ def deadband_table(
                 "heating setpoint": proposed_heat,
                 "cooling setpoint": proposed_cool,
                 "deadband width": proposed_width,
-                "note": (
-                    "PMV ±0.5 band edges"
-                    + (", fan cooling edge" if fan_used else "")
-                ),
+                "note": ("PMV ±0.5 band edges" + (", fan cooling edge" if fan_used else "")),
             },
             {
                 "scenario": "delta",

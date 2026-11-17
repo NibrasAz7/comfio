@@ -145,13 +145,10 @@ class Room:
             if wa.wall != wb.wall:
                 continue
             u_overlap = min(wa.u0 + wa.width, wb.u0 + wb.width) > max(wa.u0, wb.u0)
-            z_overlap = min(wa.z0 + wa.height, wb.z0 + wb.height) > max(
-                wa.z0, wb.z0
-            )
+            z_overlap = min(wa.z0 + wa.height, wb.z0 + wb.height) > max(wa.z0, wb.z0)
             if u_overlap and z_overlap:
                 raise ValueError(
-                    f"windows: windows[{i}] and windows[{j}] overlap on "
-                    f"wall {wa.wall!r}"
+                    f"windows: windows[{i}] and windows[{j}] overlap on wall {wa.wall!r}"
                 )
 
 
@@ -179,9 +176,7 @@ def _hottel_rect(a: float, b: float, c: float) -> float:
     return _aux(a / c, b / c) / (2.0 * math.pi)
 
 
-def _hottel_quadrant(
-    a1: float, a2: float, b1: float, b2: float, c: float
-) -> float:
+def _hottel_quadrant(a1: float, a2: float, b1: float, b2: float, c: float) -> float:
     """View factor to the rectangle ``a∈[a1,a2]``, ``b∈[b1,b2]`` in a
     parallel plane at distance ``c``; bounds may straddle the point's
     projection (negative ``a1``/``b1``)."""
@@ -220,9 +215,7 @@ def _check_point(room: Room, x: float, y: float, z: float) -> None:
         ("z", z, room.height),
     ):
         if not 0.0 <= value <= hi:
-            raise ValueError(
-                f"{name}: point {value} outside room extent [0, {hi}]"
-            )
+            raise ValueError(f"{name}: point {value} outside room extent [0, {hi}]")
 
 
 def view_factors(room: Room, x: float, y: float, z: float) -> dict[str, float]:
@@ -296,8 +289,7 @@ def mrt_grid(
     ny = math.floor((room.width - 2.0 * margin) / spacing) + 1
     if nx < 1 or ny < 1:
         raise ValueError(
-            f"margin: margin={margin} leaves no grid points inside "
-            f"{room.length}×{room.width} m"
+            f"margin: margin={margin} leaves no grid points inside {room.length}×{room.width} m"
         )
     xs = margin + np.arange(nx) * spacing
     ys = margin + np.arange(ny) * spacing

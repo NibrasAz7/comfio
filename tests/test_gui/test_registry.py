@@ -53,9 +53,7 @@ def test_missing_requires_hidden(monkeypatch: pytest.MonkeyPatch) -> None:
         requires=("no_such_mod_xyz",),
     )
     monkeypatch.setitem(sys.modules, "comfio.gui.tools.fake", fake)
-    monkeypatch.setattr(
-        tools_pkg, "BUILTIN_TOOLS", (*BUILTIN_TOOLS, "comfio.gui.tools.fake")
-    )
+    monkeypatch.setattr(tools_pkg, "BUILTIN_TOOLS", (*BUILTIN_TOOLS, "comfio.gui.tools.fake"))
 
     specs, messages = load_tools()
     assert "fake" not in [s.id for s in specs]

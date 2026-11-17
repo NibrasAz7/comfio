@@ -151,8 +151,12 @@ class TestEvaluateSPMVOpt:
         # Step 1 (paper Eq. 11): Icl = f(Tout)+f(Ta)+f(RH)+const
         c = ICL_GAM_COEFFS
         icl = (
-            c["tout"]["c1"] * 15.0 + c["tout"]["c2"] * 15.0**2 + c["tout"]["c3"] * 15.0**3
-            + c["ta"]["c1"] * 22.0 + c["ta"]["c2"] * 22.0**2 + c["ta"]["c3"] * 22.0**3
+            c["tout"]["c1"] * 15.0
+            + c["tout"]["c2"] * 15.0**2
+            + c["tout"]["c3"] * 15.0**3
+            + c["ta"]["c1"] * 22.0
+            + c["ta"]["c2"] * 22.0**2
+            + c["ta"]["c3"] * 22.0**3
             + c["rh"]["c1"] * 50.0
             + ICL_GAM_CONST
         )

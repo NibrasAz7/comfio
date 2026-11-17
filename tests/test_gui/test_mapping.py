@@ -84,14 +84,10 @@ class TestCoverage:
         }
 
     def test_missing_required(self) -> None:
-        assert missing_required({"air_temp_c": "t"}, {"air_temp_c", "co2_ppm"}) == [
-            "co2_ppm"
-        ]
+        assert missing_required({"air_temp_c": "t"}, {"air_temp_c", "co2_ppm"}) == ["co2_ppm"]
 
     def test_unmapped_columns_excludes_timestamp_tsv(self) -> None:
-        df = pd.DataFrame(
-            {"timestamp": [1], "tsv": [0], "air_temp_c": [22.0], "junk": ["x"]}
-        )
+        df = pd.DataFrame({"timestamp": [1], "tsv": [0], "air_temp_c": [22.0], "junk": ["x"]})
         m = {"air_temp_c": "air_temp_c"}
         assert unmapped_columns(df, m) == ["junk"]
 
@@ -139,9 +135,7 @@ class TestDataHelpers:
         assert list(df.columns) == ["b"]
 
     def test_prepare_injects_assumptions(self) -> None:
-        df = pd.DataFrame(
-            {"t": [20.0, np.nan, 22.0], "rh": [50.0, 45.0, 55.0]}
-        )
+        df = pd.DataFrame({"t": [20.0, np.nan, 22.0], "rh": [50.0, 45.0, 55.0]})
         m = {"air_temp_c": "t", "relative_humidity_pct": "rh"}
         cfg = {"vr": 0.15, "_mrt_equals_tdb": True}
         prep, m2, notes = prepare(df, m, cfg)
@@ -182,9 +176,7 @@ class TestDataHelpers:
         )
         import comfio.integration.weather as weather
 
-        monkeypatch.setattr(
-            weather, "fetch_outdoor_temperature", lambda *a, **k: wx
-        )
+        monkeypatch.setattr(weather, "fetch_outdoor_temperature", lambda *a, **k: wx)
         out = attach_outdoor_temperature(df, "timestamp", 40.0, -74.0)
         vals = out["outdoor_temp_c"].to_numpy()
         assert vals[0] == 5.0  # 09:10 -> nearest 09:00

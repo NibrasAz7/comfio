@@ -31,9 +31,7 @@ def _filters(db: pd.DataFrame) -> pd.DataFrame:
         if col not in db.columns:
             continue
         options = sorted(db[col].dropna().unique().tolist())
-        selected[col] = cols[i].multiselect(
-            col.replace("_", " "), options, key=f"bench_f_{col}"
-        )
+        selected[col] = cols[i].multiselect(col.replace("_", " "), options, key=f"bench_f_{col}")
     return _logic.filter_db(db, **selected)
 
 
@@ -71,9 +69,7 @@ def render() -> None:
         return
 
     db = _logic.with_operative(db)
-    n_buildings = (
-        db["building_id"].nunique() if "building_id" in db.columns else "—"
-    )
+    n_buildings = db["building_id"].nunique() if "building_id" in db.columns else "—"
     st.caption(f"{len(db):,} measurements · {n_buildings} buildings")
     filtered = _filters(db)
     st.caption(f"{len(filtered):,} rows after filters")
@@ -84,9 +80,7 @@ def render() -> None:
 
     with tab_scatter:
         overlay = _user_overlay()
-        st.plotly_chart(
-            _charts.db_adaptive_scatter(filtered, overlay), width="stretch"
-        )
+        st.plotly_chart(_charts.db_adaptive_scatter(filtered, overlay), width="stretch")
         st.caption(
             "The outdoor axis is the database's 7-day running mean "
             "(t_mot_isd) — not the ASHRAE prevailing mean — so the ASHRAE "
@@ -95,8 +89,7 @@ def render() -> None:
         )
         if overlay is None:
             st.caption(
-                "Load and map your data in 'Analyse my data' to plot it "
-                "here as black stars."
+                "Load and map your data in 'Analyse my data' to plot it here as black stars."
             )
 
     with tab_bins:
@@ -104,9 +97,7 @@ def render() -> None:
         if bins.empty:
             st.info("No operative temperature data for these filters.")
         else:
-            st.plotly_chart(
-                _charts.sensation_bins_chart(bins), width="stretch"
-            )
+            st.plotly_chart(_charts.sensation_bins_chart(bins), width="stretch")
 
     with tab_bias:
         bias = _logic.pmv_bias(filtered)

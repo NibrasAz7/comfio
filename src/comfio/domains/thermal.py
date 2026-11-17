@@ -157,13 +157,9 @@ def evaluate_thermal(
     # met/clo are analyst-chosen model parameters: values outside the
     # ISO 7730-2005 applicability domain (§3) are a configuration error.
     if np.any(met_arr < 0.8) or np.any(met_arr > 4.0):
-        raise OutOfRangeError(
-            "met: values outside ISO 7730 applicability domain [0.8, 4.0] met"
-        )
+        raise OutOfRangeError("met: values outside ISO 7730 applicability domain [0.8, 4.0] met")
     if np.any(clo_arr < 0.0) or np.any(clo_arr > 2.0):
-        raise OutOfRangeError(
-            "clo: values outside ISO 7730 applicability domain [0.0, 2.0] clo"
-        )
+        raise OutOfRangeError("clo: values outside ISO 7730 applicability domain [0.0, 2.0] clo")
 
     # pmv_ppd_iso is vectorized natively; samples outside the model's
     # applicability limits (tdb 10-30, tr 10-40, vr 0-1 °C/m/s) are

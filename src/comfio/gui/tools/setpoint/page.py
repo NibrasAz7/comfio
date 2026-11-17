@@ -18,9 +18,7 @@ from comfio.gui.tools.setpoint import _logic
 _T_AXIS = np.linspace(10.0, 36.0, 53)
 
 
-def _curve(
-    met: float, clo: float, vr: float, rh: float
-) -> np.ndarray:
+def _curve(met: float, clo: float, vr: float, rh: float) -> np.ndarray:
     """PMV over the operative axis (tdb == tr)."""
     return ashrae_pmv(
         _T_AXIS,
@@ -122,53 +120,49 @@ def render() -> None:
     current_heat = float(
         cols[0].number_input(
             "Current heating setpoint [°C]",
-            10.0, 30.0, 21.0, 0.5, key="sp_heat",
+            10.0,
+            30.0,
+            21.0,
+            0.5,
+            key="sp_heat",
         )
     )
     current_cool = float(
         cols[1].number_input(
             "Current cooling setpoint [°C]",
-            10.0, 30.0, 25.0, 0.5, key="sp_cool",
+            10.0,
+            30.0,
+            25.0,
+            0.5,
+            key="sp_cool",
         )
     )
-    met = float(
-        cols[2].number_input(
-            "Metabolic rate [met]", 0.8, 4.0, 1.2, 0.1, key="sp_met"
-        )
-    )
-    rh = float(
-        cols[3].number_input(
-            "Relative humidity [%]", 0.0, 100.0, 50.0, 5.0, key="sp_rh"
-        )
-    )
+    met = float(cols[2].number_input("Metabolic rate [met]", 0.8, 4.0, 1.2, 0.1, key="sp_met"))
+    rh = float(cols[3].number_input("Relative humidity [%]", 0.0, 100.0, 50.0, 5.0, key="sp_rh"))
 
     cols = st.columns(4)
     clo_heating = float(
-        cols[0].number_input(
-            "Winter clothing [clo]", 0.0, 2.0, 1.0, 0.1, key="sp_clo_heat"
-        )
+        cols[0].number_input("Winter clothing [clo]", 0.0, 2.0, 1.0, 0.1, key="sp_clo_heat")
     )
     clo_cooling = float(
-        cols[1].number_input(
-            "Summer clothing [clo]", 0.0, 2.0, 0.5, 0.1, key="sp_clo_cool"
-        )
+        cols[1].number_input("Summer clothing [clo]", 0.0, 2.0, 0.5, 0.1, key="sp_clo_cool")
     )
     vr_still = float(
-        cols[2].number_input(
-            "Still-air speed [m/s]", 0.0, 1.0, 0.1, 0.05, key="sp_vr_still"
-        )
+        cols[2].number_input("Still-air speed [m/s]", 0.0, 1.0, 0.1, 0.05, key="sp_vr_still")
     )
     vr_fan_in = float(
         cols[3].number_input(
             "Fan air speed [m/s] (0 = none)",
-            0.0, 1.5, 0.0, 0.1, key="sp_vr_fan",
+            0.0,
+            1.5,
+            0.0,
+            0.1,
+            key="sp_vr_fan",
         )
     )
     vr_fan = vr_fan_in if vr_fan_in > 0.0 else None
 
-    band = _logic.comfort_band(
-        met, clo_heating, clo_cooling, rh, vr_still, vr_fan
-    )
+    band = _logic.comfort_band(met, clo_heating, clo_cooling, rh, vr_still, vr_fan)
     proposed_cool = band["cool_max_fan_c"]
     if np.isnan(proposed_cool):
         proposed_cool = band["cool_max_c"]
@@ -204,9 +198,7 @@ def render() -> None:
 
     with st.container(border=True):
         st.subheader("Energy impact")
-        st.link_button(
-            "CBE setpoint energy savings calculator", _logic.ENERGY_CALC_URL
-        )
+        st.link_button("CBE setpoint energy savings calculator", _logic.ENERGY_CALC_URL)
         st.caption(
             "Setpoint-widening savings evidence: "
             f"{_logic.HOYT_2015}. PMV model: Tartarini & Schiavon (2020), "

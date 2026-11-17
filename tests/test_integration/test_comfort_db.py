@@ -34,9 +34,7 @@ def _measurements_df(n: int = 40) -> pd.DataFrame:
             "vel": rng.uniform(0.05, 0.3, n),
             "t_mot_isd": rng.uniform(10.0, 33.0, n),
             "thermal_sensation": rng.integers(-3, 4, n).astype(float),
-            "thermal_acceptability": rng.choice(
-                ["acceptable", "unacceptable"], n
-            ),
+            "thermal_acceptability": rng.choice(["acceptable", "unacceptable"], n),
             "pmv": rng.uniform(-2.0, 2.0, n),
         }
     )
@@ -96,9 +94,7 @@ def _offline(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture()
-def cached_dir(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> Path:
+def cached_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Cache dir pre-filled with synthetic DB2 files + patched checksums."""
     payloads = _payloads()
     cache = tmp_path / "db2"
@@ -107,9 +103,7 @@ def cached_dir(
     return cache
 
 
-def test_load_from_cache_verifies_hash(
-    cached_dir: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_load_from_cache_verifies_hash(cached_dir: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     _offline(monkeypatch)  # a valid cache must never touch the network
     df = comfort_db.load_ashrae_db2(cached_dir)
     assert len(df) == 40
@@ -143,9 +137,7 @@ def test_download_hash_mismatch_discards_file(
     payloads = _payloads()
     monkeypatch.setattr(comfort_db, "DB2_FILES", _fake_db2_files(payloads))
     # server returns garbage for every file
-    monkeypatch.setattr(
-        urllib.request, "urlopen", lambda *a, **k: io.BytesIO(b"junk")
-    )
+    monkeypatch.setattr(urllib.request, "urlopen", lambda *a, **k: io.BytesIO(b"junk"))
     cache = tmp_path / "db2"
     with pytest.raises(comfort_db.ComfortDBUnavailable):
         comfort_db.load_ashrae_db2(cache)
@@ -153,9 +145,7 @@ def test_download_hash_mismatch_discards_file(
     assert not list(cache.glob("*.csv*"))
 
 
-def test_download_then_cache_hit(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_download_then_cache_hit(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     payloads = _payloads()
     monkeypatch.setattr(comfort_db, "DB2_FILES", _fake_db2_files(payloads))
 
@@ -174,9 +164,7 @@ def test_download_then_cache_hit(
     assert len(df2) == 40
 
 
-def test_offline_raises_unavailable(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_offline_raises_unavailable(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     _offline(monkeypatch)
     with pytest.raises(comfort_db.ComfortDBUnavailable):
         comfort_db.load_ashrae_db2(tmp_path / "empty")

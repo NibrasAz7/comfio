@@ -129,8 +129,7 @@ def demo_data(n: int = 168, seed: int = 7) -> pd.DataFrame:
     tsv = np.full(n, np.nan)
     vote_idx = np.where((occupied == 1) & (t % 4 == 0))[0]
     tsv[vote_idx] = np.clip(
-        0.35 * (df["air_temp_c"].to_numpy()[vote_idx] - 22.0)
-        + rng.normal(0, 0.4, len(vote_idx)),
+        0.35 * (df["air_temp_c"].to_numpy()[vote_idx] - 22.0) + rng.normal(0, 0.4, len(vote_idx)),
         -3,
         3,
     ).round()
@@ -231,9 +230,7 @@ def attach_outdoor_temperature(
     ts = pd.to_datetime(df[ts_col])
     if ts.dt.tz is not None:
         ts = ts.dt.tz_convert("UTC").dt.tz_localize(None)
-    wx = fetch_outdoor_temperature(
-        lat, lon, ts.min().date(), ts.max().date()
-    )
+    wx = fetch_outdoor_temperature(lat, lon, ts.min().date(), ts.max().date())
     wx_idx = wx.index.tz_localize(None) if wx.index.tz is not None else wx.index
     wx_df = pd.DataFrame({"ts": wx_idx, "outdoor_temp_c": wx["temp"].to_numpy()})
 

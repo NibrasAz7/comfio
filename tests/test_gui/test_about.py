@@ -31,8 +31,7 @@ def test_lists_every_loaded_tool_title() -> None:
     assert not at.exception
     specs, _ = load_tools()
     rendered = " ".join(
-        str(e.value)
-        for e in list(at.markdown) + list(at.caption) + list(at.subheader)
+        str(e.value) for e in list(at.markdown) + list(at.caption) + list(at.subheader)
     )
     for spec in specs:
         assert spec.title in rendered
@@ -41,14 +40,11 @@ def test_lists_every_loaded_tool_title() -> None:
 
 def test_unknown_id_message_shown() -> None:
     at = AppTest.from_function(_about_app, default_timeout=60)
-    at.session_state["tool_messages"] = [
-        "Unknown tool id 'nope' — ignored."
-    ]
+    at.session_state["tool_messages"] = ["Unknown tool id 'nope' — ignored."]
     at.run()
     assert not at.exception
     rendered = " ".join(
-        str(e.value)
-        for e in list(at.markdown) + list(at.warning) + list(at.caption)
+        str(e.value) for e in list(at.markdown) + list(at.warning) + list(at.caption)
     )
     assert "nope" in rendered
 

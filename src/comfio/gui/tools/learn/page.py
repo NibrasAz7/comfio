@@ -40,13 +40,8 @@ def _render_step(step: Step, key: str) -> None:
         if np.isnan(res.pmv):
             st.caption(f"{_METHOD} on these inputs: outside model range.")
         else:
-            st.caption(
-                f"{_METHOD} on these inputs: "
-                f"PMV {res.pmv:+.2f} · PPD {res.ppd:.1f} %"
-            )
-        if _state.tool_enabled("calculator") and st.button(
-            "Try it in the calculator", key=key
-        ):
+            st.caption(f"{_METHOD} on these inputs: PMV {res.pmv:+.2f} · PPD {res.ppd:.1f} %")
+        if _state.tool_enabled("calculator") and st.button("Try it in the calculator", key=key):
             _state.set(_state.CALC_INPUTS, dict(step.inputs))
             _state.goto("calculator")
 
@@ -72,9 +67,7 @@ def render() -> None:
     for i, step in enumerate(lesson.steps):
         _render_step(step, key=f"learn_try_{lesson.id}_{i}")
 
-    enabled_links = [
-        lid for lid in lesson.links if _state.tool_enabled(lid)
-    ]
+    enabled_links = [lid for lid in lesson.links if _state.tool_enabled(lid)]
     if enabled_links:
         st.subheader("Related tools")
         pages = cast(dict[str, Any], _state.get(_state.TOOL_PAGES) or {})

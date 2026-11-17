@@ -18,14 +18,14 @@ _RATIO = 0.621945  # Mw/Ma
 _P_ATM = 101325.0
 
 
-def humidity_ratio(
-    tdb: np.ndarray, rh: np.ndarray, p_atm: float = _P_ATM
-) -> np.ndarray:
+def humidity_ratio(tdb: np.ndarray, rh: np.ndarray, p_atm: float = _P_ATM) -> np.ndarray:
     """Humidity ratio [kg/kg] from dry-bulb temperature and RH."""
     from pythermalcomfort.utilities import p_sat
 
-    pv = np.asarray(rh, dtype=float) / 100.0 * np.asarray(
-        p_sat(np.asarray(tdb, dtype=float)), dtype=float
+    pv = (
+        np.asarray(rh, dtype=float)
+        / 100.0
+        * np.asarray(p_sat(np.asarray(tdb, dtype=float)), dtype=float)
     )
     return np.asarray(_RATIO * pv / (p_atm - pv), dtype=float)
 
@@ -88,7 +88,12 @@ def pmv_zone_boundary(
     pmv = np.where(
         rh <= 100.0,
         ashrae_pmv(
-            tg, tg, vr, rh, met, clo,
+            tg,
+            tg,
+            vr,
+            rh,
+            met,
+            clo,
             dynamic_clo=dynamic_clo,
             relative_air_speed=relative_air_speed,
         ),
@@ -117,7 +122,12 @@ def pmv_zone_boundary(
         fine_pmv = np.where(
             rh_f <= 100.0,
             ashrae_pmv(
-                tf, tf, vr, rh_f, met, clo,
+                tf,
+                tf,
+                vr,
+                rh_f,
+                met,
+                clo,
                 dynamic_clo=dynamic_clo,
                 relative_air_speed=relative_air_speed,
             ),

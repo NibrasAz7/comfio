@@ -70,9 +70,7 @@ def test_deadband_table_rows() -> None:
     assert list(table["scenario"]) == ["current", "proposed", "delta"]
     current, proposed, delta = table.iloc[0], table.iloc[1], table.iloc[2]
     assert current["deadband width"] == pytest.approx(25.0 - 21.0)
-    assert proposed["cooling setpoint"] == pytest.approx(
-        band["cool_max_fan_c"]
-    )
+    assert proposed["cooling setpoint"] == pytest.approx(band["cool_max_fan_c"])
     assert proposed["heating setpoint"] == pytest.approx(band["heat_min_c"])
     assert delta["deadband width"] == pytest.approx(
         proposed["deadband width"] - current["deadband width"]

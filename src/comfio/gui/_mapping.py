@@ -68,9 +68,7 @@ def unmapped_columns(df: pd.DataFrame, mapping: dict[str, str]) -> list[str]:
     return [c for c in df.columns if c not in used]
 
 
-def missing_required(
-    mapping: dict[str, str], required: list[str] | set[str]
-) -> list[str]:
+def missing_required(mapping: dict[str, str], required: list[str] | set[str]) -> list[str]:
     """Canonical columns in ``required`` with no mapped source."""
     return [c for c in required if c not in mapping]
 
@@ -86,7 +84,4 @@ DOMAIN_REQUIREMENTS: dict[str, set[str]] = {
 
 def domain_coverage(mapping: dict[str, str]) -> dict[str, bool]:
     """Which of the four domains can run given a column mapping."""
-    return {
-        d: not missing_required(mapping, req)
-        for d, req in DOMAIN_REQUIREMENTS.items()
-    }
+    return {d: not missing_required(mapping, req) for d, req in DOMAIN_REQUIREMENTS.items()}

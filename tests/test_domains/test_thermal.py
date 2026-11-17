@@ -190,8 +190,12 @@ class TestApplicabilityDomainValidation:
         vec = evaluate_thermal(tdb=tdb, tr=tr, vr=vr, rh=rh, met=1.2, clo=0.5)
         for i in range(3):
             one = evaluate_thermal(
-                tdb=tdb[i : i + 1], tr=tr[i : i + 1], vr=vr[i : i + 1],
-                rh=rh[i : i + 1], met=1.2, clo=0.5,
+                tdb=tdb[i : i + 1],
+                tr=tr[i : i + 1],
+                vr=vr[i : i + 1],
+                rh=rh[i : i + 1],
+                met=1.2,
+                clo=0.5,
             )
             assert vec.pmv[i] == pytest.approx(one.pmv[0], abs=1e-9)
             assert vec.ppd[i] == pytest.approx(one.ppd[0], abs=1e-9)

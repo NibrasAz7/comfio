@@ -55,9 +55,7 @@ class TestResetAir:
         df = self._df()
         df["rh"] = 80.0
         out = reset_air(df, self._map(), "timestamp")
-        rh_row = next(
-            c for c in out["criteria"] if c["criterion"] == "Relative humidity"
-        )
+        rh_row = next(c for c in out["criteria"] if c["criterion"] == "Relative humidity")
         assert rh_row["status"] == "fail"
         assert rh_row["within target %"] == 0.0
 

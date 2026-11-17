@@ -39,27 +39,22 @@ _PROVENANCE: list[tuple[str, str, str]] = [
     (
         "CBE comfort_tool",
         "GPL-2.0",
-        "Behaviour reference only — nothing copied; physics comes from "
-        "pythermalcomfort.",
+        "Behaviour reference only — nothing copied; physics comes from pythermalcomfort.",
     ),
     (
         "CBE mrt tool",
         "GPL-3.0",
-        "Not used — the MRT designer ports the MIT-licensed engine "
-        "above instead.",
+        "Not used — the MRT designer ports the MIT-licensed engine above instead.",
     ),
     (
-        "CBE comfort-dash / energy-calc / comfortdatabase / "
-        "cozie-questionnaires",
+        "CBE comfort-dash / energy-calc / comfortdatabase / cozie-questionnaires",
         "No public licence",
-        "Not copied — comfio links out or rebuilds the idea from "
-        "papers and standards.",
+        "Not copied — comfio links out or rebuilds the idea from papers and standards.",
     ),
     (
         "StudioMatrx guided lesson",
         "Copyrighted",
-        "Idea of a guided lesson only — all lesson wording is comfio's "
-        "own.",
+        "Idea of a guided lesson only — all lesson wording is comfio's own.",
     ),
 ]
 
@@ -70,8 +65,7 @@ _CITATIONS: tuple[str, ...] = (
     "Földváry Ličina et al. (2018), Development of the ASHRAE Global "
     "Thermal Comfort Database II, Building and Environment "
     "142:502–512 — doi:10.1016/j.buildenv.2018.06.022",
-    "ASHRAE Global Thermal Comfort Database II, Dryad dataset, "
-    "CC0-1.0 — doi:10.6078/D1F671",
+    "ASHRAE Global Thermal Comfort Database II, Dryad dataset, CC0-1.0 — doi:10.6078/D1F671",
     "Arens, Hoyt, Zhou, Huang, Zhang & Schiavon (2015), Modeling the "
     "comfort effects of short-wave solar radiation indoors, Building "
     "and Environment 88:3–9 — doi:10.1016/j.buildenv.2014.09.004",
@@ -94,13 +88,8 @@ def _enabled_tools() -> list[tuple[str, str]]:
     all_specs, _ = load_tools()
     by_id = {s.id: s for s in all_specs}
     if pages:
-        return [
-            (by_id[pid].title if pid in by_id else pid, pid)
-            for pid in pages
-        ]
-    specs, _ = load_tools(
-        enabled_from_env(os.environ.get("COMFIO_GUI_TOOLS"))
-    )
+        return [(by_id[pid].title if pid in by_id else pid, pid) for pid in pages]
+    specs, _ = load_tools(enabled_from_env(os.environ.get("COMFIO_GUI_TOOLS")))
     return [(s.title, s.id) for s in specs]
 
 
@@ -113,16 +102,9 @@ def render() -> None:
     )
 
     st.subheader("Enabled tools")
-    st.markdown(
-        "\n".join(
-            f"- **{title}** (`{tool_id}`)"
-            for title, tool_id in _enabled_tools()
-        )
-    )
+    st.markdown("\n".join(f"- **{title}** (`{tool_id}`)" for title, tool_id in _enabled_tools()))
 
-    messages = cast(
-        list[str], _state.get(_state.TOOL_MESSAGES) or []
-    )
+    messages = cast(list[str], _state.get(_state.TOOL_MESSAGES) or [])
     if messages:
         st.subheader("Unavailable or ignored tools")
         for message in messages:
