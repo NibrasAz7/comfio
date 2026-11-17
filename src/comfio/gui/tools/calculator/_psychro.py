@@ -48,7 +48,7 @@ def _crossing(t: np.ndarray, f: np.ndarray) -> float:
             return float(t[j])
         if f[j] * f[j + 1] < 0:
             return float(t[j] - f[j] * (t[j + 1] - t[j]) / (f[j + 1] - f[j]))
-    return np.nan
+    return float("nan")
 
 
 def _bracket(f: np.ndarray) -> int | None:

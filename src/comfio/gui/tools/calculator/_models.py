@@ -395,7 +395,7 @@ def rh_from(
     try:
         return float(brentq(f, lo, hi))
     except (ValueError, RuntimeError):
-        return np.nan
+        return float("nan")
 
 
 def mrt_from_globe(

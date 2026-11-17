@@ -51,7 +51,7 @@ def _pmv_root(
     try:
         return float(brentq(f, _T_LO, _T_HI))
     except (ValueError, RuntimeError):
-        return np.nan
+        return float("nan")
 
 
 def comfort_band(
