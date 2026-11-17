@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-11-17
+
+### Added
+
+- **Docs**: new How-To guide *Using the comfio GUI* covering launch modes, the tool registry, the workbench flow, Jupyter widget, and Streamlit Cloud deployment
+
+### Fixed
+
+- GUI helpers returning `np.nan` now return `float("nan")` to satisfy mypy `no-any-return`
+
+### Changed
+
+- `src/` and `tests/` reformatted with `ruff format` (CI format check)
+
 ## [0.1.7] - 2026-11-16
 
 ### Added
