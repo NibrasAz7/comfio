@@ -12,3 +12,4 @@ Practical, copy-pasteable solutions to specific problems using comfio.
 - [TSV Augmentation](use_tsv_augmentation.md) — CDF-based vote expansion workflow
 - [Train Personalisation](train_personalisation.md) — OLS regression personalisation with seasonal support
 - [Integrate LLM Tools](integrate_llm_tools.md) — OpenAI/LangChain tool schemas and diagnostics
+- [Using the comfio GUI](using_the_gui.md) — Launch the Streamlit workbench, pick a tool, deploy to the cloud
