@@ -14,6 +14,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import types
 import webbrowser
 from collections.abc import Sequence
 from pathlib import Path
@@ -128,3 +129,20 @@ def gui_notebook(df: Any = None) -> Any:
 
 
 __all__ = ["gui", "gui_notebook"]
+
+
+class _CallableGuiModule(types.ModuleType):
+    """Make ``comfio.gui`` callable as ``comfio.gui()``.
+
+    Once this subpackage is imported, the import system rebinds the
+    ``comfio.gui`` attribute to this module object. Making the module
+    itself callable keeps ``comfio.gui(...)`` working in that state —
+    the same call signature as the top-level ``comfio.gui`` wrapper —
+    while ``comfio.gui.tools`` and friends keep resolving normally.
+    """
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        return gui(*args, **kwargs)
+
+
+sys.modules[__name__].__class__ = _CallableGuiModule
