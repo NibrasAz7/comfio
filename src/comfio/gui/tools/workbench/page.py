@@ -355,6 +355,50 @@ def act_verdict(
             )
             st.caption("No timestamp column — index over sample order.")
 
+    # Long-term IEQ — EN 16798-1 Annex B time-in-category summary.
+    if getattr(result, "temporal_results", None):
+        with st.expander(
+            "Long-term IEQ — % of occupied time per category (EN 16798-1)", expanded=True
+        ):
+            st.plotly_chart(_charts.temporal_bars(result.temporal_results), width="stretch")
+            rows = []
+            for domain, res in result.temporal_results.items():
+                row = {"Domain": domain.capitalize()}
+                row.update(
+                    {f"Cat. {c}": f"{res.percentages[c]:.1f} %" for c in ("I", "II", "III", "IV")}
+                )
+                row["I+II (acceptable)"] = f"{res.cumulative['I+II']:.1f} %"
+                row["I+II+III"] = f"{res.cumulative['I+II+III']:.1f} %"
+                row["Excluded"] = f"{res.excluded_pct:.1f} %"
+                if res.total_hours is not None:
+                    row["Occupied hours"] = round(res.total_hours, 1)
+                rows.append(row)
+            st.dataframe(pd.DataFrame(rows).set_index("Domain"), width="stretch")
+
+            if has_time:
+                from comfio.domains.temporal import (
+                    evaluate_temporal_acoustic,
+                    evaluate_temporal_iaq,
+                    evaluate_temporal_thermal,
+                    evaluate_temporal_visual,
+                )
+
+                evaluators: dict[str, Any] = {
+                    "thermal": evaluate_temporal_thermal,
+                    "visual": evaluate_temporal_visual,
+                    "acoustic": evaluate_temporal_acoustic,
+                    "iaq": evaluate_temporal_iaq,
+                }
+                available = [d for d in evaluators if d in result.domain_results]
+                if available:
+                    domain = st.selectbox(
+                        "Daily breakdown — domain", available, key="temporal_daily_domain"
+                    )
+                    daily = evaluators[domain](
+                        result.domain_results[domain], timestamps=ts_series, by="D"
+                    )
+                    st.dataframe(daily.round(1), width="stretch")
+
     with st.expander("Assumptions & configuration used", expanded=True):
         for n in notes:
             st.write("•", n)

@@ -38,6 +38,20 @@ from comfio.domains.iaq_pollutants import (
     evaluate_iaq_pollutants,
     pollutant_iaq_score,
 )
+from comfio.domains.temporal import (
+    TimeInCategoryResult,
+    acoustic_category,
+    adaptive_category_en,
+    evaluate_temporal_acoustic,
+    evaluate_temporal_adaptive,
+    evaluate_temporal_iaq,
+    evaluate_temporal_thermal,
+    evaluate_temporal_visual,
+    iaq_category_en,
+    summarize_time_in_categories,
+    thermal_category,
+    visual_category,
+)
 from comfio.domains.thermal import evaluate_thermal
 from comfio.domains.thermal_adaptive import (
     AdaptiveThermalResult,
@@ -101,6 +115,7 @@ from comfio.llm import (
     generate_markdown_summary,
     ieq_to_markdown,
     ieq_to_summary_dict,
+    temporal_to_markdown,
 )
 from comfio.logging_config import setup_logging
 from comfio.performance.contracts import ComplianceReport, calculate_compliance
@@ -210,6 +225,19 @@ __all__ = [
     "augment_tsv_cdf",
     "evaluate_tsv",
     "TSVResult",
+    # Long-term (temporal) IEQ — EN 16798-1 Annex B
+    "TimeInCategoryResult",
+    "thermal_category",
+    "iaq_category_en",
+    "adaptive_category_en",
+    "visual_category",
+    "acoustic_category",
+    "summarize_time_in_categories",
+    "evaluate_temporal_thermal",
+    "evaluate_temporal_adaptive",
+    "evaluate_temporal_iaq",
+    "evaluate_temporal_visual",
+    "evaluate_temporal_acoustic",
     # Local discomfort (v0.1.6)
     "evaluate_ankle_draft",
     "evaluate_vertical_gradient",
@@ -228,6 +256,7 @@ __all__ = [
     # LLM-native
     "ieq_to_markdown",
     "ieq_to_summary_dict",
+    "temporal_to_markdown",
     "generate_markdown_summary",
     "EDGE_SYSTEM_PROMPT",
     "DIAGNOSTIC_PROMPT_TEMPLATE",

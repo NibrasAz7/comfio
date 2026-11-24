@@ -841,3 +841,40 @@ def satisfaction_bars(summary: pd.DataFrame) -> go.Figure:
         margin={"l": 50, "r": 20, "t": 40, "b": 50},
     )
     return fig
+
+
+# EN 16798-1 category colors: IV red, III yellow, II green, I grey
+EN_CATEGORY_COLORS = {
+    "I": "#c9c9c9",
+    "II": "#63be7b",
+    "III": "#ffeb84",
+    "IV": "#e86a4a",
+}
+
+
+def temporal_bars(temporal_results: dict) -> go.Figure:
+    """EN 16798-1 Annex B stacked bars: % occupied time per category per domain."""
+    domains = list(temporal_results)
+    fig = go.Figure()
+    for cat in ("I", "II", "III", "IV"):
+        values = [temporal_results[d].percentages[cat] for d in domains]
+        fig.add_trace(
+            go.Bar(
+                y=domains,
+                x=values,
+                name=f"Cat. {cat}",
+                orientation="h",
+                marker_color=EN_CATEGORY_COLORS[cat],
+                text=[f"{v:.0f}%" if v >= 5 else "" for v in values],
+                textposition="inside",
+            )
+        )
+    fig.update_layout(
+        barmode="stack",
+        height=max(200, 80 * len(domains) + 120),
+        xaxis_title="% of occupied time",
+        xaxis_range=[0, 100],
+        legend={"orientation": "h", "yanchor": "bottom", "y": 1.02},
+        margin={"l": 60, "r": 20, "t": 30, "b": 40},
+    )
+    return fig

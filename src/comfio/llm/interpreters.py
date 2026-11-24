@@ -9,6 +9,8 @@ No external dependencies beyond numpy and pandas (already required by core).
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import pandas as pd
 
@@ -160,6 +162,31 @@ def ieq_to_summary_dict(
         summary["total_hours"] = round(compliance_report.total_hours, 0)
 
     return summary
+
+
+def temporal_to_markdown(temporal_results: dict[str, Any]) -> str:
+    """Serialize long-term EN 16798-1 time-in-category results to markdown.
+
+    Parameters
+    ----------
+    temporal_results : dict[str, TimeInCategoryResult]
+        Per-domain temporal summaries (e.g. ``PipelineResult.temporal_results``).
+
+    Returns
+    -------
+    str
+        Compact markdown block (~100 tokens) with per-domain category
+        percentages and the cumulative I+II ("acceptable") share.
+    """
+    md = "#### Long-term IEQ (EN 16798-1, % occupied time):\n"
+    for domain, res in temporal_results.items():
+        p = res.percentages
+        md += (
+            f"  - {domain.upper()}: I {p['I']:.0f}% / II {p['II']:.0f}% / "
+            f"III {p['III']:.0f}% / IV {p['IV']:.0f}% "
+            f"(I+II {res.cumulative['I+II']:.0f}%, excluded {res.excluded_pct:.0f}%)\n"
+        )
+    return md
 
 
 def generate_markdown_summary(

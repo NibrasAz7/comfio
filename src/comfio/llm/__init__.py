@@ -13,6 +13,7 @@ from comfio.llm.interpreters import (
     generate_markdown_summary,
     ieq_to_markdown,
     ieq_to_summary_dict,
+    temporal_to_markdown,
 )
 from comfio.llm.prompts import (
     DIAGNOSTIC_PROMPT_TEMPLATE,
@@ -23,6 +24,7 @@ from comfio.llm.prompts import (
 __all__ = [
     "ieq_to_markdown",
     "ieq_to_summary_dict",
+    "temporal_to_markdown",
     "generate_markdown_summary",
     "EDGE_SYSTEM_PROMPT",
     "DIAGNOSTIC_PROMPT_TEMPLATE",

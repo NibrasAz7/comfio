@@ -18,6 +18,13 @@ from comfio.core.result_base import ResultBase
 from comfio.domains.acoustic import AcousticResult, evaluate_acoustic
 from comfio.domains.iaq import IAQResult, evaluate_iaq
 from comfio.domains.iaq_pollutants import PollutantIAQResult, evaluate_iaq_pollutants
+from comfio.domains.temporal import (
+    TimeInCategoryResult,
+    evaluate_temporal_acoustic,
+    evaluate_temporal_iaq,
+    evaluate_temporal_thermal,
+    evaluate_temporal_visual,
+)
 from comfio.domains.thermal import ThermalResult, evaluate_thermal
 from comfio.domains.thermal_adaptive import (
     AdaptiveThermalResult,
@@ -65,6 +72,7 @@ class PipelineResult(ResultBase):
     sensor: SensorData
     capabilities: dict[str, bool]
     domain_results: dict[str, Any] = field(default_factory=dict)
+    temporal_results: dict[str, TimeInCategoryResult] = field(default_factory=dict)
     ieq_result: GlobalIEQResult | None = None
     compliance_report: ComplianceReport | None = None
     warnings: list[str] = field(default_factory=list)
@@ -190,6 +198,8 @@ def run_pipeline(
         - ``adaptive_standard`` (str, default "ashrae"): "ashrae" or "en"
         - ``adaptive_acceptability`` (int, default 80): ASHRAE acceptability
         - ``adaptive_category`` (str, default "ii"): EN category
+        - ``temporal`` (bool, default True): long-term EN 16798-1 Annex B
+          time-in-category summaries per available domain
 
     Returns
     -------
@@ -432,6 +442,24 @@ def run_pipeline(
     if not caps["iaq_co2"]:
         pip_warnings.append("IAQ CO2 domain skipped: no co2_ppm column.")
 
+    # --- Long-term (temporal) IEQ summaries — EN 16798-1 Annex B ---
+    temporal_results: dict[str, TimeInCategoryResult] = {}
+    if cfg.get("temporal", True):
+        ts = None
+        if sensor.timestamp_col and sensor.timestamp_col in sensor.df.columns:
+            raw_ts = sensor.df[sensor.timestamp_col]
+            if not raw_ts.isna().any():
+                ts = raw_ts
+        evaluator_map: dict[str, tuple[Any, Any]] = {
+            "thermal": (thermal_res, evaluate_temporal_thermal),
+            "visual": (visual_res, evaluate_temporal_visual),
+            "acoustic": (acoustic_res, evaluate_temporal_acoustic),
+            "iaq": (iaq_res, evaluate_temporal_iaq),
+        }
+        for key, (res, evaluator) in evaluator_map.items():
+            if res is not None:
+                temporal_results[key] = evaluator(res, timestamps=ts)
+
     # --- Global IEQ ---
     ieq_result: GlobalIEQResult | None = None
     compliance_report: ComplianceReport | None = None
@@ -476,6 +504,7 @@ def run_pipeline(
         sensor=sensor,
         capabilities=caps,
         domain_results=domain_results,
+        temporal_results=temporal_results,
         ieq_result=ieq_result,
         compliance_report=compliance_report,
         warnings=pip_warnings,
@@ -493,6 +522,7 @@ def run_pipeline(
             "adaptive_standard": adaptive_standard,
             "adaptive_acceptability": adaptive_acceptability,
             "adaptive_category": adaptive_category,
+            "temporal": cfg.get("temporal", True),
             "weight_preset": cfg.get("weight_preset"),
         },
     )
