@@ -30,12 +30,35 @@ print(summary.cumulative)   # {'I': ..., 'I+II': ..., 'I+II+III': ..., 'I+II+III
 ```
 
 The wrappers accept raw arrays too — `evaluate_temporal_thermal(pmv_array)`
-works for PMV, sPMV and sPMVopt alike. Equivalent wrappers exist for
-IAQ (`evaluate_temporal_iaq`), adaptive comfort
-(`evaluate_temporal_adaptive`), visual (`evaluate_temporal_visual`)
-and acoustic (`evaluate_temporal_acoustic`).
+works for PMV, sPMV and sPMVopt alike. The full set:
 
-### 2. With timestamps — occupied hours and daily tables
+| Wrapper | Input | Category basis |
+|---|---|---|
+| `evaluate_temporal_thermal` | PMV/sPMV array or `ThermalResult`/`SPMVResult` | ISO 7730 / EN bands |
+| `evaluate_temporal_tsv` | TSV votes or `TSVResult` | PMV bands (heuristic on votes) |
+| `evaluate_temporal_adaptive` | `AdaptiveThermalResult` or raw \|t_op − t_comf\| | EN 2/3/4 K bands |
+| `evaluate_temporal_iaq` | CO₂ array or `IAQResult` | EN delta above outdoor |
+| `evaluate_temporal_pollutant` | pollutant array or `PollutantIAQResult` | WHO/EPA/WELL tiers |
+| `evaluate_temporal_visual` | illuminance or `VisualResult` | EN lux limits |
+| `evaluate_temporal_acoustic` | LAeq or `AcousticResult` | EN dB limits |
+
+### 2. Particulants & gases (PM2.5, PM10, TVOC, formaldehyde, CO)
+
+```python
+from comfio import evaluate_iaq_pollutants, evaluate_temporal_pollutant
+
+pollutants = evaluate_iaq_pollutants(pm25=pm25, pm10=pm10, tvoc=tvoc)
+
+pm25_summary = evaluate_temporal_pollutant(pollutants, pollutant="pm25", timestamps=ts)
+pm10_summary = evaluate_temporal_pollutant(pollutants, pollutant="pm10", timestamps=ts)
+```
+
+Raw arrays work too: `evaluate_temporal_pollutant(pm25, pollutant="pm25")`.
+Bands come from `POLLUTANT_THRESHOLDS` (excellent/good/moderate →
+I/II/III); override with `thresholds={"excellent": ..., "good": ...,
+"moderate": ...}`.
+
+### 3. With timestamps — occupied hours and daily tables
 
 ```python
 import pandas as pd
@@ -51,7 +74,7 @@ Timestamps enable **time weighting**: each sample counts for its actual
 duration, so irregular sampling does not bias the percentages. `by`
 accepts any pandas offset alias (`"D"`, `"W"`, `"MS"`, …).
 
-### 3. Occupancy and invalid samples
+### 4. Occupancy and invalid samples
 
 ```python
 summary = evaluate_temporal_thermal(
@@ -62,17 +85,34 @@ summary = evaluate_temporal_thermal(
 print(summary.excluded_pct)  # % occupied time with NaN labels (e.g. out-of-domain PMV)
 ```
 
-### 4. Two-step use (custom classifiers)
+### 5. Two-step use (custom classifiers)
 
 ```python
-from comfio import thermal_category, iaq_category_en, summarize_time_in_categories
+from comfio import (
+    iaq_category_en,
+    pollutant_category,
+    summarize_time_in_categories,
+    thermal_category,
+)
 
 labels = thermal_category(pmv)                # 1-4, NaN for invalid
 labels = iaq_category_en(co2, outdoor=420.0)  # NOTE: delta above outdoor, not absolute ppm
+labels = pollutant_category(pm25, pollutant="pm25")
 summary = summarize_time_in_categories(labels, timestamps=df["timestamp"], by="W")
 ```
 
-### 5. In the pipeline and the GUI
+### 6. Full example
+
+`examples/temporal_ieq_example.py` runs every domain end-to-end on a
+synthetic year of hourly data — PMV, sPMV, TSV, adaptive, CO₂,
+PM2.5/PM10/TVOC, visual and acoustic — and prints the markdown report,
+a daily breakdown, and an occupancy-masked variant:
+
+```powershell
+py examples\temporal_ieq_example.py
+```
+
+### 7. In the pipeline and the GUI
 
 `run_pipeline()` computes `result.temporal_results` automatically for
 every available domain (disable with `config={"temporal": False}`), and

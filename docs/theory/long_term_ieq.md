@@ -31,7 +31,9 @@ over the whole monitored period or per day/week/month.
 
 The same bands are applied to sPMV/sPMVopt arrays as an approximation
 of the PMV-based classification (documented caveat, not a standard
-provision).
+provision). They are also applied to **TSV occupant votes** by
+`evaluate_temporal_tsv()` — a reporting heuristic, since the bands are
+defined on PMV, a model prediction, not on subjective votes.
 
 ### Thermal — adaptive model (EN 16798-1)
 
@@ -54,6 +56,23 @@ absolute ppm:
 This differs from `evaluate_iaq()`, whose thresholds are absolute-ppm
 practice indicators (ASHRAE Position Document on Indoor CO₂), not EN
 categories.
+
+### Particulates & gases — WHO/EPA/WELL tiers
+
+EN 16798-1 does **not** define categories for PM2.5, PM10, TVOC,
+formaldehyde or CO. comfio maps the existing
+`POLLUTANT_THRESHOLDS` tiers (WHO Air Quality Guidelines, EPA NAAQS,
+WELL v2) onto the I–IV scale:
+
+| Category | Criterion |
+|---|---|
+| I | concentration ≤ `excellent` threshold |
+| II | ≤ `good` threshold |
+| III | ≤ `moderate` threshold |
+| IV | above `moderate` (the `poor` tier is a scoring anchor, not a bound) |
+
+These are health-based bands, not a standard provision — documented
+caveat. Custom bands can be passed via `thresholds=`.
 
 ### Visual and acoustic
 

@@ -22,6 +22,7 @@ Auto-generated documentation for every public function, class, and module in com
 - [Acoustic](domains/acoustic.md) — Noise level evaluation (NC curves)
 - [IAQ](domains/iaq.md) — CO₂-based IAQ evaluation (ASHRAE 62.1)
 - [Pollutant IAQ](domains/iaq_pollutants.md) — PM2.5, PM10, TVOC, formaldehyde, CO
+- [Temporal / Long-Term IEQ](domains/temporal.md) — EN 16798-1 Annex B time-in-category (v0.1.9)
 
 ## Integration
 

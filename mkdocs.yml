@@ -162,6 +162,7 @@ nav:
           - reference/domains/acoustic.md
           - reference/domains/iaq.md
           - reference/domains/iaq_pollutants.md
+          - reference/domains/temporal.md
       - Integration:
           - reference/integration.md
           - reference/weather.md

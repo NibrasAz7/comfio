@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `evaluate_temporal_tsv()` — long-term time-in-category for TSV occupant votes (PMV bands, heuristic)
+- `pollutant_category()` + `evaluate_temporal_pollutant()` — time-in-category for PM2.5, PM10, TVOC, formaldehyde and CO using WHO/EPA/WELL threshold tiers
+- `examples/temporal_ieq_example.py` — full-domain temporal example (thermal PMV/sPMV/TSV, adaptive, CO2, pollutants, visual, acoustic)
+- API reference page for `comfio.domains.temporal`
+
 ## [0.1.9.1] - 2026-11-24
 
 ### Fixed
