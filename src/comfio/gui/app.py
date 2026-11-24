@@ -13,6 +13,7 @@ from __future__ import annotations
 import importlib
 import os
 from collections.abc import Callable
+from importlib import resources
 
 import streamlit as st
 from streamlit.navigation.page import StreamlitPage
@@ -30,9 +31,10 @@ def _lazy(spec: ToolSpec) -> Callable[[], None]:
 
 
 def run() -> None:
+    icon = resources.files("comfio.gui").joinpath("assets", "icon.png")
     st.set_page_config(
         page_title="comfio — IEQ Analyst Workbench",
-        page_icon="🌡️",
+        page_icon=str(icon),
         layout="wide",
     )
     _styles.inject()
