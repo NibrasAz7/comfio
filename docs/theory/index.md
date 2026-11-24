@@ -14,4 +14,5 @@ Understanding-oriented documentation covering the mathematical foundations, stan
 - [Pollutant IAQ Thresholds](pollutant_iaq_thresholds.md) — WHO/EPA/WELL threshold tables and piecewise scoring
 - [Global IEQ Aggregation](weakest_link_aggregation.md) — Weighted sum, 50/50 IAQ blend, TSV thermal override
 - [CO₂ Decay Ventilation](co2_decay_ventilation.md) — Exponential decay model for ventilation rate estimation
+- [Long-Term IEQ](long_term_ieq.md) — EN 16798-1 Annex B time-in-category evaluation (v0.1.9)
 - [Limitations & Caveats](limitations.md) — Scientific transparency, applicability ranges, known limits

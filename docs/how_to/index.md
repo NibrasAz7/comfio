@@ -13,3 +13,4 @@ Practical, copy-pasteable solutions to specific problems using comfio.
 - [Train Personalisation](train_personalisation.md) — OLS regression personalisation with seasonal support
 - [Integrate LLM Tools](integrate_llm_tools.md) — OpenAI/LangChain tool schemas and diagnostics
 - [Using the comfio GUI](using_the_gui.md) — Launch the Streamlit workbench, pick a tool, deploy to the cloud
+- [Long-Term IEQ](long_term_ieq.md) — EN 16798-1 time-in-category summaries, cumulative aggregates, daily tables

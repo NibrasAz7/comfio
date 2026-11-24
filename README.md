@@ -101,6 +101,27 @@ The repo ships `streamlit_app.py` + `requirements.txt` — point a Streamlit
 Cloud app at `streamlit_app.py` and it deploys directly. For self-hosting:
 `streamlit run streamlit_app.py` behind any reverse proxy.
 
+## Long-term IEQ — time in comfort categories (EN 16798-1)
+
+Percentage of occupied time per category I–IV, plus cumulative I+II /
+I+II+III, over the whole series or per day — from PMV, sPMV, adaptive,
+CO₂, illuminance or LAeq data:
+
+```python
+from comfio import evaluate_temporal_thermal, evaluate_temporal_iaq
+
+summary = evaluate_temporal_thermal(thermal_result, timestamps=df["timestamp"])
+summary.percentages   # {'I': 20.0, 'II': 68.0, 'III': 7.0, 'IV': 5.0}
+summary.cumulative    # {'I': 20.0, 'I+II': 88.0, 'I+II+III': 95.0, ...}
+summary.hours         # occupied hours per category (time-weighted)
+
+daily = evaluate_temporal_thermal(thermal_result, timestamps=df["timestamp"], by="D")
+```
+
+`run_pipeline()` computes these automatically (`result.temporal_results`),
+and the GUI workbench shows them as stacked category bars with a daily
+breakdown. See the how-to guide for occupancy masks and NaN handling.
+
 ## Try on Google Colab
 
 Run the tutorials instantly in your browser — no local install required.

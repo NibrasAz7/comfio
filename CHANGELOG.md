@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-11-24
+
+### Added
+
+- **Long-term (temporal) IEQ evaluation** (EN 16798-1:2019, Annex B): per-sample category classifiers for thermal PMV/sPMV (`thermal_category`), adaptive EN (`adaptive_category_en`), IAQ CO2-above-outdoor (`iaq_category_en`), visual (`visual_category`) and acoustic (`acoustic_category`); `summarize_time_in_categories()` reports % of occupied time per category I-IV plus cumulative I, I+II, I+II+III, I+II+III+IV, with optional occupancy mask, NaN exclusion reporting (`excluded_pct`), time-weighted occupied hours for irregular sampling, and daily/weekly/monthly grouping (`by="D"`, ...)
+- Convenience wrappers `evaluate_temporal_thermal/adaptive/iaq/visual/acoustic` accepting raw arrays or existing domain result objects
+- `run_pipeline()` now returns `temporal_results` per available domain (disable with `config={"temporal": False}`); `temporal_to_markdown()` renders a compact LLM-ready block
+- GUI workbench: **Long-term IEQ** section with EN-style stacked category bars (IV red / III yellow / II green / I grey), cumulative table and daily breakdown
+
 ## [0.1.8] - 2026-11-17
 
 ### Added

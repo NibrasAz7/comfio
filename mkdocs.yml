@@ -136,6 +136,7 @@ nav:
       - Train Personalisation: how_to/train_personalisation.md
       - Integrate LLM Tools: how_to/integrate_llm_tools.md
       - Using the comfio GUI: how_to/using_the_gui.md
+      - Long-Term IEQ: how_to/long_term_ieq.md
   - Theory:
       - theory/index.md
       - PMV/PPD Thermal Comfort: theory/thermal_pmv_ppd.md
@@ -146,6 +147,7 @@ nav:
       - Pollutant IAQ Thresholds: theory/pollutant_iaq_thresholds.md
       - Global IEQ Aggregation: theory/weakest_link_aggregation.md
       - CO₂ Decay Ventilation: theory/co2_decay_ventilation.md
+      - Long-Term IEQ (EN 16798-1): theory/long_term_ieq.md
       - Limitations & Caveats: theory/limitations.md
   - API Reference:
       - reference/index.md
