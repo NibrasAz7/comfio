@@ -308,6 +308,28 @@ def evaluate_temporal_thermal(
     )
 
 
+def evaluate_temporal_tsv(
+    source: Any,
+    timestamps: Any = None,
+    occupied: np.ndarray | None = None,
+    by: str | None = None,
+) -> TimeInCategoryResult | pd.DataFrame:
+    """Long-term summary from occupant thermal sensation votes (TSV).
+
+    ``source`` may be a raw TSV array (-3..+3) or a ``TSVResult``
+    (uses its ``tsv`` array). The EN 16798-1 / ISO 7730 category bands
+    (|vote| <= 0.2 / 0.5 / 0.7) are applied to the votes.
+
+    Caveat: those bands are defined on PMV, a model prediction. Applying
+    them to subjective occupant votes is a heuristic for reporting, not
+    a provision of the standard.
+    """
+    values = _values(source, "tsv")
+    return summarize_time_in_categories(
+        thermal_category(values), timestamps=timestamps, occupied=occupied, by=by
+    )
+
+
 def evaluate_temporal_adaptive(
     source: Any,
     timestamps: Any = None,

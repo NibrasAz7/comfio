@@ -199,3 +199,15 @@ class TestTemporalChart:
         fig = temporal_bars({"thermal": res})
         assert len(fig.data) == 4
         assert fig.layout.barmode == "stack"
+
+
+def test_evaluate_temporal_tsv() -> None:
+    from comfio import evaluate_temporal_tsv, evaluate_tsv
+
+    res = evaluate_tsv(np.array([-0.1, 0.6, 1.5]))
+    summary = evaluate_temporal_tsv(res)
+    assert summary.percentages["I"] == pytest.approx(100 / 3)
+    assert summary.percentages["III"] == pytest.approx(100 / 3)
+    assert summary.percentages["IV"] == pytest.approx(100 / 3)
+    # raw array path works too
+    assert evaluate_temporal_tsv(np.array([0.0])).percentages["I"] == 100.0
