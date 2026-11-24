@@ -1437,6 +1437,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#particulates-gases-whoepawell-tiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Particulates &amp; gases — WHO/EPA/WELL tiers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#visual-and-acoustic" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1613,6 +1624,8 @@
   
     
     
+      
+        
       
         
       
@@ -1948,6 +1961,34 @@
     
   
     Pollutant IAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/domains/temporal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Temporal / Long-Term IEQ
   
 
     
@@ -2379,6 +2420,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#particulates-gases-whoepawell-tiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Particulates &amp; gases — WHO/EPA/WELL tiers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#visual-and-acoustic" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2504,7 +2556,9 @@ over the whole monitored period or per day/week/month.</p>
 </table>
 <p>The same bands are applied to sPMV/sPMVopt arrays as an approximation
 of the PMV-based classification (documented caveat, not a standard
-provision).</p>
+provision). They are also applied to <strong>TSV occupant votes</strong> by
+<code>evaluate_temporal_tsv()</code> — a reporting heuristic, since the bands are
+defined on PMV, a model prediction, not on subjective votes.</p>
 <h3 id="thermal-adaptive-model-en-16798-1">Thermal — adaptive model (EN 16798-1)<a class="headerlink" href="#thermal-adaptive-model-en-16798-1" title="Permanent link">&para;</a></h3>
 <p>Classification on the absolute offset from the comfort temperature,
 <span class="arithmatex">\(|t_{op} - t_{comf}|\)</span>: Cat. I ≤ 2 K, Cat. II ≤ 3 K, Cat. III ≤ 4 K,
@@ -2541,6 +2595,39 @@ absolute ppm:</p>
 <p>This differs from <code>evaluate_iaq()</code>, whose thresholds are absolute-ppm
 practice indicators (ASHRAE Position Document on Indoor CO₂), not EN
 categories.</p>
+<h3 id="particulates-gases-whoepawell-tiers">Particulates &amp; gases — WHO/EPA/WELL tiers<a class="headerlink" href="#particulates-gases-whoepawell-tiers" title="Permanent link">&para;</a></h3>
+<p>EN 16798-1 does <strong>not</strong> define categories for PM2.5, PM10, TVOC,
+formaldehyde or CO. comfio maps the existing
+<code>POLLUTANT_THRESHOLDS</code> tiers (WHO Air Quality Guidelines, EPA NAAQS,
+WELL v2) onto the I–IV scale:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Criterion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I</td>
+<td>concentration ≤ <code>excellent</code> threshold</td>
+</tr>
+<tr>
+<td>II</td>
+<td>≤ <code>good</code> threshold</td>
+</tr>
+<tr>
+<td>III</td>
+<td>≤ <code>moderate</code> threshold</td>
+</tr>
+<tr>
+<td>IV</td>
+<td>above <code>moderate</code> (the <code>poor</code> tier is a scoring anchor, not a bound)</td>
+</tr>
+</tbody>
+</table>
+<p>These are health-based bands, not a standard provision — documented
+caveat. Custom bands can be passed via <code>thresholds=</code>.</p>
 <h3 id="visual-and-acoustic">Visual and acoustic<a class="headerlink" href="#visual-and-acoustic" title="Permanent link">&para;</a></h3>
 <p>Default category limits follow typical office requirements in the
 EN 16798-1 annexes and are configurable per space/room type:</p>

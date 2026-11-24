@@ -1067,10 +1067,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-with-timestamps-occupied-hours-and-daily-tables" class="md-nav__link">
+  <a href="#2-particulants-gases-pm25-pm10-tvoc-formaldehyde-co" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. With timestamps — occupied hours and daily tables
+        2. Particulants &amp; gases (PM2.5, PM10, TVOC, formaldehyde, CO)
       
     </span>
   </a>
@@ -1078,10 +1078,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-occupancy-and-invalid-samples" class="md-nav__link">
+  <a href="#3-with-timestamps-occupied-hours-and-daily-tables" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Occupancy and invalid samples
+        3. With timestamps — occupied hours and daily tables
       
     </span>
   </a>
@@ -1089,10 +1089,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-two-step-use-custom-classifiers" class="md-nav__link">
+  <a href="#4-occupancy-and-invalid-samples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Two-step use (custom classifiers)
+        4. Occupancy and invalid samples
       
     </span>
   </a>
@@ -1100,10 +1100,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#5-in-the-pipeline-and-the-gui" class="md-nav__link">
+  <a href="#5-two-step-use-custom-classifiers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. In the pipeline and the GUI
+        5. Two-step use (custom classifiers)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-full-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Full example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-in-the-pipeline-and-the-gui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. In the pipeline and the GUI
       
     </span>
   </a>
@@ -1623,6 +1645,8 @@
       
         
       
+        
+      
     
     
     
@@ -1937,6 +1961,34 @@
     
   
     Pollutant IAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/domains/temporal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Temporal / Long-Term IEQ
   
 
     
@@ -2346,10 +2398,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-with-timestamps-occupied-hours-and-daily-tables" class="md-nav__link">
+  <a href="#2-particulants-gases-pm25-pm10-tvoc-formaldehyde-co" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. With timestamps — occupied hours and daily tables
+        2. Particulants &amp; gases (PM2.5, PM10, TVOC, formaldehyde, CO)
       
     </span>
   </a>
@@ -2357,10 +2409,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-occupancy-and-invalid-samples" class="md-nav__link">
+  <a href="#3-with-timestamps-occupied-hours-and-daily-tables" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Occupancy and invalid samples
+        3. With timestamps — occupied hours and daily tables
       
     </span>
   </a>
@@ -2368,10 +2420,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-two-step-use-custom-classifiers" class="md-nav__link">
+  <a href="#4-occupancy-and-invalid-samples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Two-step use (custom classifiers)
+        4. Occupancy and invalid samples
       
     </span>
   </a>
@@ -2379,10 +2431,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#5-in-the-pipeline-and-the-gui" class="md-nav__link">
+  <a href="#5-two-step-use-custom-classifiers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. In the pipeline and the GUI
+        5. Two-step use (custom classifiers)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-full-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Full example
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-in-the-pipeline-and-the-gui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. In the pipeline and the GUI
       
     </span>
   </a>
@@ -2438,38 +2512,106 @@ monitored period or per day.</p>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">cumulative</span><span class="p">)</span>   <span class="c1"># {'I': ..., 'I+II': ..., 'I+II+III': ..., 'I+II+III+IV': 100.0}</span>
 </span></code></pre></div>
 <p>The wrappers accept raw arrays too — <code>evaluate_temporal_thermal(pmv_array)</code>
-works for PMV, sPMV and sPMVopt alike. Equivalent wrappers exist for
-IAQ (<code>evaluate_temporal_iaq</code>), adaptive comfort
-(<code>evaluate_temporal_adaptive</code>), visual (<code>evaluate_temporal_visual</code>)
-and acoustic (<code>evaluate_temporal_acoustic</code>).</p>
-<h3 id="2-with-timestamps-occupied-hours-and-daily-tables">2. With timestamps — occupied hours and daily tables<a class="headerlink" href="#2-with-timestamps-occupied-hours-and-daily-tables" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+works for PMV, sPMV and sPMVopt alike. The full set:</p>
+<table>
+<thead>
+<tr>
+<th>Wrapper</th>
+<th>Input</th>
+<th>Category basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>evaluate_temporal_thermal</code></td>
+<td>PMV/sPMV array or <code>ThermalResult</code>/<code>SPMVResult</code></td>
+<td>ISO 7730 / EN bands</td>
+</tr>
+<tr>
+<td><code>evaluate_temporal_tsv</code></td>
+<td>TSV votes or <code>TSVResult</code></td>
+<td>PMV bands (heuristic on votes)</td>
+</tr>
+<tr>
+<td><code>evaluate_temporal_adaptive</code></td>
+<td><code>AdaptiveThermalResult</code> or raw |t_op − t_comf|</td>
+<td>EN 2/3/4 K bands</td>
+</tr>
+<tr>
+<td><code>evaluate_temporal_iaq</code></td>
+<td>CO₂ array or <code>IAQResult</code></td>
+<td>EN delta above outdoor</td>
+</tr>
+<tr>
+<td><code>evaluate_temporal_pollutant</code></td>
+<td>pollutant array or <code>PollutantIAQResult</code></td>
+<td>WHO/EPA/WELL tiers</td>
+</tr>
+<tr>
+<td><code>evaluate_temporal_visual</code></td>
+<td>illuminance or <code>VisualResult</code></td>
+<td>EN lux limits</td>
+</tr>
+<tr>
+<td><code>evaluate_temporal_acoustic</code></td>
+<td>LAeq or <code>AcousticResult</code></td>
+<td>EN dB limits</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-particulants-gases-pm25-pm10-tvoc-formaldehyde-co">2. Particulants &amp; gases (PM2.5, PM10, TVOC, formaldehyde, CO)<a class="headerlink" href="#2-particulants-gases-pm25-pm10-tvoc-formaldehyde-co" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">comfio</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate_iaq_pollutants</span><span class="p">,</span> <span class="n">evaluate_temporal_pollutant</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">evaluate_temporal_thermal</span><span class="p">(</span><span class="n">thermal</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">])</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">total_hours</span><span class="p">,</span> <span class="n">summary</span><span class="o">.</span><span class="n">hours</span><span class="p">)</span>  <span class="c1"># occupied hours per category</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">daily</span> <span class="o">=</span> <span class="n">evaluate_temporal_thermal</span><span class="p">(</span><span class="n">thermal</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">],</span> <span class="n">by</span><span class="o">=</span><span class="s2">"D"</span><span class="p">)</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">daily</span><span class="p">[[</span><span class="s2">"I"</span><span class="p">,</span> <span class="s2">"II"</span><span class="p">,</span> <span class="s2">"III"</span><span class="p">,</span> <span class="s2">"IV"</span><span class="p">,</span> <span class="s2">"I+II"</span><span class="p">]])</span>  <span class="c1"># one row per day</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">pollutants</span> <span class="o">=</span> <span class="n">evaluate_iaq_pollutants</span><span class="p">(</span><span class="n">pm25</span><span class="o">=</span><span class="n">pm25</span><span class="p">,</span> <span class="n">pm10</span><span class="o">=</span><span class="n">pm10</span><span class="p">,</span> <span class="n">tvoc</span><span class="o">=</span><span class="n">tvoc</span><span class="p">)</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">pm25_summary</span> <span class="o">=</span> <span class="n">evaluate_temporal_pollutant</span><span class="p">(</span><span class="n">pollutants</span><span class="p">,</span> <span class="n">pollutant</span><span class="o">=</span><span class="s2">"pm25"</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">pm10_summary</span> <span class="o">=</span> <span class="n">evaluate_temporal_pollutant</span><span class="p">(</span><span class="n">pollutants</span><span class="p">,</span> <span class="n">pollutant</span><span class="o">=</span><span class="s2">"pm10"</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Raw arrays work too: <code>evaluate_temporal_pollutant(pm25, pollutant="pm25")</code>.
+Bands come from <code>POLLUTANT_THRESHOLDS</code> (excellent/good/moderate →
+I/II/III); override with <code>thresholds={"excellent": ..., "good": ...,
+"moderate": ...}</code>.</p>
+<h3 id="3-with-timestamps-occupied-hours-and-daily-tables">3. With timestamps — occupied hours and daily tables<a class="headerlink" href="#3-with-timestamps-occupied-hours-and-daily-tables" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">evaluate_temporal_thermal</span><span class="p">(</span><span class="n">thermal</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">])</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">total_hours</span><span class="p">,</span> <span class="n">summary</span><span class="o">.</span><span class="n">hours</span><span class="p">)</span>  <span class="c1"># occupied hours per category</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">daily</span> <span class="o">=</span> <span class="n">evaluate_temporal_thermal</span><span class="p">(</span><span class="n">thermal</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">],</span> <span class="n">by</span><span class="o">=</span><span class="s2">"D"</span><span class="p">)</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">daily</span><span class="p">[[</span><span class="s2">"I"</span><span class="p">,</span> <span class="s2">"II"</span><span class="p">,</span> <span class="s2">"III"</span><span class="p">,</span> <span class="s2">"IV"</span><span class="p">,</span> <span class="s2">"I+II"</span><span class="p">]])</span>  <span class="c1"># one row per day</span>
 </span></code></pre></div>
 <p>Timestamps enable <strong>time weighting</strong>: each sample counts for its actual
 duration, so irregular sampling does not bias the percentages. <code>by</code>
 accepts any pandas offset alias (<code>"D"</code>, <code>"W"</code>, <code>"MS"</code>, …).</p>
-<h3 id="3-occupancy-and-invalid-samples">3. Occupancy and invalid samples<a class="headerlink" href="#3-occupancy-and-invalid-samples" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">evaluate_temporal_thermal</span><span class="p">(</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">thermal</span><span class="p">,</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">],</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">occupied</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"occupied"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>  <span class="c1"># unoccupied rows dropped</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">)</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">excluded_pct</span><span class="p">)</span>  <span class="c1"># % occupied time with NaN labels (e.g. out-of-domain PMV)</span>
+<h3 id="4-occupancy-and-invalid-samples">4. Occupancy and invalid samples<a class="headerlink" href="#4-occupancy-and-invalid-samples" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">evaluate_temporal_thermal</span><span class="p">(</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">thermal</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">],</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">occupied</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"occupied"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>  <span class="c1"># unoccupied rows dropped</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">excluded_pct</span><span class="p">)</span>  <span class="c1"># % occupied time with NaN labels (e.g. out-of-domain PMV)</span>
 </span></code></pre></div>
-<h3 id="4-two-step-use-custom-classifiers">4. Two-step use (custom classifiers)<a class="headerlink" href="#4-two-step-use-custom-classifiers" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">comfio</span><span class="w"> </span><span class="kn">import</span> <span class="n">thermal_category</span><span class="p">,</span> <span class="n">iaq_category_en</span><span class="p">,</span> <span class="n">summarize_time_in_categories</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">labels</span> <span class="o">=</span> <span class="n">thermal_category</span><span class="p">(</span><span class="n">pmv</span><span class="p">)</span>                <span class="c1"># 1-4, NaN for invalid</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">labels</span> <span class="o">=</span> <span class="n">iaq_category_en</span><span class="p">(</span><span class="n">co2</span><span class="p">,</span> <span class="n">outdoor</span><span class="o">=</span><span class="mf">420.0</span><span class="p">)</span>  <span class="c1"># NOTE: delta above outdoor, not absolute ppm</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">summarize_time_in_categories</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">],</span> <span class="n">by</span><span class="o">=</span><span class="s2">"W"</span><span class="p">)</span>
+<h3 id="5-two-step-use-custom-classifiers">5. Two-step use (custom classifiers)<a class="headerlink" href="#5-two-step-use-custom-classifiers" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">comfio</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">iaq_category_en</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">pollutant_category</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">summarize_time_in_categories</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">thermal_category</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">labels</span> <span class="o">=</span> <span class="n">thermal_category</span><span class="p">(</span><span class="n">pmv</span><span class="p">)</span>                <span class="c1"># 1-4, NaN for invalid</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">labels</span> <span class="o">=</span> <span class="n">iaq_category_en</span><span class="p">(</span><span class="n">co2</span><span class="p">,</span> <span class="n">outdoor</span><span class="o">=</span><span class="mf">420.0</span><span class="p">)</span>  <span class="c1"># NOTE: delta above outdoor, not absolute ppm</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="n">labels</span> <span class="o">=</span> <span class="n">pollutant_category</span><span class="p">(</span><span class="n">pm25</span><span class="p">,</span> <span class="n">pollutant</span><span class="o">=</span><span class="s2">"pm25"</span><span class="p">)</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="n">summary</span> <span class="o">=</span> <span class="n">summarize_time_in_categories</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">"timestamp"</span><span class="p">],</span> <span class="n">by</span><span class="o">=</span><span class="s2">"W"</span><span class="p">)</span>
 </span></code></pre></div>
-<h3 id="5-in-the-pipeline-and-the-gui">5. In the pipeline and the GUI<a class="headerlink" href="#5-in-the-pipeline-and-the-gui" title="Permanent link">&para;</a></h3>
+<h3 id="6-full-example">6. Full example<a class="headerlink" href="#6-full-example" title="Permanent link">&para;</a></h3>
+<p><code>examples/temporal_ieq_example.py</code> runs every domain end-to-end on a
+synthetic year of hourly data — PMV, sPMV, TSV, adaptive, CO₂,
+PM2.5/PM10/TVOC, visual and acoustic — and prints the markdown report,
+a daily breakdown, and an occupancy-masked variant:</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">py</span> <span class="n">examples</span><span class="p">\</span><span class="n">temporal_ieq_example</span><span class="p">.</span><span class="n">py</span>
+</span></code></pre></div>
+<h3 id="7-in-the-pipeline-and-the-gui">7. In the pipeline and the GUI<a class="headerlink" href="#7-in-the-pipeline-and-the-gui" title="Permanent link">&para;</a></h3>
 <p><code>run_pipeline()</code> computes <code>result.temporal_results</code> automatically for
 every available domain (disable with <code>config={"temporal": False}</code>), and
 <code>temporal_to_markdown(result.temporal_results)</code> renders a compact
