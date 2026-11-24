@@ -49,3 +49,17 @@ jobs:
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
+
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e "."
+      - name: Run temporal IEQ example
+        run: python examples/temporal_ieq_example.py
