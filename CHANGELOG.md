@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9.3] - 2026-11-24
+
+### Fixed
+
+- `comfio.gui()` raised `TypeError: 'module' object is not callable` on every call after the first: importing the `comfio.gui` subpackage rebinds the `comfio.gui` attribute to the module object. The submodule is now callable (`_CallableGuiModule.__call__` delegates to `gui()`), so `comfio.gui(...)` works in both attribute states while `comfio.gui.tools` and other submodule imports are unaffected
+- `__version__` was stale (0.1.9.1) relative to the package version
+
+### Changed
+
+- README rewritten: centered header with logo, badge row, table of contents, reorganized sections, temporal IEQ API coverage
+
 ## [0.1.9.2] - 2026-11-24
 
 ### Added

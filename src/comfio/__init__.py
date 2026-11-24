@@ -5,7 +5,7 @@ and actionable smart building management by unifying Thermal, Visual,
 Acoustic, and Indoor Air Quality (IAQ) metrics into a Global IEQ Index.
 """
 
-__version__ = "0.1.9.2"
+__version__ = "0.1.9.3"
 
 from collections.abc import Sequence
 
