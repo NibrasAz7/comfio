@@ -211,3 +211,22 @@ def test_evaluate_temporal_tsv() -> None:
     assert summary.percentages["IV"] == pytest.approx(100 / 3)
     # raw array path works too
     assert evaluate_temporal_tsv(np.array([0.0])).percentages["I"] == 100.0
+
+
+def test_evaluate_temporal_pollutant() -> None:
+    from comfio import evaluate_iaq_pollutants, evaluate_temporal_pollutant
+
+    # pm25 tiers: excellent 5, good 15, moderate 35 -> I/II/III, above -> IV
+    pm25 = np.array([3.0, 10.0, 25.0, 60.0])
+    summary = evaluate_temporal_pollutant(pm25, pollutant="pm25")
+    assert summary.percentages["I"] == 25.0
+    assert summary.percentages["II"] == 25.0
+    assert summary.percentages["III"] == 25.0
+    assert summary.percentages["IV"] == 25.0
+
+    # works on a PollutantIAQResult too (reads the named attribute)
+    res = evaluate_iaq_pollutants(pm25=pm25, pm10=np.array([20.0] * 4))
+    s2 = evaluate_temporal_pollutant(res, pollutant="pm25")
+    assert s2.percentages["IV"] == 25.0
+    s3 = evaluate_temporal_pollutant(res, pollutant="pm10")
+    assert s3.percentages["II"] == 100.0  # 20 > excellent(15), <= good(45)

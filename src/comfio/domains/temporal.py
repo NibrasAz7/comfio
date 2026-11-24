@@ -25,6 +25,7 @@ import numpy as np
 import pandas as pd
 
 from comfio.core.result_base import ResultBase
+from comfio.domains.iaq_pollutants import POLLUTANT_THRESHOLDS
 from comfio.domains.thermal import CATEGORY_PMV_LIMITS
 from comfio.domains.thermal_adaptive import EN_CATEGORY_BANDS
 
@@ -159,6 +160,29 @@ def acoustic_category(
     for other room types.
     """
     return _categorize(np.asarray(laeq, dtype=float), limits)
+
+
+def pollutant_category(
+    values: np.ndarray,
+    thresholds: dict[str, float] | None = None,
+    pollutant: str = "pm25",
+) -> np.ndarray:
+    """Classify pollutant concentrations into categories I-IV.
+
+    Uses the ``excellent``/``good``/``moderate`` tiers of
+    :data:`comfio.domains.iaq_pollutants.POLLUTANT_THRESHOLDS`
+    (WHO / EPA / WELL):
+
+    I: <= excellent, II: <= good, III: <= moderate, IV: above.
+
+    The ``poor`` tier is a scoring anchor, not a category bound.
+    ``thresholds`` may be any dict with those three keys; defaults to
+    the table entry for ``pollutant`` (pm25, pm10, tvoc,
+    formaldehyde, co).
+    """
+    thr = thresholds if thresholds is not None else POLLUTANT_THRESHOLDS[pollutant]
+    bands = (thr["excellent"], thr["good"], thr["moderate"])
+    return _categorize(np.asarray(values, dtype=float), bands)
 
 
 def _sample_weights_hours(timestamps: Any, n: int) -> np.ndarray:
@@ -364,6 +388,30 @@ def evaluate_temporal_iaq(
     values = _values(source, "co2")
     return summarize_time_in_categories(
         iaq_category_en(values, outdoor=outdoor),
+        timestamps=timestamps,
+        occupied=occupied,
+        by=by,
+    )
+
+
+def evaluate_temporal_pollutant(
+    source: Any,
+    pollutant: str = "pm25",
+    thresholds: dict[str, float] | None = None,
+    timestamps: Any = None,
+    occupied: np.ndarray | None = None,
+    by: str | None = None,
+) -> TimeInCategoryResult | pd.DataFrame:
+    """Long-term pollutant summary (PM2.5, PM10, TVOC, formaldehyde, CO).
+
+    ``source`` may be a raw concentration array or a
+    ``PollutantIAQResult`` (the attribute named ``pollutant`` is read).
+    Categories come from the WHO/EPA/WELL threshold tiers — health-based
+    bands, not an EN 16798-1 provision.
+    """
+    values = _values(source, pollutant)
+    return summarize_time_in_categories(
+        pollutant_category(values, thresholds=thresholds, pollutant=pollutant),
         timestamps=timestamps,
         occupied=occupied,
         by=by,
