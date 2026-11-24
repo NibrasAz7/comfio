@@ -192,6 +192,7 @@ class TestPipelineIntegration:
 
 class TestTemporalChart:
     def test_stacked_bars(self) -> None:
+        pytest.importorskip("plotly")
         from comfio.gui._charts import temporal_bars
 
         res = evaluate_temporal_thermal(np.array([0.0, 1.5]))

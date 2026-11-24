@@ -172,7 +172,8 @@ def _sample_weights_hours(timestamps: Any, n: int) -> np.ndarray:
         raise ValueError("timestamps and labels must have the same length.")
     if not ts.is_monotonic_increasing:
         raise ValueError("timestamps must be sorted in increasing order.")
-    dt = np.diff(ts.asi8) / 3.6e12  # ns -> hours
+    # timedelta64 division is unit-agnostic (pandas 2 ns vs pandas 3 us/s)
+    dt = np.diff(ts.to_numpy()) / np.timedelta64(1, "h")
     weights = np.concatenate([dt, dt[-1:]]) if len(dt) else np.zeros(1)
     return weights
 

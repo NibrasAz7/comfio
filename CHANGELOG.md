@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9.1] - 2026-11-24
+
+### Fixed
+
+- Time-weighted occupied hours were 1000x too small on pandas 3.x: `DatetimeIndex.asi8` resolution changed (ns -> us); durations are now computed with unit-agnostic `timedelta64` division
+- Temporal chart test now skips when plotly is not installed
+
 ## [0.1.9] - 2026-11-24
 
 ### Added
