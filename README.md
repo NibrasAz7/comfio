@@ -1,25 +1,56 @@
-# comfio
+<!-- markdownlint-disable MD033 MD041 -->
+<p align="center">
+  <img src="assets/icon.svg" width="96" alt="comfio logo" />
+</p>
 
-**A multi-domain IEQ & performance contract framework for smart buildings.**
+<h1 align="center">comfio</h1>
 
-comfio bridges the gap between raw building sensor data and actionable smart building management. It breaks the silos between different building physics disciplines — bringing together **Thermal**, **Visual**, **Acoustic**, and **Indoor Air Quality (IAQ)** metrics into a unified **Global IEQ Index**.
+<p align="center">
+  <b>Multi-domain Indoor Environmental Quality (IEQ) and performance-contract framework for smart buildings.</b>
+</p>
 
-Designed for time-series data (IoT sensors, edge computing) and comfort-based performance contracts, comfio enables researchers and building managers to automate compliance tracking and generate smart-contract-ready outputs.
+<p align="center">
+  <a href="https://pypi.org/project/comfio/"><img src="https://img.shields.io/pypi/v/comfio?color=3776AB&logo=pypi&logoColor=white" alt="PyPI version" /></a>
+  <a href="https://pypi.org/project/comfio/"><img src="https://img.shields.io/pypi/pyversions/comfio?color=3776AB" alt="Python versions" /></a>
+  <a href="https://github.com/NibrasAz7/comfio/actions/workflows/test.yml"><img src="https://github.com/NibrasAz7/comfio/actions/workflows/test.yml/badge.svg?branch=main" alt="Tests" /></a>
+  <a href="https://comfio.readthedocs.io/"><img src="https://readthedocs.org/projects/comfio/badge/?version=stable" alt="Documentation" /></a>
+  <a href="https://github.com/NibrasAz7/comfio/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/comfio?color=blue" alt="License: MIT" /></a>
+  <a href="https://pepy.tech/project/comfio"><img src="https://static.pepy.tech/badge/comfio/months/py3?color=blue" alt="Downloads" /></a>
+  <img src="https://img.shields.io/badge/status-beta-orange" alt="Status: beta" />
+</p>
 
-## Why comfio?
+<p align="center">
+  <a href="https://comfio.readthedocs.io/">Documentation</a> ·
+  <a href="https://github.com/NibrasAz7/comfio/tree/main/examples">Examples</a> ·
+  <a href="#quick-start">Quick start</a>
+</p>
 
-- **Silo-Breaking**: Unifies separated domains (Thermal, Acoustic, Visual, IAQ) under a single Python API
-- **Data-Native**: Built to ingest massive arrays of time-series data (Pandas/NumPy) rather than single-point calculations
-- **Actionable Output**: Translates physical equations into compliance rates for building performance contracts
-- **Smart Contract Ready**: Generates structured JSON outputs with formal ABI schemas for blockchain Oracle integration
-- **ML/DL Compatible**: NumPy-native core with optional adapters for scikit-learn, PyTorch, and TensorFlow/Keras
-- **Advanced Physics Modules**: Optional extras for Radiance daylighting, CRI/CCT color quality, RT60 reverberation, STI speech intelligibility, CO₂ decay ventilation, and full psychrometrics
-- **Pollutant IAQ**: PM2.5, PM10, TVOC, formaldehyde, and CO evaluation against WHO, EPA NAAQS, and WELL Building Standard v2 thresholds
-- **Adaptive Thermal Comfort**: ASHRAE 55-2023 and EN 16798-1:2019 adaptive models for naturally ventilated buildings
-- **Simplified PMV (sPMV)**: Buratti et al. (2009) seasonal model requiring only temperature and humidity
-- **TSV Augmentation**: CDF-based remapping (quantile mapping) to augment sparse occupant votes to dense sensor timestamps while preserving the empirical distribution
-- **Personalised Comfort**: OLS regression-based personalisation of model predictions to match occupant feedback (TSV), with per-season support
-- **Fast & Light**: Core depends only on numpy, pandas, and pythermalcomfort
+comfio bridges the gap between raw building sensor data and actionable smart-building management. It unifies the siloed disciplines of building physics — **thermal**, **visual**, **acoustic**, and **indoor air quality** — under a single Python API, and compresses them into a weighted **Global IEQ Index** (0–100) with compliance tracking and contract-ready outputs.
+
+Built for time-series data (IoT sensors, edge computing) and comfort-based performance contracts. NumPy-native, optional pandas/numpy, ML framework adapters, and a Streamlit analyst workbench.
+
+## Contents
+
+- [Why comfio](#why-comfio)
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Long-term IEQ — time in categories](#long-term-ieq--time-in-categories-en-16798-1)
+- [GUI analyst workbench](#gui--analyst-workbench)
+- [Domain modules](#domain-modules)
+- [Try it in Colab](#try-it-in-colab)
+- [Architecture](#architecture)
+- [Citation](#citation)
+- [Development](#development)
+
+## Why comfio
+
+- **Silo-breaking** — thermal, visual, acoustic, and IAQ metrics unified under one API and one index
+- **Data-native** — built for massive time-series arrays (Pandas/NumPy), not single-point calculations
+- **Standards-grounded** — ISO 7730, ASHRAE 55/62.1, EN 12464-1, EN 16798-1, WHO/EPA/WELL pollutant thresholds
+- **Long-term compliance** — EN 16798-1 Annex B time-in-category (% occupied time per I–IV) for every domain
+- **Smart-contract ready** — structured JSON outputs with formal ABI schemas for blockchain oracle integration
+- **ML/DL compatible** — optional adapters for scikit-learn, PyTorch, and TensorFlow/Keras
+- **Fast & light** — core depends only on `numpy`, `pandas`, and `pythermalcomfort`
 
 ## Installation
 
@@ -27,85 +58,84 @@ Designed for time-series data (IoT sensors, edge computing) and comfort-based pe
 pip install comfio
 ```
 
-With ML/DL framework support:
+Optional extras:
 
 ```bash
-pip install comfio[ml]        # scikit-learn
-pip install comfio[torch]     # PyTorch
-pip install comfio[keras]     # TensorFlow/Keras
-pip install comfio[all]       # All frameworks + advanced domains
+pip install comfio[ml]             # scikit-learn
+pip install comfio[torch]          # PyTorch
+pip install comfio[keras]          # TensorFlow/Keras
+pip install comfio[gui]            # Streamlit workbench + notebook widget
+pip install comfio[gui-reports]    # + PDF/DOCX exports
+pip install comfio[daylighting]    # pyradiance ray-tracing
+pip install comfio[color]          # CRI / CCT (colour-science)
+pip install comfio[acoustics]      # RT60, STI (python-acoustics, pyroomacoustics)
+pip install comfio[psychrometrics] # PsychroLib (psychrometrics, CO₂ decay ACH)
+pip install comfio[all]            # everything
 ```
 
-GUI (Streamlit workbench + notebook widget):
+Requires Python ≥ 3.11.
 
-```bash
-pip install comfio[gui]           # streamlit>=1.51, plotly, openpyxl, ipywidgets, pywebview
-pip install comfio[gui-reports]   # + reportlab (PDF) and python-docx (DOCX) exports
-```
+## Quick start
 
-Advanced physics-based domain evaluation (optional extras):
-
-```bash
-pip install comfio[daylighting]      # pyradiance (Radiance ray-tracing)
-pip install comfio[color]            # colour-science (CRI, CCT)
-pip install comfio[acoustics]        # python-acoustics + pyroomacoustics (RT60, STI)
-pip install comfio[psychrometrics]   # PsychroLib (psychrometric properties, CO₂ decay ACH)
-```
-
-## GUI — analyst workbench
+### 1. Evaluate domains
 
 ```python
-import comfio
-comfio.gui()              # browser app on localhost:8501
-comfio.gui(df)            # preloaded DataFrame
-comfio.gui(desktop=True)  # native pywebview window instead of browser
-comfio.gui(tools=["workbench", "calculator"])  # enable only some tools
+import numpy as np
+from comfio import evaluate_thermal, evaluate_visual, evaluate_acoustic, evaluate_iaq
+
+thermal = evaluate_thermal(
+    tdb=np.array([24.0, 25.0, 26.0]),   # air temp °C
+    tr=np.array([24.0, 25.0, 26.0]),    # radiant temp °C
+    vr=np.array([0.1, 0.1, 0.1]),        # air velocity m/s
+    rh=np.array([50.0, 50.0, 50.0]),     # relative humidity %
+    met=1.2, clo=0.5, category="B",      # ISO 7730 category
+)
+print(f"PMV: {thermal.pmv}, PPD: {thermal.ppd}")
+
+visual = evaluate_visual(illuminance=np.array([450.0, 500.0, 600.0]), task_type="office_writing")
+acoustic = evaluate_acoustic(laeq=np.array([35.0, 40.0, 45.0]), nc_level="NC-35")
+iaq = evaluate_iaq(co2=np.array([700.0, 900.0, 1100.0]), threshold_level="good")
 ```
 
-The app is a multipage set of independent tools (requires
-`streamlit>=1.51`). Each tool can be enabled or removed with one line —
-in the registry (`comfio.gui.tools.BUILTIN_TOOLS`), via
-`comfio.gui(tools=[...])` as above, or with the `COMFIO_GUI_TOOLS`
-environment variable (comma-separated tool ids, e.g.
-`COMFIO_GUI_TOOLS=calculator,about`).
-
-| Tool | id | What it does |
-| --- | --- | --- |
-| Analyse my data | `workbench` | upload → mapping → Global IEQ verdict → evidence/exports (default page) |
-| Occupant survey | `survey` | satisfaction-vote import, % satisfied, sensor-vs-occupant check |
-| Comfort calculator | `calculator` | PMV/PPD, SET, adaptive models, compare & ranges, psychrometric chart |
-| MRT room designer | `mrt` | plan-view MRT/PMV map of a rectangular room, solar ΔMRT at the occupant |
-| Setpoint explorer | `setpoint` | comfort-band edges and deadband widening |
-| Global database | `benchmark` | ASHRAE DB II (CC0) adaptive scatter, sensation bins, PMV bias, building overlay |
-| Learn | `learn` | guided lessons that hand inputs to the calculator |
-| About & sources | `about` | enabled tools, provenance, licences, citations (always on) |
-
-The workbench three-act flow: **upload** CSV/Excel (multi-sheet supported, SI or IP
-units) → **inspect and correct** the auto-detected column mapping →
-**verdict** (Global IEQ gauge, per-domain traffic lights, comfort scatter,
-hour-of-day exceedance heatmap, occupant-vote calibration) → **evidence**
-(compliance rates, WELL v2 T06 / RESET Air presets, CSV/DOCX/PDF/JSON/
-Markdown/Python-script exports). Assumptions such as `MRT = air temp` or
-constant air speed are always shown, never applied silently.
-
-In Jupyter:
+### 2. Global IEQ index
 
 ```python
-w = comfio.gui_notebook(df)  # ipywidgets mini-workbench
-w
+from comfio import calculate_global_ieq, default_weights
+
+ieq = calculate_global_ieq(
+    thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq,
+    weights=default_weights(),  # thermal 40% · iaq 25% · visual 20% · acoustic 15%
+)
+print(f"Global IEQ Index: {ieq.index}")
 ```
 
-### Deploy the workbench (Streamlit Community Cloud)
+### 3. Compliance & contract outputs
 
-The repo ships `streamlit_app.py` + `requirements.txt` — point a Streamlit
-Cloud app at `streamlit_app.py` and it deploys directly. For self-hosting:
-`streamlit run streamlit_app.py` behind any reverse proxy.
+```python
+from comfio import calculate_compliance
 
-## Long-term IEQ — time in comfort categories (EN 16798-1)
+report = calculate_compliance(ieq, threshold=80.0)
+print(f"Compliance rate: {report.compliance_rate_pct:.1f}%")
+contract_json = report.to_contract_json()   # blockchain-oracle-ready JSON
+```
 
-Percentage of occupied time per category I–IV, plus cumulative I+II /
-I+II+III, over the whole series or per day — from PMV, sPMV, adaptive,
-CO₂, illuminance or LAeq data:
+### 4. Time-series data
+
+```python
+import pandas as pd
+from comfio import SensorData
+
+df = pd.read_csv("sensor_data.csv")
+sensor = SensorData(df=df)                  # auto-detects column names
+print(sensor.available_domains())           # ['thermal', 'visual', 'acoustic', 'iaq']
+sensor.validate()                           # NaN handling, physical bounds
+```
+
+Every `Result` dataclass supports `.to_dict()`, `.to_json()`, and `.to_dataframe()`.
+
+## Long-term IEQ — time in categories (EN 16798-1)
+
+Percentage of occupied time per category I–IV, cumulative I+II / I+II+III shares, and occupied hours — over a whole series or per day:
 
 ```python
 from comfio import evaluate_temporal_thermal, evaluate_temporal_iaq
@@ -118,205 +148,69 @@ summary.hours         # occupied hours per category (time-weighted)
 daily = evaluate_temporal_thermal(thermal_result, timestamps=df["timestamp"], by="D")
 ```
 
-`run_pipeline()` computes these automatically (`result.temporal_results`),
-and the GUI workbench shows them as stacked category bars with a daily
-breakdown. See the how-to guide for occupancy masks and NaN handling.
+One wrapper per domain — all return `TimeInCategoryResult`:
 
-## Try on Google Colab
+| Function | Input |
+| --- | --- |
+| `evaluate_temporal_thermal` | PMV / sPMV / sPMVopt |
+| `evaluate_temporal_tsv` | TSV occupant votes |
+| `evaluate_temporal_adaptive` | adaptive Δt |
+| `evaluate_temporal_iaq` | CO₂ (categories on ppm *above outdoor*) |
+| `evaluate_temporal_pollutant` | PM2.5, PM10, TVOC, HCHO, CO |
+| `evaluate_temporal_visual` | illuminance |
+| `evaluate_temporal_acoustic` | LAeq |
 
-Run the tutorials instantly in your browser — no local install required.
+`run_pipeline()` computes all of these automatically (`result.temporal_results`; opt out with `config={"temporal": False}`), and `temporal_to_markdown()` renders them for LLM/report pipelines.
 
-### Examples
+> [!TIP]
+> Full worked example over a synthetic year of hourly data — all 10 evaluations — in [`examples/temporal_ieq_example.py`](examples/temporal_ieq_example.py) (also exercised by CI). See the [how-to guide](https://comfio.readthedocs.io/en/stable/how_to/long_term_ieq/) for occupancy masks and NaN handling.
 
-| Notebook | Description | Open in Colab |
+## GUI — analyst workbench
+
+```python
+import comfio
+comfio.gui()              # browser app on localhost:8501
+comfio.gui(df)            # preloaded DataFrame
+comfio.gui(desktop=True)  # native pywebview window
+comfio.gui(tools=["workbench", "calculator"])  # enable only some tools
+```
+
+A multipage set of independent tools (Streamlit ≥ 1.51):
+
+| Tool | id | What it does |
 | --- | --- | --- |
-| `walkthrough_executed.ipynb` | Complete end-to-end walkthrough: data gen, all domains, Global IEQ, compliance, ML, LLM, smart contracts, reports | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/walkthrough_executed.ipynb) |
-| `simple_tutorial.ipynb` | Quick start: core domains, Global IEQ Index, compliance | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/simple_tutorial.ipynb) |
-| `simple_tutorial_executed.ipynb` | Same as above with pre-run outputs | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/simple_tutorial_executed.ipynb) |
-| `advanced_domains_tutorial.ipynb` | Advanced physics: daylighting, CRI/CCT, RT60, STI, ventilation, psychrometrics | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/advanced_domains_tutorial.ipynb) |
-| `advanced_domains_tutorial_executed.ipynb` | Same as above with pre-run outputs | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/advanced_domains_tutorial_executed.ipynb) |
-| `llm_tutorial.ipynb` | LLM integration: interpreters, prompts, OpenAI/LangChain tool schemas | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/llm_tutorial.ipynb) |
-| `llm_tutorial_executed.ipynb` | Same as above with pre-run outputs | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/llm_tutorial_executed.ipynb) |
-| `contracts_ml_tutorial.ipynb` | Smart contracts & ML: compliance ABI, web3.py, sklearn/PyTorch/Keras forecasting | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/contracts_ml_tutorial.ipynb) |
-| `contracts_ml_tutorial_executed.ipynb` | Same as above with pre-run outputs | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/contracts_ml_tutorial_executed.ipynb) |
+| Analyse my data | `workbench` | upload → mapping → Global IEQ verdict → evidence/exports (default page) |
+| Occupant survey | `survey` | satisfaction-vote import, sensor-vs-occupant check |
+| Comfort calculator | `calculator` | PMV/PPD, SET, adaptive models, compare & ranges, psychrometric chart |
+| MRT room designer | `mrt` | plan-view MRT/PMV map of a rectangular room |
+| Setpoint explorer | `setpoint` | comfort-band edges and deadband widening |
+| Global database | `benchmark` | ASHRAE DB II adaptive scatter, sensation bins, PMV bias |
+| Learn | `learn` | guided lessons that hand inputs to the calculator |
+| About & sources | `about` | enabled tools, provenance, licences, citations (always on) |
 
-### Docs Tutorials
+The workbench three-act flow: **upload** CSV/Excel → **inspect** auto-detected column mapping → **verdict** (Global IEQ gauge, per-domain traffic lights, comfort scatter, exceedance heatmap, occupant-vote calibration) → **evidence** (compliance rates, WELL v2 T06 / RESET Air presets, CSV/DOCX/PDF/JSON/Markdown exports). Assumptions such as `MRT = air temp` are always shown, never applied silently.
 
-| Notebook | Description | Open in Colab |
-| --- | --- | --- |
-| `01_first_contract.ipynb` | First IEQ compliance contract: evaluate domains, calculate Global IEQ, generate contract JSON | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/01_first_contract.ipynb) |
-| `02_new_domains.ipynb` | New domains: IAQ pollutants, adaptive thermal comfort, sPMV, TSV augmentation | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/02_new_domains.ipynb) |
-| `03_training_pcm.ipynb` | Training personal comfort models: OLS personalisation, seasonal personalisation | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/03_training_pcm.ipynb) |
-| `04_llm_diagnostics.ipynb` | LLM diagnostics: interpreters, prompt templates, edge deployment | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/04_llm_diagnostics.ipynb) |
-| `05_advanced_domains.ipynb` | Advanced domains: daylighting, color quality, reverberation, speech intelligibility | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/05_advanced_domains.ipynb) |
-| `06_walkthrough.ipynb` | Complete end-to-end walkthrough: data gen, all domains, Global IEQ, compliance, ML, LLM, smart contracts, reports | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/docs/tutorials/06_walkthrough.ipynb) |
+In Jupyter: `comfio.gui_notebook(df)` returns an ipywidgets mini-workbench.
 
-> **Tip**: In Colab, run `!pip install comfio[all]` in the first cell to install all optional dependencies.
+## Domain modules
 
-## Quick Start
-
-### 1. Evaluate Individual Domains
+### Thermal comfort
 
 ```python
-import numpy as np
-from comfio import evaluate_thermal, evaluate_visual, evaluate_acoustic, evaluate_iaq
+from comfio import evaluate_thermal, evaluate_spmv, evaluate_adaptive_ashrae, evaluate_adaptive_en
 
-# Thermal comfort (ISO 7730 / ASHRAE 55)
-thermal = evaluate_thermal(
-    tdb=np.array([24.0, 25.0, 26.0]),  # air temp °C
-    tr=np.array([24.0, 25.0, 26.0]),   # radiant temp °C
-    vr=np.array([0.1, 0.1, 0.1]),       # air velocity m/s
-    rh=np.array([50.0, 50.0, 50.0]),    # relative humidity %
-    met=1.2,                            # metabolic rate
-    clo=0.5,                            # clothing insulation
-    category="B",                       # ISO 7730 category
-)
-print(f"PMV: {thermal.pmv}, PPD: {thermal.ppd}")
+# Full PMV/PPD (ISO 7730 / ASHRAE 55) — see Quick start above
+# Simplified PMV (Buratti et al. 2009) — temperature + humidity only
+spmv = evaluate_spmv(indoor_temp=tdb, indoor_rh=rh, season="mid")
 
-# Visual comfort (EN 12464-1)
-visual = evaluate_visual(
-    illuminance=np.array([450.0, 500.0, 600.0]),
-    task_type="office_writing",
-)
-
-# Acoustic comfort (NC curves)
-acoustic = evaluate_acoustic(
-    laeq=np.array([35.0, 40.0, 45.0]),
-    nc_level="NC-35",
-)
-
-# IAQ (ASHRAE 62.1 indicators)
-iaq = evaluate_iaq(
-    co2=np.array([700.0, 900.0, 1100.0]),
-    threshold_level="good",
-)
+# Adaptive comfort for naturally ventilated buildings
+ashrae = evaluate_adaptive_ashrae(tdb=tdb, tr=tr, t_prevail=20.0, acceptability=80)
+en = evaluate_adaptive_en(tdb=tdb, tr=tr, t_running_mean=20.0, category="ii")
 ```
 
-### 2. Calculate Global IEQ Index
+Plus local thermal discomfort: `evaluate_ankle_draft` (ASHRAE 55 §5.3.3) and `evaluate_vertical_gradient` (ISO 7730 §6.1), combined via `local_discomfort_score()`.
 
-```python
-from comfio import calculate_global_ieq, default_weights
-
-# Merge all domains into a single 0-100 score
-ieq = calculate_global_ieq(
-    thermal=thermal,
-    visual=visual,
-    acoustic=acoustic,
-    iaq=iaq,
-    weights=default_weights(),  # thermal=40%, iaq=25%, visual=20%, acoustic=15%
-)
-print(f"Global IEQ Index: {ieq.index}")
-print(f"Domain scores: {ieq.domain_scores}")
-```
-
-### 3. Compliance Tracking & Contract Outputs
-
-```python
-from comfio import calculate_compliance
-
-report = calculate_compliance(ieq, threshold=80.0)
-print(f"Compliance rate: {report.compliance_rate_pct:.1f}%")
-print(f"Average IEQ: {report.ieq_index_avg:.1f}")
-
-# Generate JSON for blockchain Oracle
-contract_json = report.to_contract_json()
-print(contract_json)
-```
-
-### 4. Time-Series Data with SensorData
-
-```python
-import pandas as pd
-from comfio import SensorData
-
-# Load your sensor DataFrame
-df = pd.read_csv("sensor_data.csv")
-sensor = SensorData(df=df)
-
-# Auto-detects column names (tdb, ta, temperature → air_temp_c, etc.)
-print(sensor.available_domains())  # ['thermal', 'visual', 'acoustic', 'iaq']
-
-# Validate data (NaN handling, physical bounds checking)
-sensor.validate()
-clean_temp = sensor.get_validated("air_temp_c")
-```
-
-## ML/DL Integration
-
-### scikit-learn Pipeline
-
-```python
-from sklearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestRegressor
-from comfio.ml.sklearn_transformers import IEQFeatureExtractor
-
-pipe = Pipeline([
-    ("ieq", IEQFeatureExtractor()),
-    ("model", RandomForestRegressor()),
-])
-pipe.fit(train_df, train_labels)
-predictions = pipe.predict(test_df)
-```
-
-### PyTorch DataLoader
-
-```python
-from torch.utils.data import DataLoader
-from comfio.ml.torch_dataset import IEQTimeSeriesDataset
-
-dataset = IEQTimeSeriesDataset(df, window_size=24, stride=1)
-loader = DataLoader(dataset, batch_size=32, shuffle=True)
-for batch in loader:
-    raw = batch["raw"]           # (32, 24, n_sensors)
-    ieq = batch["ieq_index"]     # (32, 24)
-```
-
-### TensorFlow/Keras
-
-```python
-from comfio.ml.keras_adapter import IEQPreprocessingLayer
-
-layer = IEQPreprocessingLayer()
-layer.adapt(train_df)
-features = layer(train_df)  # tf.Tensor of IEQ features
-```
-
-## Advanced Domain Evaluation
-
-comfio offers optional physics-based modules that go beyond simple threshold checks. These require separate extras but integrate seamlessly with the Global IEQ Index.
-
-```python
-from comfio import (
-    evaluate_reverberation, evaluate_speech_intelligibility,
-    evaluate_ventilation, get_psychrometrics,
-    calculate_global_ieq,
-)
-
-# Reverberation time (python-acoustics)
-reverb = evaluate_reverberation(surfaces, absorption, volume, room_type="office")
-
-# Speech intelligibility from impulse response (pyroomacoustics)
-sti = evaluate_speech_intelligibility(ir_signal, sample_rate=16000)
-
-# Ventilation rate from CO₂ decay (psychrolib)
-vent = evaluate_ventilation(co2_array, timestamps, occupancy_type="office")
-
-# Psychrometric properties (psychrolib)
-psych = get_psychrometrics(tdb=25.0, rh=0.50)
-
-# Blend advanced results into Global IEQ Index
-result = calculate_global_ieq(
-    thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq,
-    reverberation=reverb, speech_intelligibility=sti, ventilation=vent,
-)
-```
-
-
-## Additional Domain Modules
-
-### Pollutant IAQ
-
-Evaluate PM2.5, PM10, TVOC, formaldehyde, and CO against health-based thresholds:
+### IAQ — CO₂ & pollutants
 
 ```python
 from comfio import evaluate_iaq_pollutants
@@ -326,193 +220,67 @@ pollutant = evaluate_iaq_pollutants(
     tvoc=np.array([150.0, 300.0, 500.0]),
     formaldehyde=np.array([20.0, 27.0, 50.0]),
     co=np.array([1.5, 5.0, 10.0]),
-    threshold_level="good",
+    threshold_level="good",   # WHO / EPA NAAQS / WELL v2 tiers
 )
 print(f"Pollutant IAQ score: {pollutant.score}")
 ```
 
-### Adaptive Thermal Comfort
+Covers PM2.5, PM10, TVOC, formaldehyde, and CO against WHO (2021), EPA NAAQS, and WELL Building Standard v2 thresholds.
 
-```python
-from comfio import evaluate_adaptive_ashrae, evaluate_adaptive_en
-
-# ASHRAE 55-2023 (naturally ventilated buildings)
-ashrae = evaluate_adaptive_ashrae(
-    tdb=np.array([24.0, 25.0, 26.0]),
-    tr=np.array([24.0, 25.0, 26.0]),
-    t_prevail=20.0,       # prevailing mean outdoor temp
-    acceptability=80,
-)
-
-# EN 16798-1:2019
-en = evaluate_adaptive_en(
-    tdb=np.array([24.0, 25.0, 26.0]),
-    tr=np.array([24.0, 25.0, 26.0]),
-    t_running_mean=20.0,
-    category="ii",
-)
-```
-
-### Simplified PMV (sPMV)
-
-```python
-from comfio import evaluate_spmv
-
-spmv = evaluate_spmv(
-    indoor_temp=np.array([23.0, 24.0, 25.0]),
-    indoor_rh=np.array([50.0, 50.0, 50.0]),
-    season="mid",  # or "winter" / "summer"
-)
-print(f"sPMV: {spmv.spmv}, score: {spmv.score}")
-```
-
-### TSV Augmentation & Evaluation
+### Occupant feedback (TSV)
 
 ```python
 from comfio import augment_tsv_cdf, evaluate_tsv
 
-# Augment sparse occupant votes to dense sensor timestamps
+# Augment sparse votes to dense sensor timestamps (CDF remapping)
 augmented = augment_tsv_cdf(
     sparse_votes=np.array([-2, -1, 0, 0, 1, 1, 2, -1, 0, 1]),
     vote_timestamps=np.arange(10),
-    target_timestamps=np.arange(100),  # dense sensor timestamps
+    target_timestamps=np.arange(100),
 )
-
-# Evaluate TSV for compliance (ASHRAE 55-2023 Appendix L)
-tsv_result = evaluate_tsv(augmented)
-print(f"Mean TSV: {tsv_result.mean_tsv}")
-print(f"Compliance rate: {tsv_result.compliance_rate:.1%}")
+tsv_result = evaluate_tsv(augmented)   # ASHRAE 55-2023 Appendix L
 ```
 
-### Personalised Thermal Comfort
+`train_personalisation` / `evaluate_personalised_pmv` fit an OLS personalisation index `TSV = α·PMV + β` to align model predictions with real occupant feedback.
+
+### Advanced physics (extras)
 
 ```python
-from comfio import train_personalisation, evaluate_personalised_pmv
-
-# Train: fit OLS regression TSV = alpha * PMV + beta
-index = train_personalisation(
-    pmv=historical_pmv_array,
-    tsv=historical_tsv_array,
+from comfio import (
+    evaluate_reverberation, evaluate_speech_intelligibility,
+    evaluate_ventilation, get_psychrometrics, calculate_global_ieq,
 )
 
-# Apply: personalise future PMV predictions
-result = evaluate_personalised_pmv(
-    tdb=tdb, tr=tr, vr=vr, rh=rh, met=1.2, clo=0.5,
-    personalisation_index=index,
-)
-print(f"Personalised PMV: {result.personalised_pmv}")
-```
-
-### Integration with Global IEQ Index
-
-```python
-from comfio import calculate_global_ieq
+reverb = evaluate_reverberation(surfaces, absorption, volume, room_type="office")
+sti = evaluate_speech_intelligibility(ir_signal, sample_rate=16000)   # pyroomacoustics
+vent = evaluate_ventilation(co2_array, timestamps, occupancy_type="office")  # CO₂ decay
+psych = get_psychrometrics(tdb=25.0, rh=0.50)                        # psychrolib
 
 ieq = calculate_global_ieq(
-    thermal=thermal_res,
-    visual=visual_res,
-    acoustic=acoustic_res,
-    iaq=iaq_res,
-    pollutant_iaq=pollutant_res,  # blends 50/50 with IAQ score
-    tsv=tsv_res,                  # overrides thermal score (occupant feedback is ground truth)
+    thermal=thermal, visual=visual, acoustic=acoustic, iaq=iaq,
+    reverberation=reverb, speech_intelligibility=sti, ventilation=vent,
 )
 ```
 
-## Newest Features
+Also `evaluate_color_quality` (CRI / CCT / D_uv, colour-science) and `evaluate_daylighting` (pyradiance).
 
-### Local Thermal Discomfort
+### Weather integration
 
-Ankle draft and vertical temperature gradient — the two local discomfort indices required for full ISO 7730 / ASHRAE 55 compliance:
+`fetch_prevailing_temp()` (ASHRAE 55, 7-day mean) and `fetch_running_mean()` (EN 16798-1, exponentially weighted) pull outdoor temperature from meteostat — no manual `t_prevail` calculation. Cached under `~/.cache/comfio/weather/`.
 
-```python
-from comfio import evaluate_ankle_draft, evaluate_vertical_gradient, local_discomfort_score
+## Try it in Colab
 
-# Ankle draft (ASHRAE 55-2023 §5.3.3)
-ad = evaluate_ankle_draft(
-    tdb=np.array([24.0, 25.0]),
-    tr=np.array([24.0, 25.0]),
-    vr=np.array([0.1, 0.1]),
-    rh=np.array([50.0, 50.0]),
-    met=1.2, clo=0.5,
-    v_ankle=np.array([0.15, 0.30]),
-)
-print(f"Ankle draft PPD: {ad.ppd_ad}")
+Run the tutorials instantly in your browser — no local install required.
 
-# Vertical temperature gradient (ISO 7730 §6.1)
-vg = evaluate_vertical_gradient(
-    tdb=np.array([24.0, 25.0]),
-    tr=np.array([24.0, 25.0]),
-    vr=np.array([0.1, 0.1]),
-    rh=np.array([50.0, 50.0]),
-    met=1.2, clo=0.5,
-    vertical_tmp_grad=np.array([2.0, 7.0]),
-)
+| Notebook | Description | Open in Colab |
+| --- | --- | --- |
+| `walkthrough_executed.ipynb` | End-to-end: data gen, all domains, Global IEQ, compliance, ML, LLM, smart contracts, reports | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/walkthrough_executed.ipynb) |
+| `simple_tutorial.ipynb` | Quick start: core domains, Global IEQ Index, compliance | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/simple_tutorial.ipynb) |
+| `advanced_domains_tutorial.ipynb` | Daylighting, CRI/CCT, RT60, STI, ventilation, psychrometrics | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/advanced_domains_tutorial.ipynb) |
+| `llm_tutorial.ipynb` | LLM integration: interpreters, prompts, OpenAI/LangChain tool schemas | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/llm_tutorial.ipynb) |
+| `contracts_ml_tutorial.ipynb` | Smart contracts & ML: compliance ABI, web3.py, sklearn/PyTorch/Keras | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NibrasAz7/comfio/blob/main/examples/contracts_ml_tutorial.ipynb) |
 
-# Combined local discomfort score (0-100)
-score = local_discomfort_score(ppd_ad=ad.ppd_ad, ppd_vg=vg.ppd_vg)
-```
-
-### Weather Integration (meteostat)
-
-Fetch historical outdoor temperature for adaptive comfort models — no more manual `t_prevail` / `t_running_mean` calculation:
-
-```python
-from datetime import date
-from comfio import fetch_prevailing_temp, fetch_running_mean
-
-# ASHRAE 55 prevailing mean (7-day arithmetic mean)
-t_prevail = fetch_prevailing_temp(
-    lat=50.11, lon=8.68,          # Frankfurt
-    end_date=date(2025, 6, 30),
-    days=7,
-)
-
-# EN 16798-1 running mean (exponentially weighted, α=0.8)
-t_rm = fetch_running_mean(
-    lat=50.11, lon=8.68,
-    end_date=date(2025, 6, 30),
-)
-
-# Feed directly into adaptive comfort evaluation
-from comfio import evaluate_adaptive_ashrae
-result = evaluate_adaptive_ashrae(
-    tdb=np.array([24.0, 25.0, 26.0]),
-    tr=np.array([24.0, 25.0, 26.0]),
-    t_prevail=float(t_prevail),
-)
-```
-
-Results are cached under `~/.cache/comfio/weather/` to minimize network calls.
-
-### Result Serialization
-
-All Result dataclasses now provide `to_dict()`, `to_json()`, and `to_dataframe()`:
-
-```python
-from comfio import evaluate_thermal
-import numpy as np
-
-result = evaluate_thermal(
-    tdb=np.array([24.0, 25.0]),
-    tr=np.array([24.0, 25.0]),
-    vr=np.array([0.1, 0.1]),
-    rh=np.array([50.0, 50.0]),
-    met=1.2, clo=0.5,
-)
-
-result.to_dict()         # → {"pmv": ..., "ppd": ..., ...}
-result.to_json()         # → JSON string (numpy arrays → lists)
-result.to_dataframe()    # → pandas.DataFrame
-```
-
-### Logging
-
-comfio now uses Python's `logging` module. Pipeline failures that were previously silent are now logged:
-
-```python
-import comfio
-comfio.setup_logging(level="INFO")  # see pipeline warnings in stderr
-```
+Executed versions with pre-run outputs are alongside each notebook in [`examples/`](https://github.com/NibrasAz7/comfio/tree/main/examples), and five more docs tutorials live in [`docs/tutorials/`](https://github.com/NibrasAz7/comfio/tree/main/docs/tutorials). In Colab, run `!pip install comfio[all]` in the first cell.
 
 ## Architecture
 
@@ -522,18 +290,18 @@ comfio operates on a **4-layer data flow**:
 Layer 1: Data Ingestion (SensorData)
     ↓ Pandas/NumPy time-series arrays
 Layer 2: Single-Domain Modules (domains/)
-    ↓ Thermal (pythermalcomfort) | Visual (EN 12464-1) | Acoustic (NC) | IAQ (ASHRAE 62.1)
+    ↓ Thermal (pythermalcomfort) | Visual (EN 12464-1) | Acoustic (NC) | IAQ | Pollutants | Adaptive | Temporal
 Layer 3: Multi-Domain Integration (integration/)
     ↓ Global IEQ Index (0-100) with configurable weighting
-Layer 4: Application & Contracts (performance/)
-    → Compliance rates, JSON reports, smart contract ABI schemas
+Layer 4: Application & Contracts (performance/, reports/, gui/)
+    → Compliance rates, exports, smart contract ABI schemas
 ```
 
-**Key design principle — Decoupling**: `integration/` only talks to `domains/`, never to `pythermalcomfort` directly. If pythermalcomfort releases a breaking change, only `domains/thermal.py` needs updating.
+**Key design principle — decoupling**: `integration/` only talks to `domains/`, never to `pythermalcomfort` directly. If upstream releases a breaking change, only `domains/thermal.py` needs updating.
 
-## Weighting Presets
+### Weighting presets
 
-| Preset | Thermal | IAQ | Visual | Acoustic | Use Case |
+| Preset | Thermal | IAQ | Visual | Acoustic | Use case |
 | --- | --- | --- | --- | --- | --- |
 | `default` | 40% | 25% | 20% | 15% | General (Pierson et al. 2019) |
 | `equal` | 25% | 25% | 25% | 25% | Equal weighting |
@@ -548,47 +316,9 @@ weights = preset_weights("office")
 weights = custom_weights(thermal=0.5, visual=0.2, acoustic=0.1, iaq=0.2)
 ```
 
-## Standards Referenced
-
-- **ISO 7730**: Thermal comfort — PMV/PPD calculation
-- **ASHRAE 55**: Thermal environmental conditions for human occupancy
-- **ASHRAE 55-2023 Appendix L**: TSV compliance threshold (|TSV| ≤ 1.5)
-- **EN 16798-1:2019**: Adaptive thermal comfort for naturally ventilated buildings
-- **EN 12464-1**: Light and lighting — lighting of work places
-- **ASHRAE 62.1**: Ventilation for acceptable indoor air quality
-- **WHO Air Quality Guidelines (2021)**: PM2.5, PM10 thresholds
-- **EPA NAAQS**: Criteria pollutant thresholds
-- **WELL Building Standard v2**: Feature A01 pollutant thresholds
-
-## Academic Attribution
-
-comfio utilizes the validated [pythermalcomfort](https://github.com/pythermalcomfort/pythermalcomfort) library as its core engine for thermal metrics, while focusing its novel architecture on multi-domain integration and temporal performance evaluation.
-
-> Tartarini, F., Schiavon, S., 2020. pythermalcomfort: A Python package for thermal comfort research. SoftwareX 12, 100578. <https://doi.org/10.1016/j.softx.2020.100578>
-
-## Development
-
-```bash
-# Install with dev dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Lint
-ruff check src/ tests/
-ruff format src/ tests/
-
-# Type check
-mypy src/comfio/
-
-# Build
-python -m build
-```
-
 ## Citation
 
-A formal academic paper for comfio is in preparation. In the meantime, if you use comfio in your research, please cite it as:
+If you use comfio in your research, please cite it:
 
 ```bibtex
 @software{comfio,
@@ -596,87 +326,19 @@ A formal academic paper for comfio is in preparation. In the meantime, if you us
   title        = {comfio: A Multi-Domain IEQ \& Performance Contract Framework for Smart Buildings},
   year         = {2026},
   url          = {https://github.com/NibrasAz7/comfio},
-  version      = {0.1.6},
+  version      = {0.1.9},
 }
 ```
 
-### Per-function citation
+comfio wraps peer-reviewed methods — when you use a specific function, also cite the underlying work (pythermalcomfort — Tartarini & Schiavon 2020, Fanger 1970, Buratti et al. 2009, de Dear & Brager 1998, Pierson et al. 2019, WHO 2021, and more). The full per-function citation table is in the [docs](https://comfio.readthedocs.io/en/stable/).
 
-comfio wraps and implements methods from multiple peer-reviewed sources. When you use a specific function, **please also cite the underlying work**:
+## Development
 
-| comfio function | Underlying method | Reference |
-| ----------------- | ------------------- | ----------- |
-| `evaluate_thermal` | Fanger PMV/PPD | Fanger (1970); ISO 7730:2005; [pythermalcomfort](https://github.com/pythermalcomfort/pythermalcomfort) — Tartarini & Schiavon (2020) |
-| `evaluate_spmv` | Simplified PMV | Buratti, Ricciardi & Vergoni (2009), *Building and Environment* 44(3), 441–449 |
-| `evaluate_adaptive_ashrae` | ASHRAE 55 adaptive | de Dear & Brager (1998), ASHRAE RP-884; ASHRAE 55-2023 Appendix L |
-| `evaluate_adaptive_en` | EN 16798-1 adaptive | Nicol & Humphreys (2010), *Energy and Buildings* 42(10), 1793–1801; EN 16798-1:2019 |
-| `evaluate_visual` | Illuminance & UGR | EN 12464-1:2021; CIE 117-1995 (UGR) |
-| `evaluate_acoustic` | Noise Criteria | Beranek (1957), *Noise Control* 3(1), 19–27; ASHRAE Handbook — HVAC Applications |
-| `evaluate_iaq` | CO₂ ventilation indicator | ASHRAE 62.1-2022; Persily (2015), *Building and Environment* 91, 61–69 |
-| `evaluate_pollutant_iaq` | PM2.5/TVOC/HCHO/CO | WHO (2021), *Global air quality guidelines*; WHO (2010), *IAQ selected pollutants* |
-| `evaluate_color_quality` | CRI / CCT / D_uv | CIE 13.3-1995; CIE 015:2018 |
-| `evaluate_reverberation` | RT60 (Sabine/Eyring) | Sabine (1922); Eyring (1930), *JASA* 1(2A), 217–241; ISO 3382-2:2008 |
-| `evaluate_speech_intelligibility` | STI | Houtgast & Steeneken (1971), *Acustica* 25, 355–367; IEC 60268-16:2020 |
-| `evaluate_ventilation` | CO₂ decay method | ASHRAE 62.1-2022; ASTM D7297-14 |
-| `get_psychrometrics` | Psychrometric properties | Hyland & Wexler (1983), *ASHRAE Transactions* 89(2A); [PsychroLib](https://github.com/psychrometrics/psychrolib) |
-| `calculate_global_ieq` | Weighted IEQ index | Pierson et al. (2019), *Building and Environment* 150, 230–239 |
-| `train_personalisation` | OLS personalisation | Schweiker et al. (2020), *Building and Environment* 176, 106834 |
-| `augment_tsv_cdf` | CDF remapping | ASHRAE 55-2023 Appendix L |
-
-**BibTeX entries for the most commonly cited works:**
-
-```bibtex
-@book{fanger1970,
-  author    = {Fanger, Povl Ole},
-  title     = {Thermal Comfort},
-  publisher = {Danish Technical Press},
-  year      = {1970},
-}
-
-@article{tartarini2020,
-  author  = {Tartarini, Federico and Schiavon, Stefano},
-  title   = {pythermalcomfort: A Python package for thermal comfort research},
-  journal = {SoftwareX},
-  volume  = {12},
-  pages   = {100578},
-  year    = {2020},
-  doi     = {10.1016/j.softx.2020.100578},
-}
-
-@article{buratti2009,
-  author  = {Buratti, C. and Ricciardi, P. and Vergoni, M.},
-  title   = {Simplified PMV model for HVAC systems control},
-  journal = {Building and Environment},
-  volume  = {44},
-  number  = {3},
-  pages   = {441--449},
-  year    = {2009},
-}
-
-@article{dedear1998,
-  author  = {de Dear, R. and Brager, G. S.},
-  title   = {Developing an adaptive model of thermal comfort and preference},
-  journal = {ASHRAE Transactions},
-  volume  = {104},
-  number  = {1},
-  year    = {1998},
-}
-
-@article{pierson2019,
-  author  = {Pierson, A. and others},
-  title   = {Indoor environmental quality: Development of a weight-based scoring system},
-  journal = {Building and Environment},
-  volume  = {150},
-  pages   = {230--239},
-  year    = {2019},
-}
-
-@misc{who2021,
-  author       = {{World Health Organization}},
-  title        = {WHO global air quality guidelines},
-  year         = {2021},
-  url          = {https://www.who.int/publications/i/item/9789240034221},
-}
+```bash
+pip install -e ".[dev]"
+pytest                # tests (3.11–3.13 in CI)
+ruff check src/ tests/
+mypy src/comfio/
 ```
 
 ## License
