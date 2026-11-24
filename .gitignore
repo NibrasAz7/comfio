@@ -39,9 +39,17 @@ Thumbs.db
 .windsurf/
 
 # Website build artifacts (comfio.com has its own .gitignore)
+comfio.com/
 comfio.com/node_modules/
 comfio.com/.next/
 comfio.com/out/
+
+# Local scratch / nested projects / crash logs
+comfio-skill/
+coverage.xml
+gui_progress.md
+hs_err_pid*.log
+replay_pid*.log
 
 # SoftwareX paper (separate repo: comfio-softwareX)
 comfio-softwareX/
